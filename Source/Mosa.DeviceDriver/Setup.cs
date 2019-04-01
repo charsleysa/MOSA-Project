@@ -73,7 +73,6 @@ namespace Mosa.DeviceDriver
 				{
 					Name = "VMwareSGAII",
 					Platforms = PlatformArchitecture.X86AndX64,
-					BusType = DeviceBusType.PCI,
 					VendorID = 0x15AD,
 					DeviceID = 0x0405,
 					PCIFields = PCIField.VendorID | PCIField.DeviceID,
@@ -82,14 +81,23 @@ namespace Mosa.DeviceDriver
 
 				new PCIDeviceDriverRegistryEntry()
 				{
-					Name = "VMwareSGAII",
+					Name = "GenericVGA",
 					Platforms = PlatformArchitecture.X86AndX64,
-					BusType = DeviceBusType.PCI,
 					ClassCode = 0X03,
 					SubClassCode = 0x00,
 					ProgIF = 0x00,
 					PCIFields = PCIField.ClassCode | PCIField.SubClassCode | PCIField.ProgIF,
 					Factory = delegate { return new PCI.VideoCard.GenericVGA(); }
+				},
+
+				new PCIDeviceDriverRegistryEntry()
+				{
+					Name = "VirtIOBlock",
+					Platforms = PlatformArchitecture.X86AndX64,
+					VendorID = 0x1AF4,
+					DeviceID = 0x1001,
+					PCIFields = PCIField.VendorID | PCIField.DeviceID,
+					Factory = delegate { return new PCI.VirtIO.VirtIOBlock(); }
 				}
 			};
 		}

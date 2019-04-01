@@ -185,7 +185,7 @@ namespace Mosa.DeviceDriver.PCI.VideoCard
 		{
 			Device.Name = "GenericVGA_0x" + Device.Resources.GetIOPortRegion(0).BaseIOPort.ToString("X");
 
-			byte portBar = (byte)(Device.Resources.IOPointRegionCount - 1);
+			byte portBar = (byte)(Device.Resources.IOPortRegionCount - 1);
 
 			miscellaneousOutputRead = Device.Resources.GetIOPortReadWrite(portBar, 0x1C);
 			crtControllerIndex = Device.Resources.GetIOPortReadWrite(portBar, 0x04);

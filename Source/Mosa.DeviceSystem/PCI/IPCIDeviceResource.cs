@@ -59,7 +59,7 @@ namespace Mosa.DeviceSystem.PCI
 		/// Gets the sub device ID.
 		/// </summary>
 		/// <value>The sub device ID.</value>
-		ushort SubSystemID { get; }
+		ushort SubSystemDeviceID { get; }
 
 		/// <summary>
 		/// Gets or sets the status register.

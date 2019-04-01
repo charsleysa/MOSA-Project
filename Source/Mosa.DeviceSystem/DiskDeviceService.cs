@@ -17,7 +17,7 @@ namespace Mosa.DeviceSystem
 
 			var deviceService = device.DeviceService;
 
-			for (uint drive = 0; drive < controller.MaximunDriveCount; drive++)
+			for (uint drive = 0; drive < controller.MaximumDriveCount; drive++)
 			{
 				if (!controller.Open(drive))
 					continue;

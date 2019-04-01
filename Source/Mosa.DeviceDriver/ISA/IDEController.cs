@@ -467,7 +467,7 @@ namespace Mosa.DeviceDriver.ISA
 		/// Gets the maximum drive count.
 		/// </summary>
 		/// <value>The drive count.</value>
-		uint IDiskControllerDevice.MaximunDriveCount => MaximumDriveCount;
+		uint IDiskControllerDevice.MaximumDriveCount => MaximumDriveCount;
 
 		/// <summary>
 		/// Gets the size of the sector.

@@ -70,6 +70,11 @@ namespace Mosa.DeviceSystem.PCI
 			//internal const ushort Fast_Back = 0x200; //  Enable back-to-back writes
 		}
 
+		internal struct PCICapability
+		{
+			private byte register;
+		}
+
 		#endregion PCICommand
 
 		/// <summary>
@@ -153,13 +158,19 @@ namespace Mosa.DeviceSystem.PCI
 		/// Gets the sub device ID.
 		/// </summary>
 		/// <value>The sub device ID.</value>
-		public ushort SubSystemID { get { return pciController.ReadConfig16(Bus, Slot, Function, PCIConfigurationHeader.SubSystemID); } }
+		public ushort SubSystemDeviceID { get { return pciController.ReadConfig16(Bus, Slot, Function, PCIConfigurationHeader.SubSystemID); } }
 
 		/// <summary>
 		/// Gets the IRQ.
 		/// </summary>
 		/// <value>The IRQ.</value>
 		public byte IRQ { get { return pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.InterruptLineRegister); } }
+
+		/// <summary>
+		/// Gets the capabilities pointer.
+		/// </summary>
+		/// <value>The address of the pointer.</value>
+		public byte CapabilitiesPointer { get { return (byte)(pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.CapabilitiesPointer) & 0xFC); } }
 
 		/// <summary>
 		/// Gets or sets the status register.
@@ -180,6 +191,12 @@ namespace Mosa.DeviceSystem.PCI
 			get { return pciController.ReadConfig16(Bus, Slot, Function, PCIConfigurationHeader.CommandRegister); }
 			set { pciController.WriteConfig16(Bus, Slot, Function, PCIConfigurationHeader.CommandRegister, value); }
 		}
+
+		/// <summary>
+		/// Gets the base addresses.
+		/// </summary>
+		/// <value>The base addresses.</value>
+		public BaseAddress[] BaseAddresses { get; private set; }
 
 		/// <summary>
 		/// Gets the base addresses.
@@ -248,6 +265,9 @@ namespace Mosa.DeviceSystem.PCI
 					case AddressType.Memory: memoryRegionCount++; break;
 				}
 			}
+
+			// Iterate over the capabilities
+			var ptrCapabilties = (byte)(pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.CapabilitiesPointer) & 0xFC)
 		}
 
 		public override void Probe() => Device.Status = DeviceStatus.Available;
@@ -298,5 +318,7 @@ namespace Mosa.DeviceSystem.PCI
 		{
 			Device.Status = DeviceStatus.Online;
 		}
+
+		public
 	}
 }

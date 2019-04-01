@@ -11,7 +11,7 @@ namespace Mosa.DeviceSystem
 		/// Gets the maximum drive count.
 		/// </summary>
 		/// <value>The drive count.</value>
-		uint MaximunDriveCount { get; }
+		uint MaximumDriveCount { get; }
 
 		/// <summary>
 		/// Opens the specified drive.

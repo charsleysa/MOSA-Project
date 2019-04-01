@@ -80,6 +80,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PCI\VirtIO\Shared.cs" />
+    <Compile Include="PCI\VirtIO\VirtIOBlock.cs" />
     <Compile Include="PCI\VideoCard\GenericVGA.cs" />
     <Compile Include="X86System.cs" />
     <Compile Include="ISA\ISABus.cs" />

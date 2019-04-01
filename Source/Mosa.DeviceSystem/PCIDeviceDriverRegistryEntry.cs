@@ -12,7 +12,7 @@ namespace Mosa.DeviceSystem
 
 		public ushort SubSystemVendorID { get; set; }
 
-		public ushort SubSystemID { get; set; }
+		public ushort SubSystemDeviceID { get; set; }
 
 		public byte RevisionID { get; set; }
 
@@ -31,7 +31,7 @@ namespace Mosa.DeviceSystem
 		DeviceID = 1,
 		VendorID = 2,
 		SubSystemVendorID = 4,
-		SubSystemID = 8,
+		SubSystemDeviceID = 8,
 		RevisionID = 16,
 		ProgIF = 32,
 		ClassCode = 64,

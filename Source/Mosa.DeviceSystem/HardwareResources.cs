@@ -57,10 +57,10 @@ namespace Mosa.DeviceSystem
 		}
 
 		/// <summary>
-		/// Gets the IO point region count.
+		/// Gets the IO port region count.
 		/// </summary>
-		/// <value>The IO point region count.</value>
-		public byte IOPointRegionCount { get { return (byte)ioPortRegions.Count; } }
+		/// <value>The IO port region count.</value>
+		public byte IOPortRegionCount { get { return (byte)ioPortRegions.Count; } }
 
 		/// <summary>
 		/// Gets the memory region count.

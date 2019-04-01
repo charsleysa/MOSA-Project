@@ -64,7 +64,7 @@ namespace Mosa.DeviceSystem
 		{
 			lock (_lock)
 			{
-				for (byte r = 0; r < hardwareResources.IOPointRegionCount - 1; r++)
+				for (byte r = 0; r < hardwareResources.IOPortRegionCount - 1; r++)
 				{
 					var region = hardwareResources.GetIOPortRegion(r);
 
@@ -75,7 +75,7 @@ namespace Mosa.DeviceSystem
 					}
 				}
 
-				for (byte r = 0; r < hardwareResources.IOPointRegionCount; r++)
+				for (byte r = 0; r < hardwareResources.IOPortRegionCount; r++)
 				{
 					var region = hardwareResources.GetIOPortRegion(r);
 
@@ -97,7 +97,7 @@ namespace Mosa.DeviceSystem
 		{
 			lock (_lock)
 			{
-				for (byte r = 0; r < hardwareResources.IOPointRegionCount; r++)
+				for (byte r = 0; r < hardwareResources.IOPortRegionCount; r++)
 				{
 					var region = hardwareResources.GetIOPortRegion(r);
 

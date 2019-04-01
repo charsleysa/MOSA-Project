@@ -103,7 +103,7 @@ namespace Mosa.DeviceSystem
 		{
 			bool VendorID = HasFlag(driver.PCIFields, PCIField.VendorID) && driver.VendorID == pciDevice.VendorID;
 			bool DeviceID = HasFlag(driver.PCIFields, PCIField.DeviceID) && driver.DeviceID == pciDevice.DeviceID;
-			bool SubSystemID = HasFlag(driver.PCIFields, PCIField.SubSystemID) && driver.SubSystemID == pciDevice.SubSystemID;
+			bool SubSystemID = HasFlag(driver.PCIFields, PCIField.SubSystemDeviceID) && driver.SubSystemDeviceID == pciDevice.SubSystemDeviceID;
 			bool SubSystemVendorID = HasFlag(driver.PCIFields, PCIField.SubSystemVendorID) && driver.SubSystemVendorID == pciDevice.SubSystemVendorID;
 			bool ClassCode = HasFlag(driver.PCIFields, PCIField.ClassCode) && driver.ClassCode == pciDevice.ClassCode;
 			bool SubClassCode = HasFlag(driver.PCIFields, PCIField.SubClassCode) && driver.SubClassCode == pciDevice.SubClassCode;

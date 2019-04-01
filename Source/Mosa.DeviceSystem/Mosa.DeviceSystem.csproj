@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="BaseDeviceConfiguration.cs" />
     <Compile Include="PCIDeviceService.cs" />
+    <Compile Include="PCI\PCICapability.cs" />
     <Compile Include="ServiceEventType.cs" />
     <Compile Include="ServiceEvent.cs" />
     <Compile Include="BaseService.cs" />

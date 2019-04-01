@@ -74,10 +74,10 @@ namespace Mosa.Utility.Launcher
 				arg += " -cpu qemu32,+sse4.1";
 			}
 
-			//arg = arg + " -vga vmware";
-
 			if (LauncherOptions.NoDisplay)
 				arg += " -display none";
+			else
+				arg += " -vga virtio";
 
 			// We need as least 2 COM Ports:
 			// COM1 = Kernel log
@@ -112,7 +112,9 @@ namespace Mosa.Utility.Launcher
 				if (LauncherOptions.ImageFormat == ImageFormat.BIN)
 					arg = arg + " -kernel " + Quote(LauncherOptions.ImageFile);
 				else
-					arg = arg + " -hda " + Quote(LauncherOptions.ImageFile);
+					arg = arg + " -drive file=" + Quote(LauncherOptions.ImageFile) + ",if=virtio";
+
+				// arg = arg + " -hda " + Quote(LauncherOptions.ImageFile);
 			}
 
 			return LaunchApplication(AppLocations.QEMU, arg, getOutput);
