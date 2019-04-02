@@ -99,4 +99,10 @@ namespace Mosa.DeviceSystem.PCI
 		/// </summary>
 		public const byte AF = 0x13;
 	}
+
+	public struct PCICapability
+	{
+		public byte register;
+		public byte capabilityID;
+	}
 }

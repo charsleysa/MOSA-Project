@@ -2,6 +2,7 @@
 
 using System;
 using Mosa.DeviceSystem;
+using Mosa.DeviceSystem.PCI;
 
 namespace Mosa.DeviceDriver.PCI.VirtIO
 {
@@ -113,6 +114,26 @@ namespace Mosa.DeviceDriver.PCI.VirtIO
 
 		public override void Probe()
 		{
+			// Find common config
+			var pciDevice = Device.Parent.DeviceDriver as PCIDevice;
+
+			PCICapability common;
+			var commonFound = false;
+			foreach (var cap in pciDevice.Capabilities)
+			{
+				if (cap.capabilityID != PCICapabilityID.VNDR) continue;
+
+				var bar = pciDevice.ReadConfig8(VirtIOPCICapabilityRegisters.BAR);
+
+				// Ignore structures with reserved BAR values
+				if (bar > 0x05) continue;
+
+				var type = pciDevice.ReadConfig8(VirtIOPCICapabilityRegisters.ConfigType);
+
+				// Make sure type matches
+				if (type != VirtIOPCICapabilityType.CommonConfig) continue;
+			}
+
 			// Get block count (ulong)
 			blockCount = blockCountHigh.Read32() << 32;
 			blockCount = blockCountLow.Read32() | blockCount;
@@ -150,9 +171,9 @@ namespace Mosa.DeviceDriver.PCI.VirtIO
 			var alignedSizeOfBuffersAndQueueAvailable = (sizeOfBuffers + sizeOfQueueAvailable + alignment - 1) & ~(alignment - 1);
 			var buffer = HAL.AllocateMemory(alignedSizeOfBuffersAndQueueAvailable + sizeOfQueueUsed, alignment);
 
-			var ptrBuffers = (byte*)buffer.Address.ToPointer();
-			var ptrAvailable = ptrBuffers + sizeOfBuffers;
-			var ptrUsed = ptrBuffers + alignedSizeOfBuffersAndQueueAvailable;
+			var ptrBuffers = buffer.Address;
+			var ptrAvailable = ptrBuffers + (int)sizeOfBuffers;
+			var ptrUsed = ptrBuffers + (int)alignedSizeOfBuffersAndQueueAvailable;
 		}
 
 		public byte[] ReadBlock(uint block, uint count)

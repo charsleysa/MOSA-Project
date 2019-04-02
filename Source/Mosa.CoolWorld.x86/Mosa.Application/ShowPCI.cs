@@ -30,7 +30,7 @@ namespace Mosa.Application
 				Console.Write(":");
 				Console.Write(pciDevice.DeviceID.ToString("x"));
 				Console.Write(" ");
-				Console.Write(pciDevice.SubSystemID.ToString("x"));
+				Console.Write(pciDevice.SubSystemDeviceID.ToString("x"));
 				Console.Write(":");
 				Console.Write(pciDevice.SubSystemVendorID.ToString("x"));
 				Console.Write(" (");

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
+using System.Collections.Generic;
+
 namespace Mosa.DeviceSystem.PCI
 {
 	/// <summary>
@@ -68,11 +70,6 @@ namespace Mosa.DeviceSystem.PCI
 			//internal const ushort Wait = 0x80; //  Enable address/data stepping
 			//internal const ushort SERR = 0x100; //  Enable SERR
 			//internal const ushort Fast_Back = 0x200; //  Enable back-to-back writes
-		}
-
-		internal struct PCICapability
-		{
-			private byte register;
 		}
 
 		#endregion PCICommand
@@ -167,12 +164,6 @@ namespace Mosa.DeviceSystem.PCI
 		public byte IRQ { get { return pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.InterruptLineRegister); } }
 
 		/// <summary>
-		/// Gets the capabilities pointer.
-		/// </summary>
-		/// <value>The address of the pointer.</value>
-		public byte CapabilitiesPointer { get { return (byte)(pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.CapabilitiesPointer) & 0xFC); } }
-
-		/// <summary>
 		/// Gets or sets the status register.
 		/// </summary>
 		/// <value>The status.</value>
@@ -199,10 +190,10 @@ namespace Mosa.DeviceSystem.PCI
 		public BaseAddress[] BaseAddresses { get; private set; }
 
 		/// <summary>
-		/// Gets the base addresses.
+		/// Gets the found PCI Capabilities
 		/// </summary>
-		/// <value>The base addresses.</value>
-		public BaseAddress[] BaseAddresses { get; private set; }
+		/// <value>The PCI Capabilities.</value>
+		public LinkedList<PCICapability> Capabilities { get; private set; }
 
 		#endregion Properties
 
@@ -267,7 +258,21 @@ namespace Mosa.DeviceSystem.PCI
 			}
 
 			// Iterate over the capabilities
-			var ptrCapabilties = (byte)(pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.CapabilitiesPointer) & 0xFC)
+			var capabilityRegister = (byte)(pciController.ReadConfig8(Bus, Slot, Function, PCIConfigurationHeader.CapabilitiesPointer) & ~0x03);
+
+			var capabilitiesList = new LinkedList<PCICapability>();
+
+			while (capabilityRegister > 0x40)
+			{
+				var header = pciController.ReadConfig16(Bus, Slot, Function, capabilityRegister);
+				var id = (byte)(header & 0xFF);
+
+				capabilitiesList.AddLast(new PCICapability { register = capabilityRegister, capabilityID = id });
+
+				capabilityRegister = (byte)(header >> 8);
+			}
+
+			Capabilities = capabilitiesList;
 		}
 
 		public override void Probe() => Device.Status = DeviceStatus.Available;
@@ -319,6 +324,34 @@ namespace Mosa.DeviceSystem.PCI
 			Device.Status = DeviceStatus.Online;
 		}
 
-		public
+		/// <summary>
+		/// Reads from configuration space for device
+		/// </summary>
+		/// <param name="register">The register.</param>
+		/// <returns></returns>
+		public uint ReadConfig32(byte register)
+		{
+			return pciController.ReadConfig32(Bus, Slot, Function, register);
+		}
+
+		/// <summary>
+		/// Reads from configuration space for device
+		/// </summary>
+		/// <param name="register">The register.</param>
+		/// <returns></returns>
+		public ushort ReadConfig16(byte register)
+		{
+			return pciController.ReadConfig16(Bus, Slot, Function, register);
+		}
+
+		/// <summary>
+		/// Reads from configuration space for device
+		/// </summary>
+		/// <param name="register">The register.</param>
+		/// <returns></returns>
+		public byte ReadConfig8(byte register)
+		{
+			return pciController.ReadConfig8(Bus, Slot, Function, register);
+		}
 	}
 }

@@ -78,6 +78,17 @@ namespace Mosa.DeviceSystem
 		}
 
 		/// <summary>
+		/// Requests an IO read/write port range object from the kernel
+		/// </summary>
+		/// <param name="port">The starting port number.</param>
+		/// <param name="length">The length of the port range.</param>
+		/// <returns></returns>
+		internal static IOPortReadWriteRange RequestReadWriteRangeIOPort(ushort port, ushort length)
+		{
+			return hardwareAbstraction.RequestReadWriteRangeIOPort(port, length);
+		}
+
+		/// <summary>
 		/// Requests a block of memory from the kernel
 		/// </summary>
 		/// <param name="address">The address.</param>

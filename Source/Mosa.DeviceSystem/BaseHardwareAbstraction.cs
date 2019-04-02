@@ -29,6 +29,14 @@ namespace Mosa.DeviceSystem
 		public abstract IOPortWrite RequestWriteIOPort(ushort port);
 
 		/// <summary>
+		/// Requests an IO read/write port range object from the kernel
+		/// </summary>
+		/// <param name="port">The starting port number.</param>
+		/// <param name="length">The length of the port range.</param>
+		/// <returns></returns>
+		public abstract IOPortReadWriteRange RequestReadWriteRangeIOPort(ushort port, ushort length);
+
+		/// <summary>
 		/// Requests a block of memory from the kernel
 		/// </summary>
 		/// <param name="address">The address.</param>

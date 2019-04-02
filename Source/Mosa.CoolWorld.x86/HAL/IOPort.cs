@@ -147,4 +147,77 @@ namespace Mosa.CoolWorld.x86.HAL
 			IOPort.Out32(Address, data);
 		}
 	}
+
+	/// <summary>
+	/// X86IOPortReadWriteRange
+	/// </summary>
+	/// <seealso cref="Mosa.DeviceSystem.IOPortReadWrite" />
+	public sealed class X86IOPortReadWriteRange : DeviceSystem.IOPortReadWriteRange
+	{
+		public X86IOPortReadWriteRange(ushort address, ushort length)
+		{
+			Address = address;
+			Length = length;
+		}
+
+		/// <summary>
+		/// Read8s this instance.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <returns></returns>
+		public override byte Read8(ushort offset)
+		{
+			return IOPort.In8((ushort)(Address + offset));
+		}
+
+		/// <summary>
+		/// Read16s this instance.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <returns></returns>
+		public override ushort Read16(ushort offset)
+		{
+			return IOPort.In16((ushort)(Address + offset));
+		}
+
+		/// <summary>
+		/// Read32s this instance.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <returns></returns>
+		public override uint Read32(ushort offset)
+		{
+			return IOPort.In32((ushort)(Address + offset));
+		}
+
+		/// <summary>
+		/// Write8s the specified data.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <param name="data">The data.</param>
+		public override void Write8(ushort offset, byte data)
+		{
+			IOPort.Out8((ushort)(Address + offset), data);
+		}
+
+		/// <summary>
+		/// Write16s the specified data.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <param name="data">The data.</param>
+		public override void Write16(ushort offset, ushort data)
+		{
+			IOPort.Out16((ushort)(Address + offset), data);
+		}
+
+		/// <summary>
+		/// Write32s the specified data.
+		/// </summary>
+		/// <param name="offset">The offset within the range.</param>
+		/// <param name="data">The data.</param>
+		public override void Write32(ushort offset, uint data)
+		{
+			IOPort.Out32((ushort)(Address + offset), data);
+		}
+	}
 }
