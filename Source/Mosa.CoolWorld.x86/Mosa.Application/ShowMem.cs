@@ -11,7 +11,7 @@ namespace Mosa.Application
 	/// </summary>
 	public class ShowMem : BaseApplication, IConsoleApp
 	{
-		public override int Start()
+		public override int Start(string parameters)
 		{
 			Console.WriteLine("*** Memory ****");
 			Console.WriteLine();

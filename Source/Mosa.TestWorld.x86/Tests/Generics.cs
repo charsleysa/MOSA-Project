@@ -4,7 +4,6 @@
  * Licensed under the terms of the New BSD License.
  *
  */
-using Mosa.Platform.x86;
 using Mosa.Kernel;
 using Mosa.Kernel.x86;
 using System;

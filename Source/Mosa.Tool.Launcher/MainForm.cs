@@ -173,8 +173,8 @@ namespace Mosa.Tool.Launcher
 
 			switch (cbBootFileSystem.SelectedIndex)
 			{
-				case 0: Options.FileSystem = FileSystem.FAT12; break;
-				case 1: Options.FileSystem = FileSystem.FAT16; break;
+				case 0: Options.FileSystem = Mosa.Utility.BootImage.FileSystem.FAT12; break;
+				case 1: Options.FileSystem = Mosa.Utility.BootImage.FileSystem.FAT16; break;
 				default: break;
 			}
 
@@ -252,8 +252,8 @@ namespace Mosa.Tool.Launcher
 
 			switch (Options.FileSystem)
 			{
-				case FileSystem.FAT12: cbBootFileSystem.SelectedIndex = 0; break;
-				case FileSystem.FAT16: cbBootFileSystem.SelectedIndex = 1; break;
+				case Mosa.Utility.BootImage.FileSystem.FAT12: cbBootFileSystem.SelectedIndex = 0; break;
+				case Mosa.Utility.BootImage.FileSystem.FAT16: cbBootFileSystem.SelectedIndex = 1; break;
 				default: break;
 			}
 

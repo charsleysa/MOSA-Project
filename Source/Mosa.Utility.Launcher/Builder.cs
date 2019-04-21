@@ -160,7 +160,7 @@ namespace Mosa.Utility.Launcher
 
 				var inputFiles = new List<FileInfo>
 				{
-					(LauncherOptions.HuntForCorLib) ? HuntFor("mscorlib.dll") : null,
+					(LauncherOptions.HuntForCorLib) ? HuntFor("System.Private.CoreLib.dll") : null,
 					(LauncherOptions.PlugKorlib) ? HuntFor("Mosa.Plug.Korlib.dll") : null,
 					(LauncherOptions.PlugKorlib) ? HuntFor("Mosa.Plug.Korlib." + LauncherOptions.PlatformType.ToString() + ".dll"): null,
 				};

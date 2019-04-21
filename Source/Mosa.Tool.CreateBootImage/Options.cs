@@ -68,7 +68,7 @@ namespace Mosa.Tool.CreateBootImage
 		{
 			set
 			{
-				options.FileSystem = (FileSystem)Enum.Parse(typeof(FileSystem), value, true);
+				options.FileSystem = (Mosa.Utility.BootImage.FileSystem)Enum.Parse(typeof(Mosa.Utility.BootImage.FileSystem), value, true);
 			}
 		}
 

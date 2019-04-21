@@ -159,8 +159,8 @@
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.DefaultExt = "*.exe";
-            this.openFileDialog1.Filter = "Assemblies|*.exe";
+            this.openFileDialog1.DefaultExt = "*.dll";
+            this.openFileDialog1.Filter = "Assemblies|*.dll";
             this.openFileDialog1.Title = "Select Assembly";
             // 
             // progressBar1

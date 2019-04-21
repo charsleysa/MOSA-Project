@@ -2,7 +2,7 @@
 
 using System.IO;
 using System.Text;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Mosa.Utility.SourceCodeGenerator
 {
@@ -64,12 +64,9 @@ namespace Mosa.Utility.SourceCodeGenerator
 
 		protected void ReadJSON()
 		{
-			var json = File.ReadAllText(JsonFile);
-
-			var jss = new JavaScriptSerializer();
-			jss.RegisterConverters(new JavaScriptConverter[] { new DynamicJsonConverter() });
-
-			Entries = jss.Deserialize(json, typeof(object));
+			var jsonReader = new JsonTextReader(File.OpenText(JsonFile));
+			var jsonDeserializer = JsonSerializer.CreateDefault();
+			Entries = jsonDeserializer.Deserialize(jsonReader);
 		}
 
 		protected virtual void Body()

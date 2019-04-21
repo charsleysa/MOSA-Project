@@ -1,235 +1,119 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Assembly attributes -->
   <PropertyGroup>
-    <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{631BC4F3-E2D8-4319-814C-13904CAA17CE}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <AssemblyName>mscorlib</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <AssemblyTitle>System.Private.CoreLib</AssemblyTitle>
+    <AssemblyName>System.Private.CoreLib</AssemblyName>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <MajorVersion>4</MajorVersion>
+    <MinorVersion>6</MinorVersion>
+    <ExcludeAssemblyInfoPartialFile>true</ExcludeAssemblyInfoPartialFile>
+  </PropertyGroup>
+  <!-- Compilation options -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworkIdentifier>.NETStandard</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>2.0</TargetFrameworkVersion>
+    <IsCoreAssembly>true</IsCoreAssembly>
+    <FeaturePortableTimer>true</FeaturePortableTimer>
+    <!-- <ProjectGuid>{631BC4F3-E2D8-4319-814C-13904CAA17CE}</ProjectGuid> -->
     <OutputType>Library</OutputType>
+    <LangVersion>8.0</LangVersion>
     <RootNamespace>System</RootNamespace>
-    <NoWarn>0169;0649;1685</NoWarn>
+    <ConfigurationOverrideFile />
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-    <TargetFrameworkProfile />
-    <OutputPath>..\..\bin\</OutputPath>
-    <RegisterForComInterop>False</RegisterForComInterop>
-    <RemoveIntegerChecks>False</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <FileAlignment>4096</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup>
-    <NoStdLib>True</NoStdLib>
-    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
-    <AdditionalExplicitAssemblyReferences />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugSymbols>True</DebugSymbols>
-    <Optimize>false</Optimize>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.2</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);618</WarningsNotAsErrors>
+    <NoWarn>649,3019,414,169,3015,591,1573,1591,0419</NoWarn>
+    <!-- Disable nullability-related warnings -->
+    <NoWarn>$(NoWarn),CS8609,CS8611,CS8631,CS8632</NoWarn>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <!-- <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign> -->
+    <DefineConstants>$(DefineConstants);_USE_NLS_PLUS_TABLE;CODE_ANALYSIS_BASELINE;netcoreapp</DefineConstants>
+    <SkipCommonResourcesIncludes>true</SkipCommonResourcesIncludes>
+    <OutputPath>..\..\bin\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <!-- Configuration specific properties -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize Condition="'$(Optimize)' == ''">false</Optimize>
+    <DebugType Condition="'$(DebugType)' == ''">full</DebugType>
+    <DefineConstants>_LOGGING;DEBUG;TRACE;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>True</Optimize>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize Condition="'$(Optimize)' == ''">true</Optimize>
+    <DebugType Condition="'$(DebugType)' == ''">pdbOnly</DebugType>
+    <DefineConstants>TRACE;$(DefineConstants)</DefineConstants>
     <WarningLevel>2</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="System.Collections.Generic\IReadOnlyCollection.cs" />
-    <Compile Include="System.Collections.Generic\IReadOnlyList.cs" />
-    <Compile Include="System.Collections.Generic\LinkedList.cs" />
-    <Compile Include="System.Collections.Generic\LinkedListNode.cs" />
-    <Compile Include="System.Collections.Generic\List.cs" />
-    <Compile Include="System.Collections\IComparer.cs" />
-    <Compile Include="System.Collections\IStructuralComparable.cs" />
-    <Compile Include="System.Collections\IStructuralEquatable.cs" />
-    <Compile Include="System.Diagnostics\ConditionalAttribute.cs" />
-    <Compile Include="System.Diagnostics\Debug.cs" />
-    <Compile Include="System.Diagnostics\DebuggerBrowsableAttribute.cs" />
-    <Compile Include="System.Diagnostics\DebuggerHiddenAttribute.cs" />
-    <Compile Include="System.Globalization\CultureInfo.cs" />
-    <Compile Include="System.IO\BinaryReader.cs" />
-    <Compile Include="System.IO\MemoryStream.cs" />
-    <Compile Include="System.Reflection\Assembly.cs" />
-    <Compile Include="System.Reflection\AssemblyDescriptionAttribute.cs" />
-    <Compile Include="System.Reflection\AssemblyTitleAttribute.cs" />
-    <Compile Include="System.Reflection\CallingConventions.cs" />
-    <Compile Include="System.Reflection\ConstructorInfo.cs" />
-    <Compile Include="System.Reflection\CustomAttributeData.cs" />
-    <Compile Include="System.Reflection\CustomAttributeNamedArgument.cs" />
-    <Compile Include="System.Reflection\CustomAttributeTypedArgument.cs" />
-    <Compile Include="System.Reflection\FieldAttributes.cs" />
-    <Compile Include="System.Reflection\FieldInfo.cs" />
-    <Compile Include="System.Reflection\ICustomAttributeProvider.cs" />
-    <Compile Include="System.Reflection\IntrospectionExtensions.cs" />
-    <Compile Include="System.Reflection\IReflectableType.cs" />
-    <Compile Include="System.Reflection\MemberInfo.cs" />
-    <Compile Include="System.Reflection\MemberTypes.cs" />
-    <Compile Include="System.Reflection\MethodAttributes.cs" />
-    <Compile Include="System.Reflection\MethodBase.cs" />
-    <Compile Include="System.Reflection\MethodInfo.cs" />
-    <Compile Include="System.Reflection\Module.cs" />
-    <Compile Include="System.Reflection\PropertyAttributes.cs" />
-    <Compile Include="System.Reflection\ParameterAttributes.cs" />
-    <Compile Include="System.Reflection\PropertyInfo.cs" />
-    <Compile Include="System.Reflection\TypeCode.cs" />
-    <Compile Include="System.Reflection\ParameterInfo.cs" />
-    <Compile Include="System.Reflection\TypeAttributes.cs" />
-    <Compile Include="System.Reflection\TypeInfo.cs" />
-    <Compile Include="System.Runtime.CompilerServices\CompilationRelaxationsAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\ExtensionAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\RuntimeCompatibilityAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\IntrinsicAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\Unsafe.cs" />
-    <Compile Include="System.Runtime.CompilerServices\RuntimeHelpers.cs" />
-    <Compile Include="System.Runtime.InteropServices\CallingConvention.cs" />
-    <Compile Include="System.Runtime.InteropServices\FieldOffsetAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\LayoutKind.cs" />
-    <Compile Include="System.Runtime.InteropServices\PreserveSigAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\StructLayoutAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\DllImportAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\UnmanagedFunctionPointerAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\Marshal.cs" />
-    <Compile Include="System.Runtime.InteropServices\UnmanagedType.cs" />
-    <Compile Include="System.Runtime.Versioning\NonVersionableAttribute.cs" />
-    <Compile Include="System.Runtime.Versioning\TargetFrameworkAttribute.cs" />
-    <Compile Include="System.Threading\Interlocked.cs" />
-    <Compile Include="System.Threading\Monitor.cs" />
-    <Compile Include="System.Threading\Thread.cs" />
-    <Compile Include="System.Threading\SpinLock.cs" />
-    <Compile Include="System\ArithmeticException.cs" />
-    <Compile Include="System\BitConverter.cs" />
-    <Compile Include="System\ConsoleColor.cs" />
-    <Compile Include="System\IConvertible.cs" />
-    <Compile Include="System\ICustomFormatter.cs" />
-    <Compile Include="System\Math.CoreCLR.cs" />
-    <Compile Include="System\Math.cs" />
-    <Compile Include="System\MathF.CoreCLR.cs" />
-    <Compile Include="System\MathF.cs" />
-    <Compile Include="System\MidpointRounding.cs" />
-    <Compile Include="System\OverflowException.cs" />
-    <Compile Include="System\PlatformNotSupportedException.cs" />
-    <Compile Include="System\Action.cs" />
-    <Compile Include="System\Activator.cs" />
-    <Compile Include="System\ArgumentException.cs" />
-    <Compile Include="System\ArgumentNullException.cs" />
-    <Compile Include="System\ArgumentOutOfRangeException.cs" />
-    <Compile Include="System\Attribute.cs" />
-    <Compile Include="System\AttributeTarget.cs" />
-    <Compile Include="System\AttributeUsageAttribute.cs" />
-    <Compile Include="System\CharEnumerator.cs" />
-    <Compile Include="System\Convert.cs" />
-    <Compile Include="System\CLSCompliantAttribute.cs" />
-    <Compile Include="System.Diagnostics\DebuggableAttribute.cs" />
-    <Compile Include="System\AsyncCallback.cs" />
-    <Compile Include="System\Func.cs" />
-    <Compile Include="System\IAsyncResult.cs" />
-    <Compile Include="System\ICloneable.cs" />
-    <Compile Include="System\IFormatProvider.cs" />
-    <Compile Include="System\IndexOutOfRangeException.cs" />
-    <Compile Include="System\NotImplementedException.cs" />
-    <Compile Include="System\Nullable.cs" />
-    <Compile Include="System\RankException.cs" />
-    <Compile Include="System\RuntimeMethodHandle.cs" />
-    <Compile Include="System\SystemException.cs" />
-    <Compile Include="System\TypedReference.cs" />
-    <Compile Include="System\Random.cs" />
-    <Compile Include="System\TypeLoadException.cs" />
-    <Compile Include="System\WaitHandle.cs" />
-    <Compile Include="System\IComparable.cs" />
-    <Compile Include="System\Delegate.cs" />
-    <Compile Include="System\Exception.cs" />
-    <Compile Include="System\FlagsAttribute.cs" />
-    <Compile Include="System\IDisposable.cs" />
-    <Compile Include="System\InvalidOperationException.cs" />
-    <Compile Include="System\MulticastDelegate.cs" />
-    <Compile Include="System\NotSupportedException.cs" />
-    <Compile Include="System\ObjectDisposedException.cs" />
-    <Compile Include="System\ParamArrayAttribute.cs" />
-    <Compile Include="System\Decimal.cs" />
-    <Compile Include="System\RuntimeFieldHandle.cs" />
-    <Compile Include="System\RuntimeTypeHandle.cs" />
-    <Compile Include="System.Runtime.CompilerServices\IndexerNameAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\MethodImplAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\MethodImplOptions.cs" />
-    <Compile Include="System.Security.Permissions\SecurityAction.cs" />
-    <Compile Include="System.Security.Permissions\SecurityPermissionAttribute.cs" />
-    <Compile Include="System.Security\UnverifiableCodeAttribute.cs" />
-    <Compile Include="System\Serializable.cs" />
-    <Compile Include="System.Text\ASCIIEncoding.cs" />
-    <Compile Include="System.Text\Encoding.cs" />
-    <Compile Include="System\Type.cs" />
-    <Compile Include="System.Collections\ICollection.cs" />
-    <Compile Include="System.Collections\IEnumerable.cs" />
-    <Compile Include="System.Collections\IEnumerator.cs" />
-    <Compile Include="System.Collections\IEqualityComparer.cs" />
-    <Compile Include="System.Collections\IList.cs" />
-    <Compile Include="System.Collections.Generic\ICollection.cs" />
-    <Compile Include="System.Collections.Generic\IComparer.cs" />
-    <Compile Include="System.Collections.Generic\IEnumerable.cs" />
-    <Compile Include="System.Collections.Generic\IEnumerator.cs" />
-    <Compile Include="System.Collections.Generic\IEqualityComparer.cs" />
-    <Compile Include="System.Collections.Generic\IList.cs" />
-    <Compile Include="System.IO\FileAccess.cs" />
-    <Compile Include="System.IO\FileShare.cs" />
-    <Compile Include="System.IO\Path.cs" />
-    <Compile Include="System.IO\SeekOrigin.cs" />
-    <Compile Include="System.IO\Stream.cs" />
-    <Compile Include="System\Array.cs" />
-    <Compile Include="System\Boolean.cs" />
-    <Compile Include="System\Byte.cs" />
-    <Compile Include="System\Char.cs" />
-    <Compile Include="System\Double.cs" />
-    <Compile Include="System\Enum.cs" />
-    <Compile Include="System\Int16.cs" />
-    <Compile Include="System\Int32.cs" />
-    <Compile Include="System\Int64.cs" />
-    <Compile Include="System\IntPtr.cs" />
-    <Compile Include="System\Object.cs" />
-    <Compile Include="System\SByte.cs" />
-    <Compile Include="System\Single.cs" />
-    <Compile Include="System\String.cs" />
-    <Compile Include="System\UInt16.cs" />
-    <Compile Include="System\UInt32.cs" />
-    <Compile Include="System\UInt64.cs" />
-    <Compile Include="System\UIntPtr.cs" />
-    <Compile Include="System\ValueType.cs" />
-    <Compile Include="System\Void.cs" />
-    <Compile Include="System.Reflection\DefaultMemberAttribute.cs" />
-    <Compile Include="System.Runtime.CompilerServices\CompilerGeneratedAttribute.cs" />
-    <Compile Include="System.Runtime.InteropServices\ComVisible.cs" />
-    <Compile Include="System.Runtime.InteropServices\OutAttribute.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Mosa.Korlib.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="System.Reflection.Emit\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- Make portable PDBs on Unix -->
+  <PropertyGroup Condition="'$(OsEnvironment)' == 'Unix'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <!-- Disable code paths that require project.assets.json files to be present or to be computed. -->
   <PropertyGroup>
-    <CompileDependsOn>GenerateCompilerResponseFile;$(CompileDependsOn)</CompileDependsOn>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ComputeNETCoreBuildOutputFiles>false</ComputeNETCoreBuildOutputFiles>
+    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
-  <Target Name="GenerateCompilerResponseFile">
-    <Message Text="Generating module name response file: $(IntermediateOutputPath)\korlib.rsp" />
+
+  <!--Disable .NET Core SDK libs-->
+  <PropertyGroup>
+    <!-- This prevents the default MsBuild targets from referencing System.Core.dll -->
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <!-- These prevent the default MsBuild targets from referencing System.dll and mscorlib.dll -->
+    <ExcludeMscorlibFacade>true</ExcludeMscorlibFacade>
+    <NoStdLib>true</NoStdLib>
+    <NoCompilerStandardLib>true</NoCompilerStandardLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
+    <ImplicitlyExpandNETStandardFacades>false</ImplicitlyExpandNETStandardFacades>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Mark netstandard as a framework assembly -->
+    <AssemblyMetadata Include=".NETFrameworkAssembly">
+      <Value></Value>
+    </AssemblyMetadata>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="runtime.linux-x64.Microsoft.NETCore.App" Version="3.0.0-preview4-27615-11" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <!--
+    Helper Paths
+  -->
+  <!--<PropertyGroup>
+    <CommonPath>$(MSBuildThisFileDirectory)Common</CommonPath>
+    <BclSourcesRoot>$(MSBuildThisFileDirectory)</BclSourcesRoot>
+    <MscorlibDir>$(MSBuildThisFileDirectory)</MscorlibDir>
+    <NlpObjDir>$(BclSourcesRoot)\System\Globalization\Tables</NlpObjDir>
+  </PropertyGroup>-->
+
+  <Target Name="GenerateCompilerResponseFile" BeforeTargets="CoreCompile">
+    <Message Text="Generating module name response file: $(IntermediateOutputPath)korlib.rsp" />
     <Message Text="VS Version: $(VisualStudioVersion); Tools Version: $(MSBuildToolsVersion)" />
-    <!-- When Roslyn is NOT enabled, we need to set the module name for mscorlib -->
-    <Touch Condition="'$(MSBuildToolsVersion)'&lt;'14.0'" Files="$(IntermediateOutputPath)\korlib.rsp" AlwaysCreate="true" />
-    <!-- When Roslyn is enabled we need to set the runtimemetadataversion -->
-    <WriteLinesToFile Condition="'$(MSBuildToolsVersion)'&gt;='14.0'" File="$(IntermediateOutputPath)\korlib.rsp" Lines="/runtimemetadataversion:v1.0.0" Overwrite="true" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)korlib.rsp" Lines="/runtimemetadataversion:v4.0.30319" Overwrite="true" />
     <ItemGroup>
-      <Clean Include="$(IntermediateOutputPath)\korlib.rsp" />
+      <Clean Include="$(IntermediateOutputPath)korlib.rsp" />
     </ItemGroup>
     <PropertyGroup>
-      <CompilerResponseFile>$(IntermediateOutputPath)\korlib.rsp</CompilerResponseFile>
+      <CompilerResponseFile>$(IntermediateOutputPath)korlib.rsp</CompilerResponseFile>
     </PropertyGroup>
+  </Target>
+
+  <Target Name="CopyRuntimeLibs" AfterTargets="Build">
+    <ItemGroup>
+      <PackageReferenceFiles
+        Include="$(Pkgruntime_linux-x64_Microsoft_NETCore_App)\runtimes\linux-x64\lib\netcoreapp3.0\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PackageReferenceFiles)" DestinationFolder="$(OutDir)" />
   </Target>
 </Project>

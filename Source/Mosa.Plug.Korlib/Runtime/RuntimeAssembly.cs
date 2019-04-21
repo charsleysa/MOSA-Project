@@ -7,110 +7,110 @@ using System.Reflection;
 
 namespace Mosa.Plug.Korlib.Runtime
 {
-	public sealed unsafe class RuntimeAssembly : Assembly
-	{
-		internal readonly List<RuntimeType> typeList;
-		internal AssemblyDefinition assemblyDefinition;
-		internal readonly List<RuntimeTypeHandle> typeHandles;
-		internal List<RuntimeTypeInfo> typeInfoList = null;
-		internal List<CustomAttributeData> customAttributesData = null;
+	//public sealed unsafe class RuntimeAssembly : Assembly
+	//{
+	//	internal readonly List<RuntimeType> typeList;
+	//	internal AssemblyDefinition assemblyDefinition;
+	//	internal readonly List<RuntimeTypeHandle> typeHandles;
+	//	internal List<RuntimeTypeInfo> typeInfoList = null;
+	//	internal List<CustomAttributeData> customAttributesData = null;
 
-		private readonly string fullName;
+	//	private readonly string fullName;
 
-		public override IEnumerable<CustomAttributeData> CustomAttributes
-		{
-			get
-			{
-				if (customAttributesData == null)
-				{
-					// Custom Attributes Data - Lazy load
-					if (!assemblyDefinition.CustomAttributes.IsNull)
-					{
-						var customAttributesTablePtr = assemblyDefinition.CustomAttributes;
-						var customAttributesCount = customAttributesTablePtr.NumberOfAttributes;
-						customAttributesData = new List<CustomAttributeData>();
-						for (uint i = 0; i < customAttributesCount; i++)
-						{
-							var cad = new RuntimeCustomAttributeData(customAttributesTablePtr.GetCustomAttribute(i));
-							customAttributesData.Add(cad);
-						}
-					}
-				}
+	//	public override IEnumerable<CustomAttributeData> CustomAttributes
+	//	{
+	//		get
+	//		{
+	//			if (customAttributesData == null)
+	//			{
+	//				// Custom Attributes Data - Lazy load
+	//				if (!assemblyDefinition.CustomAttributes.IsNull)
+	//				{
+	//					var customAttributesTablePtr = assemblyDefinition.CustomAttributes;
+	//					var customAttributesCount = customAttributesTablePtr.NumberOfAttributes;
+	//					customAttributesData = new List<CustomAttributeData>();
+	//					for (uint i = 0; i < customAttributesCount; i++)
+	//					{
+	//						var cad = new RuntimeCustomAttributeData(customAttributesTablePtr.GetCustomAttribute(i));
+	//						customAttributesData.Add(cad);
+	//					}
+	//				}
+	//			}
 
-				return customAttributesData;
-			}
-		}
+	//			return customAttributesData;
+	//		}
+	//	}
 
-		public override IEnumerable<TypeInfo> DefinedTypes
-		{
-			get
-			{
-				if (typeInfoList == null)
-				{
-					// Type Info - Lazy load
-					typeInfoList = new List<RuntimeTypeInfo>();
-					foreach (var type in typeList)
-					{
-						typeInfoList.Add(new RuntimeTypeInfo(type, this));
-					}
-				}
+	//	public override IEnumerable<TypeInfo> DefinedTypes
+	//	{
+	//		get
+	//		{
+	//			if (typeInfoList == null)
+	//			{
+	//				// Type Info - Lazy load
+	//				typeInfoList = new List<RuntimeTypeInfo>();
+	//				foreach (var type in typeList)
+	//				{
+	//					typeInfoList.Add(new RuntimeTypeInfo(type, this));
+	//				}
+	//			}
 
-				var types = new List<TypeInfo>();
+	//			var types = new List<TypeInfo>();
 
-				foreach (var type in typeInfoList)
-					types.Add(type);
+	//			foreach (var type in typeInfoList)
+	//				types.Add(type);
 
-				return types;
-			}
-		}
+	//			return types;
+	//		}
+	//	}
 
-		public override string FullName
-		{
-			get { return fullName; }
-		}
+	//	public override string FullName
+	//	{
+	//		get { return fullName; }
+	//	}
 
-		public override IEnumerable<Type> ExportedTypes
-		{
-			get
-			{
-				var list = new List<RuntimeType>();
-				foreach (var type in typeList)
-				{
-					if ((type.attributes & TypeAttributes.VisibilityMask) != TypeAttributes.Public)
-						continue;
-					list.Add(type);
-				}
-				return list;
-			}
-		}
+	//	public override IEnumerable<Type> ExportedTypes
+	//	{
+	//		get
+	//		{
+	//			var list = new List<RuntimeType>();
+	//			foreach (var type in typeList)
+	//			{
+	//				if ((type.attributes & TypeAttributes.VisibilityMask) != TypeAttributes.Public)
+	//					continue;
+	//				list.Add(type);
+	//			}
+	//			return list;
+	//		}
+	//	}
 
-		internal RuntimeAssembly(IntPtr pointer)
-		{
-			assemblyDefinition = new AssemblyDefinition(pointer);
-			fullName = assemblyDefinition.Name;
+	//	internal RuntimeAssembly(IntPtr pointer)
+	//	{
+	//		assemblyDefinition = new AssemblyDefinition(pointer);
+	//		fullName = assemblyDefinition.Name;
 
-			typeList = new List<RuntimeType>();
-			typeHandles = new List<RuntimeTypeHandle>();
+	//		typeList = new List<RuntimeType>();
+	//		typeHandles = new List<RuntimeTypeHandle>();
 
-			uint typeCount = assemblyDefinition.NumberOfTypes;
+	//		uint typeCount = assemblyDefinition.NumberOfTypes;
 
-			for (uint i = 0; i < typeCount; i++)
-			{
-				var handle = new RuntimeTypeHandle(assemblyDefinition.GetTypeDefinition(i).Ptr);
+	//		for (uint i = 0; i < typeCount; i++)
+	//		{
+	//			var handle = new RuntimeTypeHandle(assemblyDefinition.GetTypeDefinition(i).Ptr);
 
-				if (typeHandles.Contains(handle))
-					continue;
+	//			if (typeHandles.Contains(handle))
+	//				continue;
 
-				ProcessType(handle);
-			}
-		}
+	//			ProcessType(handle);
+	//		}
+	//	}
 
-		internal RuntimeType ProcessType(RuntimeTypeHandle handle)
-		{
-			typeHandles.Add(handle);
-			var type = new RuntimeType(handle);
-			typeList.Add(type);
-			return type;
-		}
-	}
+	//	internal RuntimeType ProcessType(RuntimeTypeHandle handle)
+	//	{
+	//		typeHandles.Add(handle);
+	//		var type = new RuntimeType(handle);
+	//		typeList.Add(type);
+	//		return type;
+	//	}
+	//}
 }

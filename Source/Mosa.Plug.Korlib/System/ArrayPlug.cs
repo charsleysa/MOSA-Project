@@ -40,7 +40,7 @@ namespace Mosa.Plug.Korlib.System
 			var typeStruct = new TypeDefinition(sourceArrayPtr);
 			var typeCode = typeStruct.TypeCode;
 
-			var size = (typeCode == TypeCode.ReferenceType) ? IntPtr.Size : (int)typeStruct.Size;
+			var size = (typeCode == TypeCode.Object || typeCode == TypeCode.String) ? IntPtr.Size : (int)typeStruct.Size;
 
 			Mosa.Runtime.Internal.MemoryCopy(
 				destinationArrayPtr + (IntPtr.Size * 2) + (destinationIndex * size),

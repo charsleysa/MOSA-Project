@@ -75,7 +75,7 @@ namespace Mosa.Utility.UnitTests
 				LinkerFormatType = LinkerFormatType.Elf32,
 				EmulatorMemoryInMB = 128,
 				DestinationDirectory = Path.Combine(Path.GetTempPath(), "MOSA-UnitTest"),
-				FileSystem = FileSystem.FAT16,
+				FileSystem = Mosa.Utility.BootImage.FileSystem.FAT16,
 				InlinedIRMaximum = 12,
 				BootLoader = BootLoader.Syslinux_3_72,
 				VBEVideo = false,

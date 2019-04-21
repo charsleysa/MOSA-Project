@@ -223,7 +223,7 @@ namespace Mosa.Tool.Mosactl
 					ExpandKernelBinPath(OsName)+".debug",
 					"--base-address",
 					"0x00500000",
-					"mscorlib.dll",
+					"System.Private.CoreLib.dll",
 					"Mosa.Plug.Korlib.dll",
 					"Mosa.Plug.Korlib.x86.dll",
 					ExpandKernelBinPath(OsName)+".exe"

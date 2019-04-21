@@ -15,7 +15,7 @@ namespace Mosa.Plug.Korlib.System
 
 			var s = Intrinsic.GetObjectFromAddress(v);
 
-			return Unsafe.As<string>(s);
+			return s as string;
 		}
 	}
 }

@@ -61,7 +61,7 @@ namespace Mosa.Compiler.MosaTypeSystem.Metadata
 			metadata.Cache.AddModule(mosaModule);
 			LoadedUnits.Add(mosaModule);
 
-			if (moduleDef.Assembly.IsCorLib())
+			if (moduleDef.Assembly.IsCorLib() && moduleDef.Assembly.Name == "System.Private.CoreLib")
 				CorLib = mosaModule;
 
 			return mosaModule;

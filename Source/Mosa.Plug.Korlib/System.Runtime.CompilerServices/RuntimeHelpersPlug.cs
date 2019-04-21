@@ -48,14 +48,15 @@ namespace Mosa.Plug.Korlib.System.Runtime.CompilerServices
 		[Plug("System.Runtime.CompilerServices.RuntimeHelpers::GetAssemblies")]
 		internal static IEnumerable<Assembly> GetAssemblies()
 		{
-			var assemblies = new List<Assembly>();
+			//var assemblies = new List<Assembly>();
 
-			foreach (var assembly in Internal.Assemblies)
-			{
-				assemblies.Add(assembly);
-			}
+			//foreach (var assembly in Internal.Assemblies)
+			//{
+			//	assemblies.Add(assembly);
+			//}
 
-			return assemblies;
+			//return assemblies;
+			throw new NotImplementedException(nameof(GetAssemblies));
 		}
 
 		[Plug("System.Runtime.CompilerServices.RuntimeHelpers::CreateInstance")]

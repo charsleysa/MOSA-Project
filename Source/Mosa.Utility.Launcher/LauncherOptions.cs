@@ -161,7 +161,7 @@ namespace Mosa.Utility.Launcher
 		public PlatformType PlatformType { get; set; }
 
 		[Option("file-system")]
-		public FileSystem FileSystem { get; set; }
+		public Mosa.Utility.BootImage.FileSystem FileSystem { get; set; }
 
 		[Option("serial-connection")]
 		public SerialConnectionOption SerialConnectionOption { get; set; }
@@ -361,7 +361,7 @@ namespace Mosa.Utility.Launcher
 			ImageFormat = ImageFormat.IMG;
 			LinkerFormatType = LinkerFormatType.Elf32;
 			PlatformType = PlatformType.x86;
-			FileSystem = FileSystem.FAT16;
+			FileSystem = Mosa.Utility.BootImage.FileSystem.FAT16;
 			BaseAddress = 0x00400000;
 			SerialConnectionHost = "127.0.0.1";
 			InlinedIRMaximum = 12;
