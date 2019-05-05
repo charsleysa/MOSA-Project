@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <SkipImportRoslynProps>true</SkipImportRoslynProps>
+  </PropertyGroup>
+  <Import Project=".\PackageVersions.props" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.BuildTools" Version="$(BuildToolsVersion)" />
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="$(RoslynVersion)" />
+  </ItemGroup>
+</Project>
