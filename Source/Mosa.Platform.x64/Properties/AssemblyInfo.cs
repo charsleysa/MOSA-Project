@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // Setting ComVisible to false makes the types in this assembly not visible
