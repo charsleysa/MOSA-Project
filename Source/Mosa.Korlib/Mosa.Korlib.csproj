@@ -26,7 +26,7 @@
     <WarningsNotAsErrors>$(WarningsNotAsErrors);618</WarningsNotAsErrors>
     <NoWarn>649,3019,414,169,3015,591,1573,1591,0419</NoWarn>
     <!-- Disable nullability-related warnings -->
-    <NoWarn>$(NoWarn),CS8609,CS8611,CS8631,CS8632</NoWarn>
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604;CS8605;CS8606;CS8608;CS8609;CS8610;CS8611;CS8612;CS8614;CS8615;CS8617;CS8618;CS8620;CS8622;CS8625;CS8631;CS8632;CS8634;CS8653</NoWarn>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <SignAssembly>true</SignAssembly>
     <DelaySign>true</DelaySign>
@@ -91,6 +91,7 @@
     <Compile Include="System\Enum.Mosa.cs" />
     <Compile Include="System\MulticastDelegate.cs" />
     <Compile Include="System\Object.Mosa.cs" />
+    <Compile Include="System\RuntimeType.cs" />
     <Compile Include="System\RuntimeTypeHandle.cs" />
     <Compile Include="System\Runtime\CompilerServices\EagerStaticClassConstructionAttribute.cs" />
     <Compile Include="System\Security\DynamicSecurityMethodAttribute.cs" />
