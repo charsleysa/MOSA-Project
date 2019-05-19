@@ -6,6 +6,8 @@
     <EnableDefaultItems>false</EnableDefaultItems>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <SkipImportRoslynProps>true</SkipImportRoslynProps>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <NoWarn>CS8021</NoWarn>
   </PropertyGroup>
   <Import Project=".\PackageVersions.props" />
   <ItemGroup>
