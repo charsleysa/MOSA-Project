@@ -1,62 +1,67 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+
 namespace System
 {
 	/// <summary>
 	/// Represents a type using an internal metadata token.
 	/// </summary>
-	public struct RuntimeTypeHandle
+	[StructLayout(LayoutKind.Sequential)]
+	public struct RuntimeTypeHandle : IEquatable<RuntimeTypeHandle>, ISerializable
 	{
-		private IntPtr m_type;
+		private IntPtr _value;
 
-		public RuntimeTypeHandle(IntPtr handle) // FIXME: hack - should be internal
-		{
-			m_type = handle;
-		}
-
-		/// <summary>
-		/// Gets a handle to the type represented by this instance.
-		/// </summary>
-		public IntPtr Value { get { return m_type; } }
-
-		public bool Equals(RuntimeTypeHandle obj)
-		{
-			return obj.m_type == m_type;
-		}
+		public IntPtr Value => _value;
 
 		public override bool Equals(object obj)
 		{
 			if (!(obj is RuntimeTypeHandle))
 				return false;
 
-			var handle = (RuntimeTypeHandle)obj;
-
-			return handle.m_type == m_type;
+			return Equals((RuntimeTypeHandle)obj);
 		}
 
-		public static bool operator ==(RuntimeTypeHandle left, object right)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public bool Equals(RuntimeTypeHandle handle)
+		{
+			if (_value == handle._value)
+				return true;
+
+			if (_value == IntPtr.Zero || handle._value == IntPtr.Zero)
+				return false;
+
+			return Equals(this, handle);
+		}
+
+		[MethodImpl(MethodImplOptions.InternalCall)]
+		private static extern bool Equals(RuntimeTypeHandle left, RuntimeTypeHandle right);
+
+		public override int GetHashCode()
+		{
+			if (_value == IntPtr.Zero)
+				return 0;
+			return GetHashCode(this);
+		}
+
+		[MethodImpl(MethodImplOptions.InternalCall)]
+		private static extern int GetHashCode(RuntimeTypeHandle handle);
+
+		public static bool operator ==(RuntimeTypeHandle left, RuntimeTypeHandle right)
 		{
 			return left.Equals(right);
 		}
 
-		public static bool operator ==(object left, RuntimeTypeHandle right)
-		{
-			return right.Equals(left);
-		}
-
-		public static bool operator !=(RuntimeTypeHandle left, object right)
+		public static bool operator !=(RuntimeTypeHandle left, RuntimeTypeHandle right)
 		{
 			return !left.Equals(right);
 		}
 
-		public static bool operator !=(object left, RuntimeTypeHandle right)
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			return !right.Equals(left);
-		}
-
-		public override int GetHashCode()
-		{
-			return m_type.ToInt32();
+			throw new PlatformNotSupportedException();
 		}
 	}
 }

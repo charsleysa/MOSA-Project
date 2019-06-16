@@ -77,6 +77,29 @@ namespace System
 		}
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
+		private static extern bool TryArrayClear(Array array, int index, int length);
+
+		public static void Clear(Array array, int index, int length)
+		{
+			if (!TryArrayClear(array, index, length))
+				ReportClearErrors(array, index, length);
+		}
+
+		private static unsafe void ReportClearErrors(Array array, int index, int length)
+		{
+			if (array == null)
+				throw new ArgumentNullException(nameof(array));
+
+			if (index < 0 || index > array.Length || length < 0 || length > array.Length)
+				throw new IndexOutOfRangeException();
+			if (length > (array.Length - index))
+				throw new IndexOutOfRangeException();
+
+			// The above checks should have covered all the reasons why Clear would fail.
+			Debug.Assert(false);
+		}
+
+		[MethodImpl(MethodImplOptions.InternalCall)]
 		public extern int GetLength(int dimension);
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
