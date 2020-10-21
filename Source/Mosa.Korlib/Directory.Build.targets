@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <!-- Import targets here to have TargetPath and other macros defined. Limit to CoreLib. -->
+  <Import Project="$(RepositoryEngineeringDir)illink.targets" />
+
+</Project>

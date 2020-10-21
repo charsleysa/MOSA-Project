@@ -1,0 +1,36 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <PropertyGroup>
+    <AssemblyName>System.Private.Corelib</AssemblyName>
+    <NetCoreAppCurrent>net5.0</NetCoreAppCurrent>
+    <LangVersion>9.0</LangVersion>
+    <LibrariesProjectRoot>$(MSBuildThisFileDirectory)..\..\dotnet-runtime\src\libraries</LibrariesProjectRoot>
+    <RepositoryEngineeringDir>$(MSBuildThisFileDirectory)..\..\dotnet-runtime\eng\</RepositoryEngineeringDir>
+    <CoreLibSharedDir>$([MSBuild]::NormalizeDirectory('$(LibrariesProjectRoot)', 'System.Private.CoreLib', 'src'))</CoreLibSharedDir>
+    <NoWarn>$(NoWarn),1573,1591,3021,CA2002</NoWarn>
+    <TargetsMosa>true</TargetsMosa>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Enables Strict mode for Roslyn compiler -->
+    <Features>strict;nullablePublicOnly</Features>
+  </PropertyGroup>
+
+  <!-- Properties that should be defined for all managed product assemblies -->
+  <PropertyGroup>
+    <Company>MOSA Project</Company>
+    <Product>System.Private.Corelib</Product>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Opt-in/out repo features -->
+    <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
+    <UsingToolIbcOptimization>true</UsingToolIbcOptimization>
+    <UsingToolXliff>false</UsingToolXliff>
+    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
+    <!-- ILLink -->
+    <MicrosoftNETILLinkTasksVersion>5.0.0-rtm.20509.1</MicrosoftNETILLinkTasksVersion>
+    <!-- <MicrosoftSourceLinkVersion>1.1.0-beta-20204-02</MicrosoftSourceLinkVersion> -->
+  </PropertyGroup>
+</Project>
