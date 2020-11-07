@@ -21,8 +21,10 @@
     <OutputPath>..\..\bin\</OutputPath>
     <!-- <Configurations>Debug;Release;Checked</Configurations> -->
     <!-- <Platforms>x64;x86;arm;arm64</Platforms> -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-    <ILLinkTrimAssembly>true</ILLinkTrimAssembly>
+    <!-- <ILLinkTrimAssembly>true</ILLinkTrimAssembly> -->
+    <ILLinkTrimAssembly>false</ILLinkTrimAssembly>
     <ILLinkTrimXml>$(IntermediateOutputPath)System.Private.CoreLib.xml</ILLinkTrimXml>
   </PropertyGroup>
 

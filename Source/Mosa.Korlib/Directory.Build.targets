@@ -4,4 +4,15 @@
   <!-- Import targets here to have TargetPath and other macros defined. Limit to CoreLib. -->
   <Import Project="$(RepositoryEngineeringDir)illink.targets" />
 
+  <!-- Include pre-built runtime files in the compilation -->
+  <ItemGroup>
+    <RuntimeLibs Include="$(MSBuildThisFileDirectory)lib\net5.0\*.dll" />
+  </ItemGroup>
+  <Target Name="CopyRuntimeLibs">
+    <Copy SourceFiles="@(RuntimeLibs)" DestinationFolder="$(OutputPath)" />
+  </Target>
+  <PropertyGroup>
+    <BuildDependsOn>$(BuildDependsOn);CopyRuntimeLibs</BuildDependsOn>
+  </PropertyGroup>
+
 </Project>
