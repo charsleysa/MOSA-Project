@@ -156,27 +156,15 @@ namespace Mosa.Tool.Debugger.Views
 
 			foreach (var instruction in disassembler.Decode())
 			{
-				var text = instruction.Instruction.Replace('\t', ' ');
+				var addr = ParseAddress(instruction.Instruction);
 
-				var info = string.Empty;
-
-				var value = ParseAddress(text);
-
-				if (value != 0)
-				{
-					var symbol = DebugSource.GetFirstSymbolsStartingAt(value);
-
-					if (symbol != null)
-					{
-						info = symbol.Name;
-					}
-				}
+				var info = MainForm.GetAddressInfo(addr);
 
 				var entry = new MethodInstructionEntry()
 				{
 					IP = instruction.Address,   // Offset?
 					Length = instruction.Length,
-					Instruction = text,
+					Instruction = instruction.Instruction,
 					Info = info
 				};
 
@@ -208,44 +196,37 @@ namespace Mosa.Tool.Debugger.Views
 
 			var clickedEntry = dataGridView1.Rows[e.RowIndex].DataBoundItem as MethodInstructionEntry;
 
-			var menu = new ToolStripMenuItem(clickedEntry.Address + " - " + clickedEntry.Instruction);
+			var menu = new MenuItem(clickedEntry.Address + " - " + clickedEntry.Instruction);
 			menu.Enabled = false;
-			var m = new ContextMenuStrip();
-			m.Items.Add(menu);
-			m.Items.Add(new ToolStripMenuItem("Copy to &Clipboard", null, new EventHandler(MainForm.OnCopyToClipboard)) { Tag = clickedEntry.Address });
-			m.Items.Add(new ToolStripMenuItem("Set &Breakpoint", null, new EventHandler(MainForm.OnAddBreakPoint)) { Tag = new AddBreakPointArgs(null, clickedEntry.IP) });
+			var m = new ContextMenu();
+			m.MenuItems.Add(menu);
+			m.MenuItems.Add(new MenuItem("Copy to &Clipboard", new EventHandler(MainForm.OnCopyToClipboard)) { Tag = clickedEntry.Address });
+			m.MenuItems.Add(new MenuItem("Set &Breakpoint", new EventHandler(MainForm.OnAddBreakPoint)) { Tag = new AddBreakPointArgs(null, clickedEntry.IP) });
 
 			m.Show(dataGridView1, relativeMousePosition);
 		}
 
+		public static char[] separators = new char[] { '\t', ' ' };
+
 		public ulong ParseAddress(string decode)
 		{
-			if (String.IsNullOrWhiteSpace(decode))
-				return 0;
+			var parts = decode.Split(separators);
 
-			if (!decode.Contains("call"))
-				return 0;
-
-			try
+			foreach (var part in parts)
 			{
-				int space = decode.IndexOf(' ');
+				if (part.Length <= 6)
+					continue;
 
-				if (space < 0)
-					space = decode.IndexOf('\t');
+				if (part.EndsWith("h") || part.Contains("0x"))
+				{
+					var address = MainForm.ParseHexAddress(part);
 
-				if (space <= 0)
-					return 0;
-
-				var value = decode.Substring(space + 1).Trim();
-
-				var address = MainForm.ParseHexAddress("0x" + value);
-
-				return address;
+					if (address > 0)
+						return address;
+				}
 			}
-			catch
-			{
-				return 0;
-			}
+
+			return 0;
 		}
 	}
 }

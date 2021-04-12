@@ -45,11 +45,13 @@ namespace Mosa.Demo.TestWorld.x86
 
 			IDT.SetInterruptHandler(null);
 			Screen.Write('2');
-			Debugger.Setup(Serial.COM1);
+
+			//Debugger.Setup(Serial.COM1);
 
 			Screen.Write('3');
 			PIC.Setup();
 			Screen.Write('4');
+
 			IDT.Setup();
 			Screen.Write('5');
 			PageFrameAllocator.Setup();
@@ -61,40 +63,55 @@ namespace Mosa.Demo.TestWorld.x86
 			GC.Setup();
 			Screen.Write('9');
 
-			Scheduler.Setup();
+			//Scheduler.Setup();
 			Screen.Write('B');
-			IDT.SetInterruptHandler(ProcessInterrupt);
+
+			//IDT.SetInterruptHandler(ProcessInterrupt);
 			Screen.Write('C');
-			ConsoleManager.Setup();
+
+			//ConsoleManager.Setup();
 			Screen.Write('D');
 			Screen.Write('E');
 			Screen.WriteLine();
 			Screen.WriteLine();
 
-			UnitTest();
-
 			KernelTest.RunTests();
-			StackTrace();
 
-			TestHash();
+			Screen.WriteLine();
 
-			int value = CallReturn10();
+			if (Test() != 0)
+				Screen.WriteLine("Error");
 
-			Screen.Write("Return10 Test: ");
-			if (value == 10)
-				Screen.WriteLine("Ok");
-			else
-				Screen.WriteLine("Failed");
+			Screen.WriteLine();
 
-			StartThreadTest();
-
-			// should never get here
-			Screen.Write("!BAD!");
+			Screen.Write("[DONE]");
 
 			while (true)
 			{
 				Native.Hlt();
 			}
+
+			//StackTrace();
+
+			//TestHash();
+
+			//int value = CallReturn10();
+
+			//Screen.Write("Return10 Test: ");
+			//if (value == 10)
+			//	Screen.WriteLine("Ok");
+			//else
+			//	Screen.WriteLine("Failed");
+
+			//StartThreadTest();
+
+			//// should never get here
+			//Screen.Write("!BAD!");
+
+			//while (true)
+			//{
+			//	Native.Hlt();
+			//}
 		}
 
 		private static void TestHash()
@@ -275,9 +292,16 @@ namespace Mosa.Demo.TestWorld.x86
 			DevirtualizationTests.Test1();
 		}
 
-		public static int Test1()
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		public static int Test()
 		{
-			return Unsafe.SizeOf<int>();
+			string s = "1";
+
+			object o = s;
+
+			var b = (o is System.String);
+
+			return b ? 0 : 1;   // should be 0
 		}
 	}
 }

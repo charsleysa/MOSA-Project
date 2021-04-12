@@ -369,7 +369,7 @@ namespace Mosa.Compiler.Framework.Stages
 				return;
 			}
 
-			var typeSize = Alignment.AlignUp(TypeLayout.GetTypeSize(type), TypeLayout.NativePointerAlignment);
+			var typeSize = Alignment.AlignUp((uint)TypeLayout.GetTypeSize(type), TypeLayout.NativePointerAlignment);
 			var runtimeType = GetRuntimeTypeHandle(type);
 
 			if (typeSize <= 8 || type.IsR)
@@ -407,7 +407,7 @@ namespace Mosa.Compiler.Framework.Stages
 			node.ReplaceInstruction(IRInstruction.Jmp);
 		}
 
-		private int CalculateInterfaceSlot(MosaType interaceType)
+		private uint CalculateInterfaceSlot(MosaType interaceType)
 		{
 			return TypeLayout.GetInterfaceSlot(interaceType);
 		}
@@ -429,21 +429,16 @@ namespace Mosa.Compiler.Framework.Stages
 				&& context.Operand1.Type.ElementType.IsValueType
 				&& method.DeclaringType == context.Operand1.Type.ElementType)
 			{
-				var before = context.InsertBefore();
-
-				if (OverridesMethod(method))
-				{
-					before.SetInstruction(Select(context.Operand1, IRInstruction.Sub32, IRInstruction.Sub64), context.Operand1, context.Operand1, CreateConstant32(NativePointerSize * 2));
-				}
-				else
+				if (!OverridesMethod(method))
 				{
 					// Get the value type, size and native alignment
 					var type = context.Operand1.Type.ElementType;
-					var typeSize = Alignment.AlignUp(TypeLayout.GetTypeSize(type), TypeLayout.NativePointerAlignment);
+					var typeSize = Alignment.AlignUp((uint)TypeLayout.GetTypeSize(type), TypeLayout.NativePointerAlignment);
 
 					// Create a virtual register to hold our boxed value
 					var boxedValue = AllocateVirtualRegister(TypeSystem.BuiltIn.Object);
 
+					var before = context.InsertBefore();
 					before.SetInstruction(IRInstruction.Box, boxedValue, GetRuntimeTypeHandle(type), context.Operand1, CreateConstant32(typeSize));
 
 					// Now replace the value type pointer with the boxed value virtual register
@@ -494,22 +489,10 @@ namespace Mosa.Compiler.Framework.Stages
 				{
 					method = GetMethodOrOverride(type, method);
 
-					if (type.Methods.Contains(method))
-					{
-						// If the method being called is a virtual method then we need to box the value type
-						if (method.IsVirtual
-							&& context.Operand1.Type.ElementType != null
-							&& context.Operand1.Type.ElementType.IsValueType
-							&& method.DeclaringType == context.Operand1.Type.ElementType)
-						{
-							var before = context.InsertBefore();
-							before.SetInstruction(Select(context.Operand1, IRInstruction.Sub32, IRInstruction.Sub64), context.Operand1, context.Operand1, CreateConstant32(NativePointerSize * 2));
-						}
-					}
-					else
+					if (!type.Methods.Contains(method))
 					{
 						var elementType = context.Operand1.Type.ElementType;
-						var typeSize = Alignment.AlignUp(TypeLayout.GetTypeSize(elementType), TypeLayout.NativePointerAlignment);
+						var typeSize = Alignment.AlignUp((uint)TypeLayout.GetTypeSize(elementType), TypeLayout.NativePointerAlignment);
 
 						// Create a virtual register to hold our boxed value
 						var boxedValue = AllocateVirtualRegister(TypeSystem.BuiltIn.Object);
@@ -684,6 +667,11 @@ namespace Mosa.Compiler.Framework.Stages
 			return method;
 		}
 
+		private Operand GetMethodTablePointer(MosaType runtimeType)
+		{
+			return Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, Metadata.TypeDefinition + runtimeType.FullName);
+		}
+
 		private Operand GetRuntimeTypeHandle(MosaType runtimeType)
 		{
 			return Operand.CreateSymbol(TypeSystem.GetTypeByName("System", "RuntimeTypeHandle"), Metadata.TypeDefinition + runtimeType.FullName);
@@ -752,7 +740,7 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 			else
 			{
-				int slot = CalculateInterfaceSlot(classType);
+				var slot = CalculateInterfaceSlot(classType);
 				node.SetInstruction(IRInstruction.IsInstanceOfInterfaceType, result, CreateConstant32(slot), reference);
 			}
 		}
@@ -867,7 +855,7 @@ namespace Mosa.Compiler.Framework.Stages
 			var operand = context.Operand1;
 			var field = context.MosaField;
 
-			int offset = TypeLayout.GetFieldOffset(field);
+			uint offset = TypeLayout.GetFieldOffset(field);
 			bool isPointer = operand.IsPointer || operand.Type == TypeSystem.BuiltIn.I || operand.Type == TypeSystem.BuiltIn.U;
 
 			if (!result.IsOnStack && MosaTypeLayout.CanFitInRegister(operand.Type) && !operand.IsReferenceType && isPointer)
@@ -948,7 +936,7 @@ namespace Mosa.Compiler.Framework.Stages
 
 			MethodScanner.AccessedField(field);
 
-			int offset = TypeLayout.GetFieldOffset(field);
+			uint offset = TypeLayout.GetFieldOffset(field);
 
 			var fieldAddress = node.Result;
 			var objectOperand = node.Operand1;
@@ -993,8 +981,7 @@ namespace Mosa.Compiler.Framework.Stages
 		/// <param name="node">The node.</param>
 		private void Ldlen(InstructionNode node)
 		{
-			var offset = CreateConstant32(NativePointerSize * 2);
-			node.SetInstruction(Select(node.Result, IRInstruction.Load32, IRInstruction.Load64), node.Result, node.Operand1, offset);
+			node.SetInstruction(Select(node.Result, IRInstruction.Load32, IRInstruction.Load64), node.Result, node.Operand1, ConstantZero);
 		}
 
 		/// <summary>
@@ -1090,25 +1077,26 @@ namespace Mosa.Compiler.Framework.Stages
 			 */
 
 			var symbolName = node.Operand1.Name;
-			var stringdata = node.Operand1.StringData;
+			var data = node.Operand1.StringData;
 
-			node.SetInstruction(IRInstruction.MoveObject, node.Result, node.Operand1);
-
-			var symbol = Linker.DefineSymbol(symbolName, SectionKind.ROData, NativeAlignment, (NativePointerSize * 2) + 4 + (stringdata.Length * 2));
+			// FUTURE: Add to linkers to allow for deduplicate of internal strings
+			var symbol = Linker.DefineSymbol(symbolName, SectionKind.ROData, NativeAlignment, ObjectHeaderSize + NativePointerSize + ((uint)data.Length * 2));
 			var stream = symbol.Stream;
 
-			// Type Definition and sync block
-			Linker.Link(LinkType.AbsoluteAddress, PatchType.I32, symbol, 0, $"{Metadata.TypeDefinition}System.String", 0);
+			// Header Block
+			stream.WriteZeroBytes(NativePointerSize);
 
-			stream.WriteZeroBytes(NativePointerSize * 2);
+			// Type Definition
+			Linker.Link(LinkType.AbsoluteAddress, PatchType.I32, symbol, stream.Position, Metadata.TypeDefinition + "System.String", 0);
+			stream.WriteZeroBytes(NativePointerSize);
 
 			// String length field
-			stream.Write(BitConverter.GetBytes(stringdata.Length), 0, 4);
+			stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
 
 			// String data
-			var stringData = Encoding.Unicode.GetBytes(stringdata);
-			Debug.Assert(stringData.Length == stringdata.Length * 2, "Byte array of string data doesn't match expected string data length");
-			stream.Write(stringData);
+			stream.Write(Encoding.Unicode.GetBytes(data));
+
+			node.SetInstruction(IRInstruction.MoveObject, node.Result, node.Operand1);
 		}
 
 		/// <summary>
@@ -1204,9 +1192,9 @@ namespace Mosa.Compiler.Framework.Stages
 
 			Debug.Assert(elementSize != 0);
 
-			var runtimeTypeHandle = GetRuntimeTypeHandle(arrayType);
+			var methodTable = GetMethodTablePointer(arrayType);
 			var size = CreateConstant32(elementSize);
-			node.SetInstruction(IRInstruction.NewArray, result, runtimeTypeHandle, size, elements);
+			node.SetInstruction(IRInstruction.NewArray, result, methodTable, size, elements);
 			node.MosaType = arrayType;
 		}
 
@@ -1255,9 +1243,9 @@ namespace Mosa.Compiler.Framework.Stages
 			{
 				Debug.Assert(result.IsReferenceType);
 
-				var runtimeTypeHandle = GetRuntimeTypeHandle(classType);
+				var methodTable = GetMethodTablePointer(classType);
 				var size = CreateConstant32(TypeLayout.GetTypeSize(classType));
-				before.SetInstruction(IRInstruction.NewObject, result, runtimeTypeHandle, size);
+				before.SetInstruction(IRInstruction.NewObject, result, methodTable, size);
 				before.MosaType = classType;
 
 				operands.Insert(0, result);
@@ -1437,7 +1425,7 @@ namespace Mosa.Compiler.Framework.Stages
 
 			MethodScanner.AccessedField(field);
 
-			int offset = TypeLayout.GetFieldOffset(field);
+			uint offset = TypeLayout.GetFieldOffset(field);
 			var offsetOperand = CreateConstant32(offset);
 
 			var objectOperand = node.Operand1;
@@ -1988,9 +1976,8 @@ namespace Mosa.Compiler.Framework.Stages
 
 			// Get array length
 			var lengthOperand = AllocateVirtualRegisterI32();
-			var fixedOffset = CreateConstant32(NativePointerSize * 2);
 
-			before.SetInstruction(Select(lengthOperand, IRInstruction.Load32, IRInstruction.Load64), lengthOperand, arrayOperand, fixedOffset);
+			before.SetInstruction(Select(lengthOperand, IRInstruction.Load32, IRInstruction.Load64), lengthOperand, arrayOperand, ConstantZero);
 
 			// Now compare length with index
 			// If index is greater than or equal to the length then jump to exception block, otherwise jump to next block
@@ -2037,7 +2024,7 @@ namespace Mosa.Compiler.Framework.Stages
 		/// </returns>
 		private Operand CalculateTotalArrayOffset(InstructionNode node, Operand elementOffset)
 		{
-			var fixedOffset = CreateConstant32(NativePointerSize * 3);
+			var fixedOffset = CreateConstant32(NativePointerSize);
 			var arrayElement = Is32BitPlatform ? AllocateVirtualRegisterI32() : AllocateVirtualRegisterI64();
 
 			var context = new Context(node).InsertBefore();

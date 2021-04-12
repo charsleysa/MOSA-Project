@@ -19,14 +19,16 @@ namespace Mosa.Tool.Debugger.Views
 
 			public string Name { get { return Watch.Name; } }
 
-			[Browsable(false)]
-			public bool Signed { get { return Watch.Signed; } }
-
 			public string HexValue { get; set; }
 
 			public ulong Value { get; set; }
 
 			public uint Size { get { return Watch.Size; } }
+
+			public string Info { get; set; }
+
+			//[Browsable(false)]
+			//public bool Signed { get { return Watch.Signed; } }
 
 			[Browsable(false)]
 			public Watch Watch;
@@ -45,6 +47,11 @@ namespace Mosa.Tool.Debugger.Views
 			dataGridView1.AutoResizeColumns();
 			dataGridView1.Columns[0].Width = 65;
 			dataGridView1.Columns[1].Width = 250;
+			dataGridView1.Columns[2].Width = 75;
+			dataGridView1.Columns[3].Width = 75;
+			dataGridView1.Columns[4].Width = 40;
+			dataGridView1.Columns[5].Width = 250;
+
 			cbLength.SelectedIndex = 2;
 		}
 
@@ -83,6 +90,7 @@ namespace Mosa.Tool.Debugger.Views
 
 				watch.Value = MainForm.ToLong(bytes);
 				watch.HexValue = BasePlatform.ToHex(watch.Value, watch.Size);
+				watch.Info = MainForm.GetAddressInfo(watch.Value);
 			}
 
 			Refresh();
@@ -123,12 +131,12 @@ namespace Mosa.Tool.Debugger.Views
 
 			var clickedEntry = dataGridView1.Rows[e.RowIndex].DataBoundItem as WatchEntry;
 
-			var menu = new ToolStripMenuItem(clickedEntry.HexValue + " - " + clickedEntry.Name);
+			var menu = new MenuItem(clickedEntry.HexValue + " - " + clickedEntry.Name);
 			menu.Enabled = false;
-			var m = new ContextMenuStrip();
-			m.Items.Add(menu);
-			m.Items.Add(new ToolStripMenuItem("Copy to &Clipboard", null, new EventHandler(MainForm.OnCopyToClipboard)) { Tag = clickedEntry.Address });
-			m.Items.Add(new ToolStripMenuItem("&Delete watch", null, new EventHandler(MainForm.OnRemoveWatch)) { Tag = clickedEntry.Watch });
+			var m = new ContextMenu();
+			m.MenuItems.Add(menu);
+			m.MenuItems.Add(new MenuItem("Copy to &Clipboard", new EventHandler(MainForm.OnCopyToClipboard)) { Tag = clickedEntry.Address });
+			m.MenuItems.Add(new MenuItem("&Delete watch", new EventHandler(MainForm.OnRemoveWatch)) { Tag = clickedEntry.Watch });
 
 			m.Show(dataGridView1, relativeMousePosition);
 		}

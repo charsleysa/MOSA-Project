@@ -22,7 +22,9 @@ namespace Mosa.Compiler.Framework
 	/// </summary>
 	public sealed class Compiler
 	{
-		private const int MaxThreads = 1024;
+		public const uint ObjectHeaderSizeInNativeIntegers = 2;
+
+		private const uint MaxThreads = 1024;
 
 		#region Data Members
 
@@ -140,6 +142,8 @@ namespace Mosa.Compiler.Framework
 
 		public bool Statistics { get; }
 
+		public uint ObjectHeaderSize { get; }
+
 		#endregion Properties
 
 		#region Static Methods
@@ -182,7 +186,7 @@ namespace Mosa.Compiler.Framework
 				new StaticAllocationResolutionStage(),
 				compilerSettings.Devirtualization ? new DevirtualizeCallStage() : null,
 				new PlugStage(),
-				new UnboxValueTypeStage(),
+
 				new RuntimeCallStage(),
 				(compilerSettings.InlineMethods) ? new InlineStage() : null,
 				(compilerSettings.InlineMethods) ? new BlockMergeStage() : null,
@@ -249,6 +253,8 @@ namespace Mosa.Compiler.Framework
 
 			Linker = new MosaLinker(this);
 
+			ObjectHeaderSize = (uint)Architecture.NativePointerSize * ObjectHeaderSizeInNativeIntegers;
+
 			StackFrame = Operand.CreateCPURegister(TypeSystem.BuiltIn.Pointer, Architecture.StackFrameRegister);
 			StackPointer = Operand.CreateCPURegister(TypeSystem.BuiltIn.Pointer, Architecture.StackPointerRegister);
 			LinkRegister = Architecture.LinkRegister == null ? null : Operand.CreateCPURegister(TypeSystem.BuiltIn.Object, Architecture.LinkRegister);
@@ -276,7 +282,7 @@ namespace Mosa.Compiler.Framework
 
 					for (int i = 0; i < attributes.Length; i++)
 					{
-						var d = (IntrinsicMethodDelegate)Delegate.CreateDelegate(typeof(IntrinsicMethodDelegate), method);
+						var d = (IntrinsicMethodDelegate)System.Delegate.CreateDelegate(typeof(IntrinsicMethodDelegate), method);
 
 						// Finally add the dictionary entry mapping the target name and the delegate
 						InternalIntrinsicMethods.Add(attributes[i].Target, d);
@@ -480,7 +486,7 @@ namespace Mosa.Compiler.Framework
 		{
 			var threadID = Thread.CurrentThread.ManagedThreadId;
 			int success = 0;
-			
+
 			while (true)
 			{
 				var result = ProcessQueue(threadID);

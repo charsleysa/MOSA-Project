@@ -7,6 +7,7 @@ namespace Mosa.Compiler.Framework.Stages
 {
 	public class StaticAllocationResolutionStage : BaseMethodCompilerStage
 	{
+		private int allocationCount = 0;
 		public const string StaticSymbolPrefix = "$cctor$";
 
 		protected override void Run()
@@ -35,45 +36,46 @@ namespace Mosa.Compiler.Framework.Stages
 		private void PerformStaticAllocation(Context context)
 		{
 			var allocatedType = context.MosaType; // node.Result.Type;
-			var handle = context.Operand1;
 
 			bool newObject = context.Instruction == IRInstruction.NewObject;
-			int elements = 0;
+			uint elements = 0;
 
 			//Debug.WriteLine($"Method: {Method} : {node}");
 			//Debug.WriteLine($"  --> {allocatedType}");
 
 			MethodScanner.TypeAllocated(allocatedType, Method);
 
-			int allocationSize;
+			uint allocationSize;
 
 			if (newObject)
 			{
-				allocationSize = TypeLayout.GetTypeSize(allocatedType);
+				allocationSize = TypeLayout.GetTypeSize(allocatedType) + (TypeLayout.NativePointerSize * 2);
 			}
 			else
 			{
-				elements = (int)GetConstant(context.Operand3);
+				elements = (uint)GetConstant(context.Operand3);
 				allocationSize = (TypeLayout.GetTypeSize(allocatedType.ElementType) * elements) + (TypeLayout.NativePointerSize * 3);
 			}
 
-			var symbolName = Linker.DefineSymbol(StaticSymbolPrefix + allocatedType.FullName, SectionKind.BSS, Architecture.NativeAlignment, allocationSize);
+			// Ensure unique symbol name
+			var symbolName = Linker.DefineSymbol($"{StaticSymbolPrefix}{Method.DeclaringType.FullName}${allocationCount++}", SectionKind.BSS, Architecture.NativeAlignment, allocationSize);
 
 			string typeDefinitionSymbol = Metadata.TypeDefinition + allocatedType.FullName;
 
-			Linker.Link(LinkType.AbsoluteAddress, Is32BitPlatform ? PatchType.I32 : PatchType.I64, symbolName, 0, typeDefinitionSymbol, 0);
+			Linker.Link(LinkType.AbsoluteAddress, Is32BitPlatform ? PatchType.I32 : PatchType.I64, symbolName, TypeLayout.NativePointerSize, typeDefinitionSymbol, 0);
 
-			var staticAddress = Operand.CreateSymbol(allocatedType, symbolName.Name);
+			var staticAddress = Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, symbolName.Name);
 
 			var move = Is32BitPlatform ? (BaseInstruction)IRInstruction.Move32 : IRInstruction.Move64;
+			var add = Is32BitPlatform ? (BaseInstruction)IRInstruction.Add32 : IRInstruction.Add64;
 			var store = Is32BitPlatform ? (BaseInstruction)IRInstruction.Store32 : IRInstruction.Store64;
 
 			context.SetInstruction(move, context.Result, staticAddress);
-			context.AppendInstruction(store, null, staticAddress, ConstantZero, handle);
+			context.AppendInstruction(add, context.Result, context.Result, CreateConstant32(NativePointerSize * 2));
 
 			if (!newObject)
 			{
-				context.AppendInstruction(store, null, staticAddress, CreateConstant32(2 * (Is32BitPlatform ? 4 : 8)), CreateConstant32(elements));
+				context.AppendInstruction(store, null, context.Result, ConstantZero, CreateConstant32(elements));
 			}
 		}
 

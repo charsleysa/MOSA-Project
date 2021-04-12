@@ -125,7 +125,7 @@ namespace Mosa.Tool.Debugger
 
 		public bool EmulatorDisplay
 		{
-			get { return Settings.GetValue("LEmulator.Display", false); }
+			get { return Settings.GetValue("Emulator.Display", false); }
 			set { Settings.SetValue("Emulator.Display", value); }
 		}
 
@@ -169,7 +169,7 @@ namespace Mosa.Tool.Debugger
 
 			sourceView = new SourceView(this);
 
-			//sourceDataView = new SourceDataView(this);	// only useful when debugging this tool
+			sourceDataView = new SourceDataView(this);  // only useful when debugging this tool
 
 			launchView = new LaunchView(this);
 
@@ -192,7 +192,6 @@ namespace Mosa.Tool.Debugger
 			Text = "MOSA GDB Debugger v" + CompilerVersion.VersionString;
 
 			dockPanel.SuspendLayout(true);
-			dockPanel.Theme = new VS2015DarkTheme();
 			dockPanel.DockTopPortion = 54;
 
 			controlView.Show(dockPanel, DockState.DockTop);
@@ -211,7 +210,7 @@ namespace Mosa.Tool.Debugger
 
 			sourceView.Show(dockPanel, DockState.Document);
 
-			//sourceDataView.Show(dockPanel, DockState.Document);
+			sourceDataView.Show(dockPanel, DockState.Document);
 
 			var memoryView = new MemoryView(this);
 			memoryView.Show(dockPanel, DockState.Document);
@@ -303,19 +302,47 @@ namespace Mosa.Tool.Debugger
 			}
 		}
 
+		private bool IsDigitsOnly(string str)
+		{
+			foreach (char c in str)
+			{
+				if (c < '0' || c > '9')
+					return false;
+			}
+
+			return true;
+		}
+
+		private bool IsHexDigitsOnly(string str)
+		{
+			foreach (char c in str)
+			{
+				if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
+					return false;
+			}
+
+			return true;
+		}
+
 		public ulong ParseHexAddress(string input)
 		{
-			string nbr = input.ToUpper().Trim();
-			int digits = 10;
-			int where = nbr.IndexOf('X');
+			string nbr = input.ToLower().Trim();
+			int where = nbr.IndexOf('x');
 
 			if (where >= 0)
 			{
-				digits = 16;
 				nbr = nbr.Substring(where + 1);
 			}
 
-			return Convert.ToUInt64(nbr, digits);
+			if (nbr.EndsWith("h"))
+			{
+				nbr = nbr.Substring(0, nbr.Length - 1);
+			}
+
+			if (!IsHexDigitsOnly(nbr))
+				return 0;
+
+			return Convert.ToUInt64(nbr, 16);
 		}
 
 		private void btnConnect_Click(object sender, EventArgs e)
@@ -388,18 +415,8 @@ namespace Mosa.Tool.Debugger
 			{
 				return list[0].CommonName;
 			}
-			else
-			{
-				var first = DebugSource.GetFirstSymbol(address);
 
-				if (first != null)
-				{
-					int delta = (int)(address - first.Address);
-					return "0x" + delta.ToString("X2") + "+" + first.CommonName;
-				}
-			}
-
-			return string.Empty;
+			return GetAddressInfo(address);
 		}
 
 		public string CreateWatchName(ulong address)
@@ -513,7 +530,7 @@ namespace Mosa.Tool.Debugger
 
 		public void OnAddBreakPoint(Object sender, EventArgs e)
 		{
-			var args = (sender as ToolStripDropDownMenu).Tag as AddBreakPointArgs;
+			var args = (sender as Menu).Tag as AddBreakPointArgs;
 
 			if (string.IsNullOrWhiteSpace(args.Name))
 			{
@@ -527,35 +544,35 @@ namespace Mosa.Tool.Debugger
 
 		public void OnCopyToClipboardAsBreakPoint(Object sender, EventArgs e)
 		{
-			var text = (((sender as ToolStripDropDownMenu).Tag) as BreakPoint).Name;
+			var text = (((sender as Menu).Tag) as BreakPoint).Name;
 
 			Clipboard.SetText(text);
 		}
 
 		public void OnCopyToClipboard(Object sender, EventArgs e)
 		{
-			var text = (((sender as ToolStripDropDownMenu).Tag) as string);
+			var text = (((sender as Menu).Tag) as string);
 
 			Clipboard.SetText(text);
 		}
 
 		public void OnRemoveBreakPoint(Object sender, EventArgs e)
 		{
-			var breakpoint = (sender as ToolStripDropDownMenu).Tag as BreakPoint;
+			var breakpoint = (sender as Menu).Tag as BreakPoint;
 
 			RemoveBreakPoint(breakpoint);
 		}
 
 		public void OnAddWatch(Object sender, EventArgs e)
 		{
-			var args = (sender as ToolStripDropDownMenu).Tag as AddWatchArgs;
+			var args = (sender as Menu).Tag as AddWatchArgs;
 
 			AddWatch(args.Name, args.Address, args.Length);
 		}
 
 		public void OnRemoveWatch(Object sender, EventArgs e)
 		{
-			var watch = (sender as ToolStripDropDownMenu).Tag as Watch;
+			var watch = (sender as Menu).Tag as Watch;
 
 			RemoveWatch(watch);
 		}
@@ -805,6 +822,29 @@ namespace Mosa.Tool.Debugger
 					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 				}
 			}
+		}
+
+		public string GetAddressInfo(ulong address)
+		{
+			if (address < 4096)
+				return null;
+
+			var symbol = DebugSource.GetFirstSymbol(address);
+
+			if (symbol != null)
+			{
+				int delta = (int)(address - symbol.Address);
+
+				if (delta > 1024 * 16)
+					return null;
+
+				if (delta == 0)
+					return symbol.CommonName;
+
+				return $"0x{delta.ToString("X2")}+{symbol.CommonName}";
+			}
+
+			return null;
 		}
 
 		public void SetFocus(ulong instructionPointer, ulong stackFrame, ulong stackPointer)

@@ -84,12 +84,12 @@ namespace Mosa.Compiler.Framework
 		/// <summary>
 		/// Holds the native pointer size
 		/// </summary>
-		protected int NativePointerSize { get; private set; }
+		protected uint NativePointerSize { get; private set; }
 
 		/// <summary>
 		/// Holds the native alignment
 		/// </summary>
-		protected int NativeAlignment { get; private set; }
+		protected uint NativeAlignment { get; private set; }
 
 		/// <summary>
 		/// Gets the size of the native instruction.
@@ -220,6 +220,8 @@ namespace Mosa.Compiler.Framework
 		/// </summary>
 		private readonly List<Counter> Counters = new List<Counter>();
 
+		protected uint ObjectHeaderSize;
+
 		#endregion Method Properties
 
 		#region Methods
@@ -242,6 +244,8 @@ namespace Mosa.Compiler.Framework
 			NativeInstructionSize = Architecture.NativeInstructionSize;
 			Is32BitPlatform = Architecture.Is32BitPlatform;
 			Is64BitPlatform = Architecture.Is64BitPlatform;
+
+			ObjectHeaderSize = compiler.ObjectHeaderSize;
 
 			if (Is32BitPlatform)
 			{
@@ -357,7 +361,7 @@ namespace Mosa.Compiler.Framework
 		{
 			return AllocateVirtualRegisterI(); // temp
 		}
-		
+
 		protected Operand AllocateVirtualRegisterI()
 		{
 			return Is32BitPlatform ? MethodCompiler.VirtualRegisters.Allocate(TypeSystem.BuiltIn.I4) : MethodCompiler.VirtualRegisters.Allocate(TypeSystem.BuiltIn.I8);
@@ -901,7 +905,7 @@ namespace Mosa.Compiler.Framework
 		/// <param name="type">The type.</param>
 		/// <param name="align">if set to <c>true</c> [align].</param>
 		/// <returns></returns>
-		public int GetTypeSize(MosaType type, bool align)
+		public uint GetTypeSize(MosaType type, bool align)
 		{
 			return MethodCompiler.GetReferenceOrTypeSize(type, align);
 		}
