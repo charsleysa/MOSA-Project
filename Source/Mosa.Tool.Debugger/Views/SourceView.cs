@@ -8,7 +8,7 @@ namespace Mosa.Tool.Debugger.Views
 {
 	public partial class SourceView : DebugDockContent
 	{
-		private readonly SourceLocation lastSourceLocation;
+		private SourceLocation lastSourceLocation;
 		private string lastFileContent;
 
 		private struct LineInfo
@@ -60,6 +60,7 @@ namespace Mosa.Tool.Debugger.Views
 			{
 				fileContent = File.ReadAllText(sourceLocation.SourceFilename);
 				lastFileContent = fileContent;
+				lastSourceLocation = sourceLocation;
 			}
 
 			lbSourceFilename.Text = Path.GetFileName(sourceLocation.SourceFilename);

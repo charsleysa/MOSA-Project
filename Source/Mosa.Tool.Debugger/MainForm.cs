@@ -5,7 +5,6 @@ using Mosa.Compiler.Framework;
 using Mosa.Tool.Debugger.DebugData;
 using Mosa.Tool.Debugger.GDB;
 using Mosa.Tool.Debugger.Views;
-using Mosa.Utility.BootImage;
 using Mosa.Utility.Configuration;
 using Mosa.Utility.Launcher;
 using System;
@@ -192,7 +191,8 @@ namespace Mosa.Tool.Debugger
 			Text = "MOSA GDB Debugger v" + CompilerVersion.VersionString;
 
 			dockPanel.SuspendLayout(true);
-			dockPanel.DockTopPortion = 54;
+			dockPanel.Theme = new VS2015DarkTheme();
+			dockPanel.DockTopPortion = 88;
 
 			controlView.Show(dockPanel, DockState.DockTop);
 			statusView.Show(controlView.PanelPane, DockAlignment.Right, 0.50);
@@ -530,7 +530,7 @@ namespace Mosa.Tool.Debugger
 
 		public void OnAddBreakPoint(Object sender, EventArgs e)
 		{
-			var args = (sender as Menu).Tag as AddBreakPointArgs;
+			var args = (sender as ToolStripMenuItem).Tag as AddBreakPointArgs;
 
 			if (string.IsNullOrWhiteSpace(args.Name))
 			{
@@ -544,35 +544,35 @@ namespace Mosa.Tool.Debugger
 
 		public void OnCopyToClipboardAsBreakPoint(Object sender, EventArgs e)
 		{
-			var text = (((sender as Menu).Tag) as BreakPoint).Name;
+			var text = (((sender as ToolStripMenuItem).Tag) as BreakPoint).Name;
 
 			Clipboard.SetText(text);
 		}
 
 		public void OnCopyToClipboard(Object sender, EventArgs e)
 		{
-			var text = (((sender as Menu).Tag) as string);
+			var text = (((sender as ToolStripMenuItem).Tag) as string);
 
 			Clipboard.SetText(text);
 		}
 
 		public void OnRemoveBreakPoint(Object sender, EventArgs e)
 		{
-			var breakpoint = (sender as Menu).Tag as BreakPoint;
+			var breakpoint = (sender as ToolStripMenuItem).Tag as BreakPoint;
 
 			RemoveBreakPoint(breakpoint);
 		}
 
 		public void OnAddWatch(Object sender, EventArgs e)
 		{
-			var args = (sender as Menu).Tag as AddWatchArgs;
+			var args = (sender as ToolStripMenuItem).Tag as AddWatchArgs;
 
 			AddWatch(args.Name, args.Address, args.Length);
 		}
 
 		public void OnRemoveWatch(Object sender, EventArgs e)
 		{
-			var watch = (sender as Menu).Tag as Watch;
+			var watch = (sender as ToolStripMenuItem).Tag as Watch;
 
 			RemoveWatch(watch);
 		}
