@@ -40,12 +40,15 @@
 		<ProjectReference Include="..\Mosa.Utility.Launcher\Mosa.Utility.Launcher.csproj" />
 		<Reference Include="MetroFramework">
 			<HintPath>..\External\MetroFramework.dll</HintPath>
+			<Private>true</Private>
 		</Reference>
 		<Reference Include="MetroFramework.Design">
 			<HintPath>..\External\MetroFramework.Design.dll</HintPath>
+			<Private>true</Private>
 		</Reference>
 		<Reference Include="MetroFramework.Fonts">
 			<HintPath>..\External\MetroFramework.Fonts.dll</HintPath>
+			<Private>true</Private>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

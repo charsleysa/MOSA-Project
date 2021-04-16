@@ -117,9 +117,11 @@
     <ProjectReference Include="..\Mosa.Utility.RSP\Mosa.Utility.RSP.csproj" />
 	  <Reference Include="DockPanelSuite">
 		  <HintPath>..\External\WinFormsUI.dll</HintPath>
+		  <Private>true</Private>
 	  </Reference>
 	  <Reference Include="DockPanelSuite.ThemeVS2015">
 		  <HintPath>..\External\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll</HintPath>
+		  <Private>true</Private>
 	  </Reference>
   </ItemGroup>
   <ItemGroup>
