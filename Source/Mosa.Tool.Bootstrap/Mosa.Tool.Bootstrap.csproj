@@ -17,18 +17,9 @@
     <StartupObject>Mosa.Tool.Bootstrap.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="StatusForm.cs" />
-    <Compile Update="StatusForm.Designer.cs">
-      <DependentUpon>StatusForm.cs</DependentUpon>
-    </Compile>
     <ProjectReference Include="..\Mosa.Compiler.Common\Mosa.Compiler.Common.csproj" />
     <ProjectReference Include="..\Mosa.Compiler.MosaTypeSystem\Mosa.Compiler.MosaTypeSystem.csproj" />
     <ProjectReference Include="..\Mosa.Compiler.Framework\Mosa.Compiler.Framework.csproj" />
     <ProjectReference Include="..\Mosa.Platform.x86\Mosa.Platform.x86.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="StatusForm.resx">
-      <DependentUpon>StatusForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
 </Project>

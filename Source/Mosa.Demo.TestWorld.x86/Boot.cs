@@ -46,7 +46,7 @@ namespace Mosa.Demo.TestWorld.x86
 			IDT.SetInterruptHandler(null);
 			Screen.Write('2');
 
-			//Debugger.Setup(Serial.COM1);
+			Debugger.Setup(Serial.COM1);
 
 			Screen.Write('3');
 			PIC.Setup();
@@ -63,13 +63,13 @@ namespace Mosa.Demo.TestWorld.x86
 			GC.Setup();
 			Screen.Write('9');
 
-			//Scheduler.Setup();
+			Scheduler.Setup();
 			Screen.Write('B');
 
-			//IDT.SetInterruptHandler(ProcessInterrupt);
+			IDT.SetInterruptHandler(ProcessInterrupt);
 			Screen.Write('C');
 
-			//ConsoleManager.Setup();
+			ConsoleManager.Setup();
 			Screen.Write('D');
 			Screen.Write('E');
 			Screen.WriteLine();

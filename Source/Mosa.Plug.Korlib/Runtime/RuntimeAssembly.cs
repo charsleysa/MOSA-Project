@@ -25,7 +25,7 @@ namespace Mosa.Plug.Korlib.Runtime
 				if (customAttributesData == null)
 				{
 					// Custom Attributes Data - Lazy load
-					// FIXME: Race condition
+					// FIXME: Race condition - WHERE?
 					if (!assemblyDefinition.CustomAttributes.IsNull)
 					{
 						var customAttributesTablePtr = assemblyDefinition.CustomAttributes;
@@ -86,9 +86,9 @@ namespace Mosa.Plug.Korlib.Runtime
 			}
 		}
 
-		internal RuntimeAssembly(IntPtr pointer)
+		internal RuntimeAssembly(Pointer ptr)
 		{
-			assemblyDefinition = new AssemblyDefinition(new Pointer(pointer));
+			assemblyDefinition = new AssemblyDefinition(ptr);
 			fullName = assemblyDefinition.Name;
 
 			typeList = new List<RuntimeType>();
