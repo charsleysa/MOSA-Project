@@ -29,6 +29,14 @@ jobs:
         working-directory: Source
       - name: Build
         run: msbuild Source/Mosa.sln /p:Version=${{ env.BUILD_VERSION }}
+
+      - name: Archive Compile Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Bin Directory
+          path: bin
+          retention-days: 5
+
       - name: Create Installer
         run: ISCC.exe /DMyAppVersion=${{ env.BUILD_VERSION }}.${{ steps.mosa-project-build-number.outputs.build-number }} Source/Inno-Setup-Script/Mosa-Installer.iss
       - name: Create Package - Mosa.Tools.Package
