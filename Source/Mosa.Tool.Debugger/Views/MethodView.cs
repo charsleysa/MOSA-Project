@@ -217,13 +217,10 @@ namespace Mosa.Tool.Debugger.Views
 				if (part.Length <= 6)
 					continue;
 
-				if (part.EndsWith("h") || part.Contains("0x"))
-				{
-					var address = MainForm.ParseHexAddress(part);
+				var address = MainForm.ParseHexAddress(part);
 
-					if (address > 0)
-						return address;
-				}
+				if (address > 0)
+					return address;
 			}
 
 			return 0;

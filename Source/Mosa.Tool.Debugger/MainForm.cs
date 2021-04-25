@@ -327,6 +327,12 @@ namespace Mosa.Tool.Debugger
 		public ulong ParseHexAddress(string input)
 		{
 			string nbr = input.ToLower().Trim();
+
+			if (nbr.StartsWith('[') && nbr.EndsWith(']'))
+			{
+				nbr = nbr.Substring(1, nbr.Length - 2);
+			}
+
 			int where = nbr.IndexOf('x');
 
 			if (where >= 0)
