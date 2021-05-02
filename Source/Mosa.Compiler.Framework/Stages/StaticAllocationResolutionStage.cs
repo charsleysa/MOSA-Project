@@ -7,8 +7,9 @@ namespace Mosa.Compiler.Framework.Stages
 {
 	public class StaticAllocationResolutionStage : BaseMethodCompilerStage
 	{
-		private int allocationCount = 0;
 		public const string StaticSymbolPrefix = "$cctor$";
+
+		private int allocationCount = 0;
 
 		protected override void Run()
 		{
@@ -35,9 +36,8 @@ namespace Mosa.Compiler.Framework.Stages
 
 		private void PerformStaticAllocation(Context context)
 		{
-			var allocatedType = context.MosaType; // node.Result.Type;
+			var allocatedType = context.MosaType;
 
-			bool newObject = context.Instruction == IRInstruction.NewObject;
 			uint elements = 0;
 
 			//Debug.WriteLine($"Method: {Method} : {node}");
@@ -47,14 +47,14 @@ namespace Mosa.Compiler.Framework.Stages
 
 			uint allocationSize;
 
-			if (newObject)
+			if (context.Instruction == IRInstruction.NewObject)
 			{
-				allocationSize = TypeLayout.GetTypeSize(allocatedType) + (TypeLayout.NativePointerSize * 2);
+				allocationSize = TypeLayout.GetTypeSize(allocatedType) + ObjectHeaderSize;
 			}
 			else
 			{
 				elements = (uint)GetConstant(context.Operand3);
-				allocationSize = (TypeLayout.GetTypeSize(allocatedType.ElementType) * elements) + (TypeLayout.NativePointerSize * 3);
+				allocationSize = (TypeLayout.GetTypeSize(allocatedType.ElementType) * elements) + ObjectHeaderSize + TypeLayout.NativePointerSize;
 			}
 
 			// Ensure unique symbol name
@@ -73,7 +73,7 @@ namespace Mosa.Compiler.Framework.Stages
 			context.SetInstruction(move, context.Result, staticAddress);
 			context.AppendInstruction(add, context.Result, context.Result, CreateConstant32(NativePointerSize * 2));
 
-			if (!newObject)
+			if (context.Instruction == IRInstruction.NewArray)
 			{
 				context.AppendInstruction(store, null, context.Result, ConstantZero, CreateConstant32(elements));
 			}

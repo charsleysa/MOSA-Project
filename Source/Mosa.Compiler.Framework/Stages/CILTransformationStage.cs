@@ -753,16 +753,16 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			Debug.Assert(node.Operand1.IsParameter);
 
-			if (!MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
-			{
-				node.SetInstruction(IRInstruction.LoadParamCompound, node.Result, node.Operand1);
-				node.MosaType = node.Operand1.Type;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
 			{
 				var loadInstruction = GetLoadParameterInstruction(node.Operand1.Type);
 
 				node.SetInstruction(loadInstruction, node.Result, node.Operand1);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.LoadParamCompound, node.Result, node.Operand1);
+				node.MosaType = node.Operand1.Type;
 			}
 		}
 
@@ -810,16 +810,16 @@ namespace Mosa.Compiler.Framework.Stages
 
 			Debug.Assert(elementOffset != null);
 
-			if (!MosaTypeLayout.CanFitInRegister(arrayType.ElementType))
-			{
-				node.SetInstruction(IRInstruction.LoadCompound, result, array, totalElementOffset);
-				node.MosaType = arrayType.ElementType;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(arrayType.ElementType))
 			{
 				var loadInstruction = GetLoadInstruction(arrayType.ElementType);
 
 				node.SetInstruction(loadInstruction, result, array, totalElementOffset);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.LoadCompound, result, array, totalElementOffset);
+				node.MosaType = arrayType.ElementType;
 			}
 		}
 
@@ -1006,15 +1006,15 @@ namespace Mosa.Compiler.Framework.Stages
 
 			// This is actually ldind.* and ldobj - the opcodes have the same meanings
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				node.SetInstruction(IRInstruction.LoadCompound, destination, source, ConstantZero);
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var loadInstruction = GetLoadInstruction(type);
 
 				node.SetInstruction(loadInstruction, destination, source, ConstantZero);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.LoadCompound, destination, source, ConstantZero);
 			}
 
 			node.MosaType = type;
@@ -1034,16 +1034,17 @@ namespace Mosa.Compiler.Framework.Stages
 			var destination = node.Result;
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
 			{
-				// Interesting -- this code appears to never be executed
-				node.SetInstruction(IRInstruction.LoadCompound, destination, fieldOperand, ConstantZero);
+				var loadInstruction = GetLoadInstruction(fieldType);
+
+				node.SetInstruction(loadInstruction, destination, fieldOperand, ConstantZero);
 				node.MosaType = fieldType;
 			}
 			else
 			{
-				var loadInstruction = GetLoadInstruction(fieldType);
-				node.SetInstruction(loadInstruction, destination, fieldOperand, ConstantZero);
+				// Interesting -- this code appears to never be executed
+				node.SetInstruction(IRInstruction.LoadCompound, destination, fieldOperand, ConstantZero);
 				node.MosaType = fieldType;
 			}
 		}
@@ -1215,7 +1216,8 @@ namespace Mosa.Compiler.Framework.Stages
 			var before = context.InsertBefore();
 
 			// If the type is value type we don't need to call AllocateObject
-			if (!MosaTypeLayout.CanFitInRegister(result.Type))
+			bool v = !MosaTypeLayout.CanFitInRegister(result.Type);
+			if (v)
 			{
 				Debug.Assert(result.Uses.Count <= 1, "Usages too high");
 
@@ -1372,16 +1374,16 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			Debug.Assert(node.Result.IsParameter);
 
-			if (!MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
+			if (MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
+			{
+				var storeInstruction = GetStoreParameterInstruction(node.Operand1.Type);
+				node.SetInstruction(storeInstruction, null, node.Result, node.Operand1);
+			}
+			else
 			{
 				var result = node.Result;
 				node.SetInstruction(IRInstruction.StoreParamCompound, null, result, node.Operand1);
 				node.MosaType = result.Type; // may not be necessary
-			}
-			else
-			{
-				var storeInstruction = GetStoreParameterInstruction(node.Operand1.Type);
-				node.SetInstruction(storeInstruction, null, node.Result, node.Operand1);
 			}
 		}
 
@@ -1402,16 +1404,16 @@ namespace Mosa.Compiler.Framework.Stages
 			var elementOffset = CalculateArrayElementOffset(node, arrayType, arrayIndex);
 			var totalElementOffset = CalculateTotalArrayOffset(node, elementOffset);
 
-			if (!MosaTypeLayout.CanFitInRegister(value.Type))
-			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, array, totalElementOffset, value);
-				node.MosaType = arrayType.ElementType;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(value.Type))
 			{
 				var storeInstruction = GetStoreInstruction(arrayType.ElementType);
 
 				node.SetInstruction(storeInstruction, null, array, totalElementOffset, value);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.StoreCompound, null, array, totalElementOffset, value);
+				node.MosaType = arrayType.ElementType;
 			}
 		}
 
@@ -1432,15 +1434,15 @@ namespace Mosa.Compiler.Framework.Stages
 			var valueOperand = node.Operand2;
 			var fieldType = field.FieldType;
 
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
 			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, objectOperand, offsetOperand, valueOperand);
+				var storeInstruction = GetStoreInstruction(fieldType);
+				node.SetInstruction(storeInstruction, null, objectOperand, offsetOperand, valueOperand);
 				node.MosaType = fieldType;
 			}
 			else
 			{
-				var storeInstruction = GetStoreInstruction(fieldType);
-				node.SetInstruction(storeInstruction, null, objectOperand, offsetOperand, valueOperand);
+				node.SetInstruction(IRInstruction.StoreCompound, null, objectOperand, offsetOperand, valueOperand);
 				node.MosaType = fieldType;
 			}
 		}
@@ -1462,17 +1464,20 @@ namespace Mosa.Compiler.Framework.Stages
 				return;
 			}
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
+			if (MosaTypeLayout.CanFitInRegister(type))
+			{
+				if (node.Operand1.IsVirtualRegister)
+				{
+					var storeInstruction = GetStoreInstruction(type);
+
+					node.SetInstruction(storeInstruction, null, StackFrame, node.Result, node.Operand1);
+				}
+			}
+			else
 			{
 				Debug.Assert(!node.Result.IsVirtualRegister);
 
 				node.SetInstruction(IRInstruction.MoveCompound, node.Result, node.Operand1);
-			}
-			else if (node.Operand1.IsVirtualRegister)
-			{
-				var storeInstruction = GetStoreInstruction(type);
-
-				node.SetInstruction(storeInstruction, null, StackFrame, node.Result, node.Operand1);
 			}
 
 			node.MosaType = type;
@@ -1487,15 +1492,15 @@ namespace Mosa.Compiler.Framework.Stages
 			// This is actually stind.* and stobj - the opcodes have the same meanings
 			var type = node.MosaType;  // pass thru
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, node.Operand1, ConstantZero, node.Operand2);
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var storeInstruction = GetStoreInstruction(type);
 
 				node.SetInstruction(storeInstruction, null, node.Operand1, ConstantZero, node.Operand2);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.StoreCompound, null, node.Operand1, ConstantZero, node.Operand2);
 			}
 
 			node.MosaType = type;
@@ -1514,16 +1519,16 @@ namespace Mosa.Compiler.Framework.Stages
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 			var fieldType = field.FieldType;
 
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
-			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, fieldOperand, ConstantZero, node.Operand1);
-				node.MosaType = fieldType;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
 			{
 				var storeInstruction = GetStoreInstruction(fieldType);
 
 				node.SetInstruction(storeInstruction, null, fieldOperand, ConstantZero, node.Operand1);
+				node.MosaType = fieldType;
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.StoreCompound, null, fieldOperand, ConstantZero, node.Operand1);
 				node.MosaType = fieldType;
 			}
 		}
@@ -1624,16 +1629,16 @@ namespace Mosa.Compiler.Framework.Stages
 				context.AppendInstruction(IRInstruction.UnboxAny, tmp, value, adr, CreateConstant32(typeSize));
 			}
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				context.AppendInstruction(IRInstruction.LoadCompound, result, tmp, ConstantZero);
-				context.MosaType = type;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var loadInstruction = GetLoadInstruction(type);
 
 				context.AppendInstruction(loadInstruction, result, tmp, ConstantZero);
+				context.MosaType = type;
+			}
+			else
+			{
+				context.AppendInstruction(IRInstruction.LoadCompound, result, tmp, ConstantZero);
 				context.MosaType = type;
 			}
 		}
@@ -2148,21 +2153,24 @@ namespace Mosa.Compiler.Framework.Stages
 			var destination = node.Result;
 			var source = node.Operand1;
 
-			if (!MosaTypeLayout.CanFitInRegister(source.Type))
+			if (MosaTypeLayout.CanFitInRegister(source.Type))
 			{
-				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
-			}
-			else if (!source.IsVirtualRegister)
-			{
-				var loadInstruction = GetLoadInstruction(source.Type);
+				if (!source.IsVirtualRegister)
+				{
+					var loadInstruction = GetLoadInstruction(source.Type);
 
-				node.SetInstruction(loadInstruction, destination, StackFrame, source);
+					node.SetInstruction(loadInstruction, destination, StackFrame, source);
+				}
+				else
+				{
+					var moveInstruction = GetMoveInstruction(source.Type);
+
+					node.SetInstruction(moveInstruction, destination, source);
+				}
 			}
 			else
 			{
-				var moveInstruction = GetMoveInstruction(source.Type);
-
-				node.SetInstruction(moveInstruction, destination, source);
+				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
 			}
 		}
 

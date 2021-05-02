@@ -654,14 +654,14 @@ namespace Mosa.Compiler.Framework
 		/// <returns></returns>
 		public Operand AllocateVirtualRegisterOrStackSlot(MosaType type)
 		{
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				return AddStackLocal(type);
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var resultType = Compiler.GetStackType(type);
 				return CreateVirtualRegister(resultType);
+			}
+			else
+			{
+				return AddStackLocal(type);
 			}
 		}
 
@@ -676,14 +676,14 @@ namespace Mosa.Compiler.Framework
 			int index = 0;
 			foreach (var local in locals)
 			{
-				if (!MosaTypeLayout.CanFitInRegister(local.Type) || local.IsPinned)
-				{
-					LocalVariables[index++] = AddStackLocal(local.Type, local.IsPinned);
-				}
-				else
+				if (MosaTypeLayout.CanFitInRegister(local.Type) && !local.IsPinned)
 				{
 					var stacktype = Compiler.GetStackType(local.Type);
 					LocalVariables[index++] = CreateVirtualRegister(stacktype);
+				}
+				else
+				{
+					LocalVariables[index++] = AddStackLocal(local.Type, local.IsPinned);
 				}
 			}
 		}
