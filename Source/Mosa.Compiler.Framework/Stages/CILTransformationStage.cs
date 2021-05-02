@@ -248,6 +248,14 @@ namespace Mosa.Compiler.Framework.Stages
 			//AddVisitation(CILInstruction.Sub_ovf_un,Sub_ovf_un);
 		}
 
+		protected override void Run()
+		{
+			if (!MethodCompiler.IsCILStream)
+				return;
+
+			base.Run();
+		}
+
 		#region Visitation Methods
 
 		/// <summary>
@@ -407,6 +415,15 @@ namespace Mosa.Compiler.Framework.Stages
 			node.ReplaceInstruction(IRInstruction.Jmp);
 		}
 
+		/// <summary>
+		/// Visitation function for Break instruction.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		private void Break(Context context)
+		{
+			context.Empty();
+		}
+
 		private uint CalculateInterfaceSlot(MosaType interaceType)
 		{
 			return TypeLayout.GetInterfaceSlot(interaceType);
@@ -542,22 +559,6 @@ namespace Mosa.Compiler.Framework.Stages
 			node.ReplaceInstruction(IRInstruction.MoveObject); // HACK!
 		}
 
-		private ulong GetBitMask(int bits)
-		{
-			if (bits == 0)
-				return 0;
-			else if (bits == 8)
-				return 0xFF;
-			else if (bits == 16)
-				return 0xFFFF;
-			else if (bits == 32)
-				return 0xFFFFFFFF;
-			else if (bits == 64)
-				return 0xFFFFFFFFFFFFFFFF;
-
-			throw new CompilerException($"GetBitMask(): Invalid parameter: {nameof(bits)} = {bits}");
-		}
-
 		/// <summary>
 		/// Visitation function for Conversion instruction.
 		/// </summary>
@@ -643,38 +644,6 @@ namespace Mosa.Compiler.Framework.Stages
 		private void Endfinally(InstructionNode node)
 		{
 			throw new CompilerException();
-		}
-
-		private MosaMethod GetMethodOrOverride(MosaType type, MosaMethod method)
-		{
-			MosaMethod implMethod = null;
-
-			if (type.Methods.Contains(method)
-				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
-			{
-				return implMethod;
-			}
-
-			if (method.DeclaringType.Module == TypeSystem.CorLib
-				&& (method.DeclaringType.Name.Equals("ValueType")
-					|| method.DeclaringType.Name.Equals("Object")
-					|| method.DeclaringType.Name.Equals("Enum"))
-				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
-			{
-				return implMethod;
-			}
-
-			return method;
-		}
-
-		private Operand GetMethodTablePointer(MosaType runtimeType)
-		{
-			return Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, Metadata.TypeDefinition + runtimeType.FullName);
-		}
-
-		private Operand GetRuntimeTypeHandle(MosaType runtimeType)
-		{
-			return Operand.CreateSymbol(TypeSystem.GetTypeByName("System", "RuntimeTypeHandle"), Metadata.TypeDefinition + runtimeType.FullName);
 		}
 
 		/// <summary>
@@ -985,6 +954,37 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		/// <summary>
+		/// Replaces the IL load instruction by an appropriate IR move instruction or removes it entirely, if
+		/// it is a native size.
+		/// </summary>
+		/// <param name="node">Provides the transformation context.</param>
+		private void Ldloc(InstructionNode node)
+		{
+			var destination = node.Result;
+			var source = node.Operand1;
+
+			if (MosaTypeLayout.CanFitInRegister(source.Type))
+			{
+				if (!source.IsVirtualRegister)
+				{
+					var loadInstruction = GetLoadInstruction(source.Type);
+
+					node.SetInstruction(loadInstruction, destination, StackFrame, source);
+				}
+				else
+				{
+					var moveInstruction = GetMoveInstruction(source.Type);
+
+					node.SetInstruction(moveInstruction, destination, source);
+				}
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
+			}
+		}
+
+		/// <summary>
 		/// Visitation function for Ldloca instruction.
 		/// </summary>
 		/// <param name="node">The node.</param>
@@ -1028,8 +1028,6 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			var field = node.MosaField;
 
-			MethodScanner.AccessedField(field);
-
 			var fieldType = field.FieldType;
 			var destination = node.Result;
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
@@ -1047,6 +1045,8 @@ namespace Mosa.Compiler.Framework.Stages
 				node.SetInstruction(IRInstruction.LoadCompound, destination, fieldOperand, ConstantZero);
 				node.MosaType = fieldType;
 			}
+
+			MethodScanner.AccessedField(field);
 		}
 
 		/// <summary>
@@ -1297,6 +1297,11 @@ namespace Mosa.Compiler.Framework.Stages
 		private void Pop(InstructionNode node)
 		{
 			node.Empty();
+		}
+
+		private void PreReadOnly(Context context)
+		{
+			context.SetInstruction(IRInstruction.Nop);
 		}
 
 		/// <summary>
@@ -1561,15 +1566,6 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		/// <summary>
-		/// Visitation function for Break instruction.
-		/// </summary>
-		/// <param name="context">The context.</param>
-		private void Break(Context context)
-		{
-			context.Empty();
-		}
-
-		/// <summary>
 		/// Visitation function for UnaryBranch instruction.
 		/// </summary>
 		/// <param name="context">The context.</param>
@@ -1643,60 +1639,9 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
-		private void PreReadOnly(Context context)
-		{
-			context.SetInstruction(IRInstruction.Nop);
-		}
-
 		#endregion Visitation Methods
 
-		protected override void Run()
-		{
-			if (!MethodCompiler.IsCILStream)
-				return;
-
-			base.Run();
-		}
-
 		#region Internals
-
-		private static BaseIRInstruction Select(Operand operand, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
-		{
-			return Select(operand.IsInteger64, instruction32, instruction64);
-		}
-
-		private static BaseIRInstruction Select(bool is64Bit, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
-		{
-			return !is64Bit ? instruction32 : instruction64;
-		}
-
-		private struct ConversionEntry
-		{
-			public BaseInstruction Instruction;
-			public BaseInstruction PostInstruction;
-			public int BitsToMask;
-
-			public ConversionEntry(BaseInstruction instruction)
-			{
-				Instruction = instruction;
-				PostInstruction = null;
-				BitsToMask = 0;
-			}
-
-			public ConversionEntry(BaseInstruction instruction, int bitsToMask = 0)
-			{
-				Instruction = instruction;
-				PostInstruction = null;
-				BitsToMask = bitsToMask;
-			}
-
-			public ConversionEntry(BaseInstruction instruction, BaseInstruction postInstruction = null, int bitsToMask = 0)
-			{
-				Instruction = instruction;
-				PostInstruction = postInstruction;
-				BitsToMask = bitsToMask;
-			}
-		}
 
 		// [destination]<-[source]
 		private static readonly ConversionEntry[][] ConversionTable32 = new ConversionEntry[][] {
@@ -1965,6 +1910,16 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
+		private static BaseIRInstruction Select(Operand operand, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
+		{
+			return Select(operand.IsInteger64, instruction32, instruction64);
+		}
+
+		private static BaseIRInstruction Select(bool is64Bit, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
+		{
+			return !is64Bit ? instruction32 : instruction64;
+		}
+
 		/// <summary>
 		/// Adds bounds check to the array access.
 		/// </summary>
@@ -2038,6 +1993,22 @@ namespace Mosa.Compiler.Framework.Stages
 			return arrayElement;
 		}
 
+		private ulong GetBitMask(int bits)
+		{
+			if (bits == 0)
+				return 0;
+			else if (bits == 8)
+				return 0xFF;
+			else if (bits == 16)
+				return 0xFFFF;
+			else if (bits == 32)
+				return 0xFFFFFFFF;
+			else if (bits == 64)
+				return 0xFFFFFFFFFFFFFFFF;
+
+			throw new CompilerException($"GetBitMask(): Invalid parameter: {nameof(bits)} = {bits}");
+		}
+
 		/// <summary>
 		/// Gets the index.
 		/// </summary>
@@ -2065,41 +2036,36 @@ namespace Mosa.Compiler.Framework.Stages
 			throw new CompilerException();
 		}
 
-		private IntrinsicMethodDelegate ResolveIntrinsicDelegateMethod(MosaMethod method)
+		private MosaMethod GetMethodOrOverride(MosaType type, MosaMethod method)
 		{
-			IntrinsicMethodDelegate intrinsic = null;
+			MosaMethod implMethod = null;
 
-			if (InstrinsicMap.TryGetValue(method, out intrinsic))
+			if (type.Methods.Contains(method)
+				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
 			{
-				return intrinsic;
+				return implMethod;
 			}
 
-			if (method.IsExternal)
+			if (method.DeclaringType.Module == TypeSystem.CorLib
+				&& (method.DeclaringType.Name.Equals("ValueType")
+					|| method.DeclaringType.Name.Equals("Object")
+					|| method.DeclaringType.Name.Equals("Enum"))
+				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
 			{
-				intrinsic = Architecture.GetInstrinsicMethod(method.ExternMethodModule);
-			}
-			else if (method.IsInternal)
-			{
-				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
-
-				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
-
-				if (intrinsic == null)
-				{
-					// special case for plugging constructors
-					intrinsic = MethodCompiler.Compiler.GetInstrincMethod($"{method.DeclaringType.FullName}::{method.Name}");
-				}
-			}
-			else
-			{
-				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
-
-				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+				return implMethod;
 			}
 
-			InstrinsicMap.Add(method, intrinsic);
+			return method;
+		}
 
-			return intrinsic;
+		private Operand GetMethodTablePointer(MosaType runtimeType)
+		{
+			return Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, Metadata.TypeDefinition + runtimeType.FullName);
+		}
+
+		private Operand GetRuntimeTypeHandle(MosaType runtimeType)
+		{
+			return Operand.CreateSymbol(TypeSystem.GetTypeByName("System", "RuntimeTypeHandle"), Metadata.TypeDefinition + runtimeType.FullName);
 		}
 
 		/// <summary>
@@ -2143,37 +2109,6 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
-		/// <summary>
-		/// Replaces the IL load instruction by an appropriate IR move instruction or removes it entirely, if
-		/// it is a native size.
-		/// </summary>
-		/// <param name="node">Provides the transformation context.</param>
-		private void Ldloc(InstructionNode node)
-		{
-			var destination = node.Result;
-			var source = node.Operand1;
-
-			if (MosaTypeLayout.CanFitInRegister(source.Type))
-			{
-				if (!source.IsVirtualRegister)
-				{
-					var loadInstruction = GetLoadInstruction(source.Type);
-
-					node.SetInstruction(loadInstruction, destination, StackFrame, source);
-				}
-				else
-				{
-					var moveInstruction = GetMoveInstruction(source.Type);
-
-					node.SetInstruction(moveInstruction, destination, source);
-				}
-			}
-			else
-			{
-				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
-			}
-		}
-
 		private bool ReplaceWithInternalCall(InstructionNode node)
 		{
 			var method = node.InvokeMethod;
@@ -2191,6 +2126,71 @@ namespace Mosa.Compiler.Framework.Stages
 			node.AppendOperands(operands);
 
 			return true;
+		}
+
+		private IntrinsicMethodDelegate ResolveIntrinsicDelegateMethod(MosaMethod method)
+		{
+			IntrinsicMethodDelegate intrinsic = null;
+
+			if (InstrinsicMap.TryGetValue(method, out intrinsic))
+			{
+				return intrinsic;
+			}
+
+			if (method.IsExternal)
+			{
+				intrinsic = Architecture.GetInstrinsicMethod(method.ExternMethodModule);
+			}
+			else if (method.IsInternal)
+			{
+				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
+
+				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+
+				if (intrinsic == null)
+				{
+					// special case for plugging constructors
+					intrinsic = MethodCompiler.Compiler.GetInstrincMethod($"{method.DeclaringType.FullName}::{method.Name}");
+				}
+			}
+			else
+			{
+				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
+
+				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+			}
+
+			InstrinsicMap.Add(method, intrinsic);
+
+			return intrinsic;
+		}
+
+		private struct ConversionEntry
+		{
+			public int BitsToMask;
+			public BaseInstruction Instruction;
+			public BaseInstruction PostInstruction;
+
+			public ConversionEntry(BaseInstruction instruction)
+			{
+				Instruction = instruction;
+				PostInstruction = null;
+				BitsToMask = 0;
+			}
+
+			public ConversionEntry(BaseInstruction instruction, int bitsToMask = 0)
+			{
+				Instruction = instruction;
+				PostInstruction = null;
+				BitsToMask = bitsToMask;
+			}
+
+			public ConversionEntry(BaseInstruction instruction, BaseInstruction postInstruction = null, int bitsToMask = 0)
+			{
+				Instruction = instruction;
+				PostInstruction = postInstruction;
+				BitsToMask = bitsToMask;
+			}
 		}
 
 		#endregion Internals
