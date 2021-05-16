@@ -302,7 +302,7 @@ namespace Mosa.Tool.Debugger
 			}
 		}
 
-		private bool IsDigitsOnly(string str)
+		private static bool IsDigitsOnly(string str)
 		{
 			foreach (char c in str)
 			{
@@ -313,7 +313,7 @@ namespace Mosa.Tool.Debugger
 			return true;
 		}
 
-		private bool IsHexDigitsOnly(string str)
+		private static bool IsHexDigitsOnly(string str)
 		{
 			foreach (char c in str)
 			{
@@ -324,14 +324,29 @@ namespace Mosa.Tool.Debugger
 			return true;
 		}
 
-		public ulong ParseHexAddress(string input)
-		{
-			string nbr = input.ToLower().Trim();
+		public static char[] separators = new char[] { '\t', ' ', ',', '[', ']' };
 
-			if (nbr.StartsWith('[') && nbr.EndsWith(']'))
+		public static ulong ParseAddress(string decode)
+		{
+			var parts = decode.Split(separators);
+
+			foreach (var part in parts)
 			{
-				nbr = nbr.Substring(1, nbr.Length - 2);
+				if (part.Length <= 6)
+					continue;
+
+				var address = ParseHexAddress(part);
+
+				if (address > 0)
+					return address;
 			}
+
+			return 0;
+		}
+
+		public static ulong ParseHexAddress(string input)
+		{
+			string nbr = input.ToLower().Trim().Trim(',').Trim('[').Trim('[');
 
 			int where = nbr.IndexOf('x');
 

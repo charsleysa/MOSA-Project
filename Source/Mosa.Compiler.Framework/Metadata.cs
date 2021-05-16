@@ -29,5 +29,7 @@ namespace Mosa.Compiler.Framework
 
 		public const string MethodLookupTable = "<$>MethodLookupTable";
 		public const string MethodExceptionLookupTable = "<$>MethodExceptionLookupTable";
+
+		public const string StaticSymbolPrefix = "$static$";
 	}
 }

@@ -1021,35 +1021,6 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		/// <summary>
-		/// Visitation function for Ldsfld instruction.
-		/// </summary>
-		/// <param name="node">The node.</param>
-		private void Ldsfld(InstructionNode node)
-		{
-			var field = node.MosaField;
-
-			var fieldType = field.FieldType;
-			var destination = node.Result;
-			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
-
-			if (MosaTypeLayout.CanFitInRegister(fieldType))
-			{
-				var loadInstruction = GetLoadInstruction(fieldType);
-
-				node.SetInstruction(loadInstruction, destination, fieldOperand, ConstantZero);
-				node.MosaType = fieldType;
-			}
-			else
-			{
-				// Interesting -- this code appears to never be executed
-				node.SetInstruction(IRInstruction.LoadCompound, destination, fieldOperand, ConstantZero);
-				node.MosaType = fieldType;
-			}
-
-			MethodScanner.AccessedField(field);
-		}
-
-		/// <summary>
 		/// Visitation function for Ldsflda instruction.
 		/// </summary>
 		/// <param name="node">The node.</param>
@@ -1058,6 +1029,12 @@ namespace Mosa.Compiler.Framework.Stages
 			var field = node.MosaField;
 
 			MethodScanner.AccessedField(field);
+
+			if (field.FieldType.IsReferenceType)
+			{
+				// TODO
+				node.Result = node.Result;
+			}
 
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 
@@ -1216,8 +1193,35 @@ namespace Mosa.Compiler.Framework.Stages
 			var before = context.InsertBefore();
 
 			// If the type is value type we don't need to call AllocateObject
-			bool v = !MosaTypeLayout.CanFitInRegister(result.Type);
-			if (v)
+			if (MosaTypeLayout.CanFitInRegister(result.Type))
+			{
+				if (result.IsValueType)
+				{
+					//Debug.Assert(result.Uses.Count <= 1, "Usages too high");
+
+					var newThisLocal = MethodCompiler.AddStackLocal(result.Type);
+					var newThis = MethodCompiler.CreateVirtualRegister(result.Type.ToManagedPointer());
+					before.SetInstruction(IRInstruction.AddressOf, newThis, newThisLocal);
+
+					var loadInstruction = GetLoadInstruction(newThisLocal.Type);
+
+					context.InsertAfter().SetInstruction(loadInstruction, result, StackFrame, newThisLocal);
+
+					operands.Insert(0, newThis);
+				}
+				else
+				{
+					Debug.Assert(result.IsReferenceType);
+
+					var methodTable = GetMethodTablePointer(classType);
+					var size = CreateConstant32(TypeLayout.GetTypeSize(classType));
+					before.SetInstruction(IRInstruction.NewObject, result, methodTable, size);
+					before.MosaType = classType;
+
+					operands.Insert(0, result);
+				}
+			}
+			else
 			{
 				Debug.Assert(result.Uses.Count <= 1, "Usages too high");
 
@@ -1226,31 +1230,6 @@ namespace Mosa.Compiler.Framework.Stages
 				before.AppendInstruction(IRInstruction.Nop);
 
 				operands.Insert(0, newThis);
-			}
-			else if (result.IsValueType)
-			{
-				//Debug.Assert(result.Uses.Count <= 1, "Usages too high");
-
-				var newThisLocal = MethodCompiler.AddStackLocal(result.Type);
-				var newThis = MethodCompiler.CreateVirtualRegister(result.Type.ToManagedPointer());
-				before.SetInstruction(IRInstruction.AddressOf, newThis, newThisLocal);
-
-				var loadInstruction = GetLoadInstruction(newThisLocal.Type);
-
-				context.InsertAfter().SetInstruction(loadInstruction, result, StackFrame, newThisLocal);
-
-				operands.Insert(0, newThis);
-			}
-			else
-			{
-				Debug.Assert(result.IsReferenceType);
-
-				var methodTable = GetMethodTablePointer(classType);
-				var size = CreateConstant32(TypeLayout.GetTypeSize(classType));
-				before.SetInstruction(IRInstruction.NewObject, result, methodTable, size);
-				before.MosaType = classType;
-
-				operands.Insert(0, result);
 			}
 
 			var symbol = Operand.CreateSymbolFromMethod(method, TypeSystem);
@@ -1512,6 +1491,45 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		/// <summary>
+		/// Visitation function for Ldsfld instruction.
+		/// </summary>
+		/// <param name="node">The node.</param>
+		private void Ldsfld(InstructionNode node)
+		{
+			var field = node.MosaField;
+
+			var fieldType = field.FieldType;
+			var result = node.Result;
+			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
+
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
+			{
+				var loadInstruction = GetLoadInstruction(fieldType);
+
+				if (fieldType.IsReferenceType)
+				{
+					var symbol = GetStaticSymbol(field);
+					var staticReference = Operand.CreateSymbol(TypeSystem.BuiltIn.Object, symbol.Name);
+
+					node.SetInstruction(IRInstruction.LoadObject, result, staticReference, ConstantZero);
+				}
+				else
+				{
+					node.SetInstruction(loadInstruction, result, fieldOperand, ConstantZero);
+					node.MosaType = fieldType;
+				}
+			}
+			else
+			{
+				// Interesting -- this code appears to never be executed
+				node.SetInstruction(IRInstruction.LoadCompound, result, fieldOperand, ConstantZero);
+				node.MosaType = fieldType;
+			}
+
+			MethodScanner.AccessedField(field);
+		}
+
+		/// <summary>
 		/// Visitation function for Stsfld instruction.
 		/// </summary>
 		/// <param name="node">The context.</param>
@@ -1519,23 +1537,34 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			var field = node.MosaField;
 
-			MethodScanner.AccessedField(field);
-
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 			var fieldType = field.FieldType;
+			var operand1 = node.Operand1;
 
 			if (MosaTypeLayout.CanFitInRegister(fieldType))
 			{
 				var storeInstruction = GetStoreInstruction(fieldType);
 
-				node.SetInstruction(storeInstruction, null, fieldOperand, ConstantZero, node.Operand1);
-				node.MosaType = fieldType;
+				if (fieldType.IsReferenceType)
+				{
+					var symbol = GetStaticSymbol(field);
+					var staticReference = Operand.CreateSymbol(TypeSystem.BuiltIn.Object, symbol.Name);
+
+					node.SetInstruction(IRInstruction.StoreObject, null, staticReference, ConstantZero, operand1);
+				}
+				else
+				{
+					node.SetInstruction(storeInstruction, null, fieldOperand, ConstantZero, operand1);
+					node.MosaType = fieldType;
+				}
 			}
 			else
 			{
 				node.SetInstruction(IRInstruction.StoreCompound, null, fieldOperand, ConstantZero, node.Operand1);
 				node.MosaType = fieldType;
 			}
+
+			MethodScanner.AccessedField(field);
 		}
 
 		/// <summary>
@@ -2194,5 +2223,10 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		#endregion Internals
+
+		public LinkerSymbol GetStaticSymbol(MosaField field)
+		{
+			return Linker.DefineSymbol($"{Metadata.StaticSymbolPrefix}{field.DeclaringType}+{field.Name}", SectionKind.BSS, Architecture.NativeAlignment, NativePointerSize);
+		}
 	}
 }

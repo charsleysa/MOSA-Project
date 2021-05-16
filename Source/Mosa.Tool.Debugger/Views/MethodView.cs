@@ -156,7 +156,7 @@ namespace Mosa.Tool.Debugger.Views
 
 			foreach (var instruction in disassembler.Decode())
 			{
-				var addr = ParseAddress(instruction.Instruction);
+				var addr = MainForm.ParseAddress(instruction.Instruction);
 
 				var info = MainForm.GetAddressInfo(addr);
 
@@ -204,26 +204,6 @@ namespace Mosa.Tool.Debugger.Views
 			m.Items.Add(new ToolStripMenuItem("Set &Breakpoint", null, new EventHandler(MainForm.OnAddBreakPoint)) { Tag = new AddBreakPointArgs(null, clickedEntry.IP) });
 
 			m.Show(dataGridView1, relativeMousePosition);
-		}
-
-		public static char[] separators = new char[] { '\t', ' ' };
-
-		public ulong ParseAddress(string decode)
-		{
-			var parts = decode.Split(separators);
-
-			foreach (var part in parts)
-			{
-				if (part.Length <= 6)
-					continue;
-
-				var address = MainForm.ParseHexAddress(part);
-
-				if (address > 0)
-					return address;
-			}
-
-			return 0;
 		}
 	}
 }
