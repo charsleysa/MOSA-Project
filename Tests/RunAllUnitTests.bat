@@ -1,1 +1,1 @@
-..\bin\Mosa.Utility.UnitTests.exe -o9 -output-hash
+..\bin\Mosa.Utility.UnitTests.exe -o0 -output-hash
