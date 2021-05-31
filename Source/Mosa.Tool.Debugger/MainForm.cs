@@ -235,11 +235,14 @@ namespace Mosa.Tool.Debugger
 			}
 		}
 
-		private void NotifyStatus(string status) => Invoke((MethodInvoker)(() => NewStatus(status)));
-
-		private void NewStatus(string info)
+		private void LogEvent(string status)
 		{
-			outputView.AddOutput(info);
+			Invoke((MethodInvoker)(() => OutputLogEvent(status)));
+		}
+
+		private void OutputLogEvent(string info)
+		{
+			outputView.LogEvent(info);
 		}
 
 		private void LoadDebugFile()
@@ -398,10 +401,17 @@ namespace Mosa.Tool.Debugger
 				return;
 			}
 
+			GDBConnector.GDBClient.LogEvent = LogGDBEvent;
+
 			GDBConnector.ExtendedMode();
 			GDBConnector.ClearAllBreakPoints();
 			ResendBreakPoints();
 			MemoryCache = new MemoryCache(GDBConnector);
+		}
+
+		private void LogGDBEvent(string info)
+		{
+			//LogEvent($"GDB >> {info}");
 		}
 
 		private void Disconnect()
@@ -679,10 +689,15 @@ namespace Mosa.Tool.Debugger
 		{
 			var compilerHooks = new CompilerHooks
 			{
-				NotifyStatus = NotifyStatus
+				NotifyStatus = LogCompilerEvent
 			};
 
 			return compilerHooks;
+		}
+
+		private void LogCompilerEvent(string info)
+		{
+			LogEvent($"Compiler >> {info}");
 		}
 
 		private void StartQEMU()
