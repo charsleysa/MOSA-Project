@@ -4,7 +4,6 @@ using Mosa.Compiler.Common;
 using Mosa.Compiler.Common.Configuration;
 using Mosa.Compiler.Framework;
 using Mosa.Compiler.Framework.CompilerStages;
-using Mosa.Compiler.Framework.Linker;
 using Mosa.Compiler.Framework.Trace;
 using Mosa.Compiler.MosaTypeSystem;
 using Mosa.Tool.Explorer.Stages;
@@ -747,7 +746,7 @@ namespace Mosa.Tool.Explorer
 
 		private void NotifyEvent(CompilerEvent compilerEvent, string message, int threadID)
 		{
-			message = string.IsNullOrWhiteSpace(message) ? string.Empty : $"{message}";
+			message = string.IsNullOrWhiteSpace(message) ? string.Empty : $" => {message}";
 
 			var status = $"{compilerEvent.ToText()}{message}";
 

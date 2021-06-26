@@ -235,11 +235,14 @@ namespace Mosa.Tool.Debugger
 			}
 		}
 
-		private void NotifyStatus(string status) => Invoke((MethodInvoker)(() => NewStatus(status)));
-
-		private void NewStatus(string info)
+		private void LogEvent(string status)
 		{
-			outputView.AddOutput(info);
+			Invoke((MethodInvoker)(() => OutputLogEvent(status)));
+		}
+
+		private void OutputLogEvent(string info)
+		{
+			outputView.LogEvent(info);
 		}
 
 		private void LoadDebugFile()
@@ -302,7 +305,7 @@ namespace Mosa.Tool.Debugger
 			}
 		}
 
-		private bool IsDigitsOnly(string str)
+		private static bool IsDigitsOnly(string str)
 		{
 			foreach (char c in str)
 			{
@@ -313,7 +316,7 @@ namespace Mosa.Tool.Debugger
 			return true;
 		}
 
-		private bool IsHexDigitsOnly(string str)
+		private static bool IsHexDigitsOnly(string str)
 		{
 			foreach (char c in str)
 			{
@@ -324,9 +327,30 @@ namespace Mosa.Tool.Debugger
 			return true;
 		}
 
-		public ulong ParseHexAddress(string input)
+		public static char[] separators = new char[] { '\t', ' ', ',', '[', ']' };
+
+		public static ulong ParseAddress(string decode)
 		{
-			string nbr = input.ToLower().Trim();
+			var parts = decode.Split(separators);
+
+			foreach (var part in parts)
+			{
+				if (part.Length <= 6)
+					continue;
+
+				var address = ParseHexAddress(part);
+
+				if (address > 0)
+					return address;
+			}
+
+			return 0;
+		}
+
+		public static ulong ParseHexAddress(string input)
+		{
+			string nbr = input.ToLower().Trim().Trim(',').Trim('[').Trim('[');
+
 			int where = nbr.IndexOf('x');
 
 			if (where >= 0)
@@ -377,10 +401,17 @@ namespace Mosa.Tool.Debugger
 				return;
 			}
 
+			GDBConnector.GDBClient.LogEvent = LogGDBEvent;
+
 			GDBConnector.ExtendedMode();
 			GDBConnector.ClearAllBreakPoints();
 			ResendBreakPoints();
 			MemoryCache = new MemoryCache(GDBConnector);
+		}
+
+		private void LogGDBEvent(string info)
+		{
+			//LogEvent($"GDB >> {info}");
 		}
 
 		private void Disconnect()
@@ -658,10 +689,15 @@ namespace Mosa.Tool.Debugger
 		{
 			var compilerHooks = new CompilerHooks
 			{
-				NotifyStatus = NotifyStatus
+				NotifyStatus = LogCompilerEvent
 			};
 
 			return compilerHooks;
+		}
+
+		private void LogCompilerEvent(string info)
+		{
+			LogEvent($"Compiler >> {info}");
 		}
 
 		private void StartQEMU()

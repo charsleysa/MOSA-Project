@@ -183,7 +183,8 @@ namespace Mosa.Compiler.Framework
 				new ExceptionStage(),
 
 				new StackSetupStage(),
-				new StaticAllocationResolutionStage(),
+
+				//new StaticAllocationResolutionStage(),
 				compilerSettings.Devirtualization ? new DevirtualizeCallStage() : null,
 				new PlugStage(),
 

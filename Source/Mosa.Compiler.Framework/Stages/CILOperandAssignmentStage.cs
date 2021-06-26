@@ -157,14 +157,14 @@ namespace Mosa.Compiler.Framework.Stages
 				var source = sourceOperands[i];
 				var destination = destinationOperands[i];
 
-				if (!MosaTypeLayout.CanFitInRegister(source.Type))
-				{
-					context.AppendInstruction(IRInstruction.MoveCompound, destination, source);
-				}
-				else
+				if (MosaTypeLayout.CanFitInRegister(source.Type))
 				{
 					var moveInstruction = GetMoveInstruction(source.Type);
 					context.AppendInstruction(moveInstruction, destination, source);
+				}
+				else
+				{
+					context.AppendInstruction(IRInstruction.MoveCompound, destination, source);
 				}
 			}
 		}

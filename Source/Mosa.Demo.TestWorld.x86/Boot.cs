@@ -45,13 +45,11 @@ namespace Mosa.Demo.TestWorld.x86
 
 			IDT.SetInterruptHandler(null);
 			Screen.Write('2');
-
 			Debugger.Setup(Serial.COM1);
 
 			Screen.Write('3');
 			PIC.Setup();
 			Screen.Write('4');
-
 			IDT.Setup();
 			Screen.Write('5');
 			PageFrameAllocator.Setup();
@@ -65,32 +63,19 @@ namespace Mosa.Demo.TestWorld.x86
 
 			Scheduler.Setup();
 			Screen.Write('B');
-
 			IDT.SetInterruptHandler(ProcessInterrupt);
 			Screen.Write('C');
-
 			ConsoleManager.Setup();
 			Screen.Write('D');
 			Screen.Write('E');
 			Screen.WriteLine();
 			Screen.WriteLine();
 
-			KernelTest.RunTests();
+			Test2();
 
-			Screen.WriteLine();
+			//UnitTest();
 
-			if (Test() != 0)
-				Screen.WriteLine("Error");
-
-			Screen.WriteLine();
-
-			Screen.Write("[DONE]");
-
-			while (true)
-			{
-				Native.Hlt();
-			}
-
+			//KernelTest.RunTests();
 			//StackTrace();
 
 			//TestHash();
@@ -108,10 +93,10 @@ namespace Mosa.Demo.TestWorld.x86
 			//// should never get here
 			//Screen.Write("!BAD!");
 
-			//while (true)
-			//{
-			//	Native.Hlt();
-			//}
+			while (true)
+			{
+				Native.Hlt();
+			}
 		}
 
 		private static void TestHash()
@@ -293,15 +278,15 @@ namespace Mosa.Demo.TestWorld.x86
 		}
 
 		[MethodImpl(MethodImplOptions.NoInlining)]
-		public static int Test()
+		public static int Test1()
 		{
-			string s = "1";
+			return Unsafe.SizeOf<int>();
+		}
 
-			object o = s;
-
-			var b = (o is System.String);
-
-			return b ? 0 : 1;   // should be 0
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		public static int Test2()
+		{
+			return DevirtualizationTests.Test1();
 		}
 	}
 }

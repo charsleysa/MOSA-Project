@@ -248,6 +248,14 @@ namespace Mosa.Compiler.Framework.Stages
 			//AddVisitation(CILInstruction.Sub_ovf_un,Sub_ovf_un);
 		}
 
+		protected override void Run()
+		{
+			if (!MethodCompiler.IsCILStream)
+				return;
+
+			base.Run();
+		}
+
 		#region Visitation Methods
 
 		/// <summary>
@@ -407,6 +415,15 @@ namespace Mosa.Compiler.Framework.Stages
 			node.ReplaceInstruction(IRInstruction.Jmp);
 		}
 
+		/// <summary>
+		/// Visitation function for Break instruction.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		private void Break(Context context)
+		{
+			context.Empty();
+		}
+
 		private uint CalculateInterfaceSlot(MosaType interaceType)
 		{
 			return TypeLayout.GetInterfaceSlot(interaceType);
@@ -542,22 +559,6 @@ namespace Mosa.Compiler.Framework.Stages
 			node.ReplaceInstruction(IRInstruction.MoveObject); // HACK!
 		}
 
-		private ulong GetBitMask(int bits)
-		{
-			if (bits == 0)
-				return 0;
-			else if (bits == 8)
-				return 0xFF;
-			else if (bits == 16)
-				return 0xFFFF;
-			else if (bits == 32)
-				return 0xFFFFFFFF;
-			else if (bits == 64)
-				return 0xFFFFFFFFFFFFFFFF;
-
-			throw new CompilerException($"GetBitMask(): Invalid parameter: {nameof(bits)} = {bits}");
-		}
-
 		/// <summary>
 		/// Visitation function for Conversion instruction.
 		/// </summary>
@@ -645,38 +646,6 @@ namespace Mosa.Compiler.Framework.Stages
 			throw new CompilerException();
 		}
 
-		private MosaMethod GetMethodOrOverride(MosaType type, MosaMethod method)
-		{
-			MosaMethod implMethod = null;
-
-			if (type.Methods.Contains(method)
-				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
-			{
-				return implMethod;
-			}
-
-			if (method.DeclaringType.Module == TypeSystem.CorLib
-				&& (method.DeclaringType.Name.Equals("ValueType")
-					|| method.DeclaringType.Name.Equals("Object")
-					|| method.DeclaringType.Name.Equals("Enum"))
-				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
-			{
-				return implMethod;
-			}
-
-			return method;
-		}
-
-		private Operand GetMethodTablePointer(MosaType runtimeType)
-		{
-			return Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, Metadata.TypeDefinition + runtimeType.FullName);
-		}
-
-		private Operand GetRuntimeTypeHandle(MosaType runtimeType)
-		{
-			return Operand.CreateSymbol(TypeSystem.GetTypeByName("System", "RuntimeTypeHandle"), Metadata.TypeDefinition + runtimeType.FullName);
-		}
-
 		/// <summary>
 		/// Visitation function for Initblk instruction.
 		/// </summary>
@@ -753,16 +722,16 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			Debug.Assert(node.Operand1.IsParameter);
 
-			if (!MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
-			{
-				node.SetInstruction(IRInstruction.LoadParamCompound, node.Result, node.Operand1);
-				node.MosaType = node.Operand1.Type;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
 			{
 				var loadInstruction = GetLoadParameterInstruction(node.Operand1.Type);
 
 				node.SetInstruction(loadInstruction, node.Result, node.Operand1);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.LoadParamCompound, node.Result, node.Operand1);
+				node.MosaType = node.Operand1.Type;
 			}
 		}
 
@@ -810,16 +779,16 @@ namespace Mosa.Compiler.Framework.Stages
 
 			Debug.Assert(elementOffset != null);
 
-			if (!MosaTypeLayout.CanFitInRegister(arrayType.ElementType))
-			{
-				node.SetInstruction(IRInstruction.LoadCompound, result, array, totalElementOffset);
-				node.MosaType = arrayType.ElementType;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(arrayType.ElementType))
 			{
 				var loadInstruction = GetLoadInstruction(arrayType.ElementType);
 
 				node.SetInstruction(loadInstruction, result, array, totalElementOffset);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.LoadCompound, result, array, totalElementOffset);
+				node.MosaType = arrayType.ElementType;
 			}
 		}
 
@@ -985,6 +954,37 @@ namespace Mosa.Compiler.Framework.Stages
 		}
 
 		/// <summary>
+		/// Replaces the IL load instruction by an appropriate IR move instruction or removes it entirely, if
+		/// it is a native size.
+		/// </summary>
+		/// <param name="node">Provides the transformation context.</param>
+		private void Ldloc(InstructionNode node)
+		{
+			var destination = node.Result;
+			var source = node.Operand1;
+
+			if (MosaTypeLayout.CanFitInRegister(source.Type))
+			{
+				if (!source.IsVirtualRegister)
+				{
+					var loadInstruction = GetLoadInstruction(source.Type);
+
+					node.SetInstruction(loadInstruction, destination, StackFrame, source);
+				}
+				else
+				{
+					var moveInstruction = GetMoveInstruction(source.Type);
+
+					node.SetInstruction(moveInstruction, destination, source);
+				}
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
+			}
+		}
+
+		/// <summary>
 		/// Visitation function for Ldloca instruction.
 		/// </summary>
 		/// <param name="node">The node.</param>
@@ -1006,46 +1006,18 @@ namespace Mosa.Compiler.Framework.Stages
 
 			// This is actually ldind.* and ldobj - the opcodes have the same meanings
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				node.SetInstruction(IRInstruction.LoadCompound, destination, source, ConstantZero);
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var loadInstruction = GetLoadInstruction(type);
 
 				node.SetInstruction(loadInstruction, destination, source, ConstantZero);
 			}
-
-			node.MosaType = type;
-		}
-
-		/// <summary>
-		/// Visitation function for Ldsfld instruction.
-		/// </summary>
-		/// <param name="node">The node.</param>
-		private void Ldsfld(InstructionNode node)
-		{
-			var field = node.MosaField;
-
-			MethodScanner.AccessedField(field);
-
-			var fieldType = field.FieldType;
-			var destination = node.Result;
-			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
-
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
-			{
-				// Interesting -- this code appears to never be executed
-				node.SetInstruction(IRInstruction.LoadCompound, destination, fieldOperand, ConstantZero);
-				node.MosaType = fieldType;
-			}
 			else
 			{
-				var loadInstruction = GetLoadInstruction(fieldType);
-				node.SetInstruction(loadInstruction, destination, fieldOperand, ConstantZero);
-				node.MosaType = fieldType;
+				node.SetInstruction(IRInstruction.LoadCompound, destination, source, ConstantZero);
 			}
+
+			node.MosaType = type;
 		}
 
 		/// <summary>
@@ -1057,6 +1029,12 @@ namespace Mosa.Compiler.Framework.Stages
 			var field = node.MosaField;
 
 			MethodScanner.AccessedField(field);
+
+			if (field.FieldType.IsReferenceType)
+			{
+				// TODO
+				node.Result = node.Result;
+			}
 
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 
@@ -1215,7 +1193,35 @@ namespace Mosa.Compiler.Framework.Stages
 			var before = context.InsertBefore();
 
 			// If the type is value type we don't need to call AllocateObject
-			if (!MosaTypeLayout.CanFitInRegister(result.Type))
+			if (MosaTypeLayout.CanFitInRegister(result.Type))
+			{
+				if (result.IsValueType)
+				{
+					//Debug.Assert(result.Uses.Count <= 1, "Usages too high");
+
+					var newThisLocal = MethodCompiler.AddStackLocal(result.Type);
+					var newThis = MethodCompiler.CreateVirtualRegister(result.Type.ToManagedPointer());
+					before.SetInstruction(IRInstruction.AddressOf, newThis, newThisLocal);
+
+					var loadInstruction = GetLoadInstruction(newThisLocal.Type);
+
+					context.InsertAfter().SetInstruction(loadInstruction, result, StackFrame, newThisLocal);
+
+					operands.Insert(0, newThis);
+				}
+				else
+				{
+					Debug.Assert(result.IsReferenceType);
+
+					var methodTable = GetMethodTablePointer(classType);
+					var size = CreateConstant32(TypeLayout.GetTypeSize(classType));
+					before.SetInstruction(IRInstruction.NewObject, result, methodTable, size);
+					before.MosaType = classType;
+
+					operands.Insert(0, result);
+				}
+			}
+			else
 			{
 				Debug.Assert(result.Uses.Count <= 1, "Usages too high");
 
@@ -1224,31 +1230,6 @@ namespace Mosa.Compiler.Framework.Stages
 				before.AppendInstruction(IRInstruction.Nop);
 
 				operands.Insert(0, newThis);
-			}
-			else if (result.IsValueType)
-			{
-				//Debug.Assert(result.Uses.Count <= 1, "Usages too high");
-
-				var newThisLocal = MethodCompiler.AddStackLocal(result.Type);
-				var newThis = MethodCompiler.CreateVirtualRegister(result.Type.ToManagedPointer());
-				before.SetInstruction(IRInstruction.AddressOf, newThis, newThisLocal);
-
-				var loadInstruction = GetLoadInstruction(newThisLocal.Type);
-
-				context.InsertAfter().SetInstruction(loadInstruction, result, StackFrame, newThisLocal);
-
-				operands.Insert(0, newThis);
-			}
-			else
-			{
-				Debug.Assert(result.IsReferenceType);
-
-				var methodTable = GetMethodTablePointer(classType);
-				var size = CreateConstant32(TypeLayout.GetTypeSize(classType));
-				before.SetInstruction(IRInstruction.NewObject, result, methodTable, size);
-				before.MosaType = classType;
-
-				operands.Insert(0, result);
 			}
 
 			var symbol = Operand.CreateSymbolFromMethod(method, TypeSystem);
@@ -1295,6 +1276,11 @@ namespace Mosa.Compiler.Framework.Stages
 		private void Pop(InstructionNode node)
 		{
 			node.Empty();
+		}
+
+		private void PreReadOnly(Context context)
+		{
+			context.SetInstruction(IRInstruction.Nop);
 		}
 
 		/// <summary>
@@ -1372,16 +1358,16 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			Debug.Assert(node.Result.IsParameter);
 
-			if (!MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
+			if (MosaTypeLayout.CanFitInRegister(node.Operand1.Type))
+			{
+				var storeInstruction = GetStoreParameterInstruction(node.Operand1.Type);
+				node.SetInstruction(storeInstruction, null, node.Result, node.Operand1);
+			}
+			else
 			{
 				var result = node.Result;
 				node.SetInstruction(IRInstruction.StoreParamCompound, null, result, node.Operand1);
 				node.MosaType = result.Type; // may not be necessary
-			}
-			else
-			{
-				var storeInstruction = GetStoreParameterInstruction(node.Operand1.Type);
-				node.SetInstruction(storeInstruction, null, node.Result, node.Operand1);
 			}
 		}
 
@@ -1402,16 +1388,16 @@ namespace Mosa.Compiler.Framework.Stages
 			var elementOffset = CalculateArrayElementOffset(node, arrayType, arrayIndex);
 			var totalElementOffset = CalculateTotalArrayOffset(node, elementOffset);
 
-			if (!MosaTypeLayout.CanFitInRegister(value.Type))
-			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, array, totalElementOffset, value);
-				node.MosaType = arrayType.ElementType;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(value.Type))
 			{
 				var storeInstruction = GetStoreInstruction(arrayType.ElementType);
 
 				node.SetInstruction(storeInstruction, null, array, totalElementOffset, value);
+			}
+			else
+			{
+				node.SetInstruction(IRInstruction.StoreCompound, null, array, totalElementOffset, value);
+				node.MosaType = arrayType.ElementType;
 			}
 		}
 
@@ -1432,15 +1418,15 @@ namespace Mosa.Compiler.Framework.Stages
 			var valueOperand = node.Operand2;
 			var fieldType = field.FieldType;
 
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
 			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, objectOperand, offsetOperand, valueOperand);
+				var storeInstruction = GetStoreInstruction(fieldType);
+				node.SetInstruction(storeInstruction, null, objectOperand, offsetOperand, valueOperand);
 				node.MosaType = fieldType;
 			}
 			else
 			{
-				var storeInstruction = GetStoreInstruction(fieldType);
-				node.SetInstruction(storeInstruction, null, objectOperand, offsetOperand, valueOperand);
+				node.SetInstruction(IRInstruction.StoreCompound, null, objectOperand, offsetOperand, valueOperand);
 				node.MosaType = fieldType;
 			}
 		}
@@ -1462,17 +1448,20 @@ namespace Mosa.Compiler.Framework.Stages
 				return;
 			}
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
+			if (MosaTypeLayout.CanFitInRegister(type))
+			{
+				if (node.Operand1.IsVirtualRegister)
+				{
+					var storeInstruction = GetStoreInstruction(type);
+
+					node.SetInstruction(storeInstruction, null, StackFrame, node.Result, node.Operand1);
+				}
+			}
+			else
 			{
 				Debug.Assert(!node.Result.IsVirtualRegister);
 
 				node.SetInstruction(IRInstruction.MoveCompound, node.Result, node.Operand1);
-			}
-			else if (node.Operand1.IsVirtualRegister)
-			{
-				var storeInstruction = GetStoreInstruction(type);
-
-				node.SetInstruction(storeInstruction, null, StackFrame, node.Result, node.Operand1);
 			}
 
 			node.MosaType = type;
@@ -1487,18 +1476,57 @@ namespace Mosa.Compiler.Framework.Stages
 			// This is actually stind.* and stobj - the opcodes have the same meanings
 			var type = node.MosaType;  // pass thru
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				node.SetInstruction(IRInstruction.StoreCompound, null, node.Operand1, ConstantZero, node.Operand2);
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var storeInstruction = GetStoreInstruction(type);
 
 				node.SetInstruction(storeInstruction, null, node.Operand1, ConstantZero, node.Operand2);
 			}
+			else
+			{
+				node.SetInstruction(IRInstruction.StoreCompound, null, node.Operand1, ConstantZero, node.Operand2);
+			}
 
 			node.MosaType = type;
+		}
+
+		/// <summary>
+		/// Visitation function for Ldsfld instruction.
+		/// </summary>
+		/// <param name="node">The node.</param>
+		private void Ldsfld(InstructionNode node)
+		{
+			var field = node.MosaField;
+
+			var fieldType = field.FieldType;
+			var result = node.Result;
+			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
+
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
+			{
+				var loadInstruction = GetLoadInstruction(fieldType);
+
+				if (fieldType.IsReferenceType)
+				{
+					var symbol = GetStaticSymbol(field);
+					var staticReference = Operand.CreateSymbol(TypeSystem.BuiltIn.Object, symbol.Name);
+
+					node.SetInstruction(IRInstruction.LoadObject, result, staticReference, ConstantZero);
+				}
+				else
+				{
+					node.SetInstruction(loadInstruction, result, fieldOperand, ConstantZero);
+					node.MosaType = fieldType;
+				}
+			}
+			else
+			{
+				// Interesting -- this code appears to never be executed
+				node.SetInstruction(IRInstruction.LoadCompound, result, fieldOperand, ConstantZero);
+				node.MosaType = fieldType;
+			}
+
+			MethodScanner.AccessedField(field);
 		}
 
 		/// <summary>
@@ -1509,23 +1537,34 @@ namespace Mosa.Compiler.Framework.Stages
 		{
 			var field = node.MosaField;
 
-			MethodScanner.AccessedField(field);
-
 			var fieldOperand = Operand.CreateStaticField(field, TypeSystem);
 			var fieldType = field.FieldType;
+			var operand1 = node.Operand1;
 
-			if (!MosaTypeLayout.CanFitInRegister(fieldType))
+			if (MosaTypeLayout.CanFitInRegister(fieldType))
+			{
+				var storeInstruction = GetStoreInstruction(fieldType);
+
+				if (fieldType.IsReferenceType)
+				{
+					var symbol = GetStaticSymbol(field);
+					var staticReference = Operand.CreateSymbol(TypeSystem.BuiltIn.Object, symbol.Name);
+
+					node.SetInstruction(IRInstruction.StoreObject, null, staticReference, ConstantZero, operand1);
+				}
+				else
+				{
+					node.SetInstruction(storeInstruction, null, fieldOperand, ConstantZero, operand1);
+					node.MosaType = fieldType;
+				}
+			}
+			else
 			{
 				node.SetInstruction(IRInstruction.StoreCompound, null, fieldOperand, ConstantZero, node.Operand1);
 				node.MosaType = fieldType;
 			}
-			else
-			{
-				var storeInstruction = GetStoreInstruction(fieldType);
 
-				node.SetInstruction(storeInstruction, null, fieldOperand, ConstantZero, node.Operand1);
-				node.MosaType = fieldType;
-			}
+			MethodScanner.AccessedField(field);
 		}
 
 		/// <summary>
@@ -1553,15 +1592,6 @@ namespace Mosa.Compiler.Framework.Stages
 		private void Throw(InstructionNode node)
 		{
 			throw new CompilerException();
-		}
-
-		/// <summary>
-		/// Visitation function for Break instruction.
-		/// </summary>
-		/// <param name="context">The context.</param>
-		private void Break(Context context)
-		{
-			context.Empty();
 		}
 
 		/// <summary>
@@ -1624,74 +1654,23 @@ namespace Mosa.Compiler.Framework.Stages
 				context.AppendInstruction(IRInstruction.UnboxAny, tmp, value, adr, CreateConstant32(typeSize));
 			}
 
-			if (!MosaTypeLayout.CanFitInRegister(type))
-			{
-				context.AppendInstruction(IRInstruction.LoadCompound, result, tmp, ConstantZero);
-				context.MosaType = type;
-			}
-			else
+			if (MosaTypeLayout.CanFitInRegister(type))
 			{
 				var loadInstruction = GetLoadInstruction(type);
 
 				context.AppendInstruction(loadInstruction, result, tmp, ConstantZero);
 				context.MosaType = type;
 			}
-		}
-
-		private void PreReadOnly(Context context)
-		{
-			context.SetInstruction(IRInstruction.Nop);
+			else
+			{
+				context.AppendInstruction(IRInstruction.LoadCompound, result, tmp, ConstantZero);
+				context.MosaType = type;
+			}
 		}
 
 		#endregion Visitation Methods
 
-		protected override void Run()
-		{
-			if (!MethodCompiler.IsCILStream)
-				return;
-
-			base.Run();
-		}
-
 		#region Internals
-
-		private static BaseIRInstruction Select(Operand operand, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
-		{
-			return Select(operand.IsInteger64, instruction32, instruction64);
-		}
-
-		private static BaseIRInstruction Select(bool is64Bit, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
-		{
-			return !is64Bit ? instruction32 : instruction64;
-		}
-
-		private struct ConversionEntry
-		{
-			public BaseInstruction Instruction;
-			public BaseInstruction PostInstruction;
-			public int BitsToMask;
-
-			public ConversionEntry(BaseInstruction instruction)
-			{
-				Instruction = instruction;
-				PostInstruction = null;
-				BitsToMask = 0;
-			}
-
-			public ConversionEntry(BaseInstruction instruction, int bitsToMask = 0)
-			{
-				Instruction = instruction;
-				PostInstruction = null;
-				BitsToMask = bitsToMask;
-			}
-
-			public ConversionEntry(BaseInstruction instruction, BaseInstruction postInstruction = null, int bitsToMask = 0)
-			{
-				Instruction = instruction;
-				PostInstruction = postInstruction;
-				BitsToMask = bitsToMask;
-			}
-		}
 
 		// [destination]<-[source]
 		private static readonly ConversionEntry[][] ConversionTable32 = new ConversionEntry[][] {
@@ -1960,6 +1939,16 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
+		private static BaseIRInstruction Select(Operand operand, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
+		{
+			return Select(operand.IsInteger64, instruction32, instruction64);
+		}
+
+		private static BaseIRInstruction Select(bool is64Bit, BaseIRInstruction instruction32, BaseIRInstruction instruction64)
+		{
+			return !is64Bit ? instruction32 : instruction64;
+		}
+
 		/// <summary>
 		/// Adds bounds check to the array access.
 		/// </summary>
@@ -2033,6 +2022,22 @@ namespace Mosa.Compiler.Framework.Stages
 			return arrayElement;
 		}
 
+		private ulong GetBitMask(int bits)
+		{
+			if (bits == 0)
+				return 0;
+			else if (bits == 8)
+				return 0xFF;
+			else if (bits == 16)
+				return 0xFFFF;
+			else if (bits == 32)
+				return 0xFFFFFFFF;
+			else if (bits == 64)
+				return 0xFFFFFFFFFFFFFFFF;
+
+			throw new CompilerException($"GetBitMask(): Invalid parameter: {nameof(bits)} = {bits}");
+		}
+
 		/// <summary>
 		/// Gets the index.
 		/// </summary>
@@ -2060,41 +2065,36 @@ namespace Mosa.Compiler.Framework.Stages
 			throw new CompilerException();
 		}
 
-		private IntrinsicMethodDelegate ResolveIntrinsicDelegateMethod(MosaMethod method)
+		private MosaMethod GetMethodOrOverride(MosaType type, MosaMethod method)
 		{
-			IntrinsicMethodDelegate intrinsic = null;
+			MosaMethod implMethod = null;
 
-			if (InstrinsicMap.TryGetValue(method, out intrinsic))
+			if (type.Methods.Contains(method)
+				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
 			{
-				return intrinsic;
+				return implMethod;
 			}
 
-			if (method.IsExternal)
+			if (method.DeclaringType.Module == TypeSystem.CorLib
+				&& (method.DeclaringType.Name.Equals("ValueType")
+					|| method.DeclaringType.Name.Equals("Object")
+					|| method.DeclaringType.Name.Equals("Enum"))
+				&& (implMethod = type.FindMethodBySignature(method.Name, method.Signature)) != null)
 			{
-				intrinsic = Architecture.GetInstrinsicMethod(method.ExternMethodModule);
-			}
-			else if (method.IsInternal)
-			{
-				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
-
-				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
-
-				if (intrinsic == null)
-				{
-					// special case for plugging constructors
-					intrinsic = MethodCompiler.Compiler.GetInstrincMethod($"{method.DeclaringType.FullName}::{method.Name}");
-				}
-			}
-			else
-			{
-				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
-
-				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+				return implMethod;
 			}
 
-			InstrinsicMap.Add(method, intrinsic);
+			return method;
+		}
 
-			return intrinsic;
+		private Operand GetMethodTablePointer(MosaType runtimeType)
+		{
+			return Operand.CreateSymbol(TypeSystem.BuiltIn.Pointer, Metadata.TypeDefinition + runtimeType.FullName);
+		}
+
+		private Operand GetRuntimeTypeHandle(MosaType runtimeType)
+		{
+			return Operand.CreateSymbol(TypeSystem.GetTypeByName("System", "RuntimeTypeHandle"), Metadata.TypeDefinition + runtimeType.FullName);
 		}
 
 		/// <summary>
@@ -2138,34 +2138,6 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
-		/// <summary>
-		/// Replaces the IL load instruction by an appropriate IR move instruction or removes it entirely, if
-		/// it is a native size.
-		/// </summary>
-		/// <param name="node">Provides the transformation context.</param>
-		private void Ldloc(InstructionNode node)
-		{
-			var destination = node.Result;
-			var source = node.Operand1;
-
-			if (!MosaTypeLayout.CanFitInRegister(source.Type))
-			{
-				node.SetInstruction(IRInstruction.MoveCompound, destination, source);
-			}
-			else if (!source.IsVirtualRegister)
-			{
-				var loadInstruction = GetLoadInstruction(source.Type);
-
-				node.SetInstruction(loadInstruction, destination, StackFrame, source);
-			}
-			else
-			{
-				var moveInstruction = GetMoveInstruction(source.Type);
-
-				node.SetInstruction(moveInstruction, destination, source);
-			}
-		}
-
 		private bool ReplaceWithInternalCall(InstructionNode node)
 		{
 			var method = node.InvokeMethod;
@@ -2185,6 +2157,76 @@ namespace Mosa.Compiler.Framework.Stages
 			return true;
 		}
 
+		private IntrinsicMethodDelegate ResolveIntrinsicDelegateMethod(MosaMethod method)
+		{
+			IntrinsicMethodDelegate intrinsic = null;
+
+			if (InstrinsicMap.TryGetValue(method, out intrinsic))
+			{
+				return intrinsic;
+			}
+
+			if (method.IsExternal)
+			{
+				intrinsic = Architecture.GetInstrinsicMethod(method.ExternMethodModule);
+			}
+			else if (method.IsInternal)
+			{
+				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
+
+				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+
+				if (intrinsic == null)
+				{
+					// special case for plugging constructors
+					intrinsic = MethodCompiler.Compiler.GetInstrincMethod($"{method.DeclaringType.FullName}::{method.Name}");
+				}
+			}
+			else
+			{
+				var methodName = $"{method.DeclaringType.FullName}::{method.Name}";
+
+				intrinsic = MethodCompiler.Compiler.GetInstrincMethod(methodName);
+			}
+
+			InstrinsicMap.Add(method, intrinsic);
+
+			return intrinsic;
+		}
+
+		private struct ConversionEntry
+		{
+			public int BitsToMask;
+			public BaseInstruction Instruction;
+			public BaseInstruction PostInstruction;
+
+			public ConversionEntry(BaseInstruction instruction)
+			{
+				Instruction = instruction;
+				PostInstruction = null;
+				BitsToMask = 0;
+			}
+
+			public ConversionEntry(BaseInstruction instruction, int bitsToMask = 0)
+			{
+				Instruction = instruction;
+				PostInstruction = null;
+				BitsToMask = bitsToMask;
+			}
+
+			public ConversionEntry(BaseInstruction instruction, BaseInstruction postInstruction = null, int bitsToMask = 0)
+			{
+				Instruction = instruction;
+				PostInstruction = postInstruction;
+				BitsToMask = bitsToMask;
+			}
+		}
+
 		#endregion Internals
+
+		public LinkerSymbol GetStaticSymbol(MosaField field)
+		{
+			return Linker.DefineSymbol($"{Metadata.StaticSymbolPrefix}{field.DeclaringType}+{field.Name}", SectionKind.BSS, Architecture.NativeAlignment, NativePointerSize);
+		}
 	}
 }

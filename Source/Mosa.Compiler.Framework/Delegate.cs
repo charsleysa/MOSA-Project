@@ -97,18 +97,18 @@ namespace Mosa.Compiler.Framework
 			{
 				var type = methodCompiler.Parameters[i].Type;
 
-				if (!MosaTypeLayout.CanFitInRegister(type))
-				{
-					b0.AppendInstruction(IRInstruction.LoadParamCompound, vrs[i], methodCompiler.Parameters[i]);
-					b0.MosaType = type;
-				}
-				else
+				if (MosaTypeLayout.CanFitInRegister(type))
 				{
 					vrs[i] = methodCompiler.VirtualRegisters.Allocate(methodCompiler.Parameters[i].Type);
 
 					var paramLoadInstruction = BaseMethodCompilerStage.GetLoadParameterInstruction(vrs[i].Type, methodCompiler.Is32BitPlatform);
 
 					b0.AppendInstruction(paramLoadInstruction, vrs[i], methodCompiler.Parameters[i]);
+					b0.MosaType = type;
+				}
+				else
+				{
+					b0.AppendInstruction(IRInstruction.LoadParamCompound, vrs[i], methodCompiler.Parameters[i]);
 					b0.MosaType = type;
 				}
 			}
