@@ -36,12 +36,15 @@
     <ProjectReference Include="..\Mosa.Utility.Launcher\Mosa.Utility.Launcher.csproj" />
     <Reference Include="MetroFramework">
       <HintPath>..\External\MetroFramework.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="MetroFramework.Design">
       <HintPath>..\External\MetroFramework.Design.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="MetroFramework.Fonts">
       <HintPath>..\External\MetroFramework.Fonts.dll</HintPath>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +56,6 @@
     <Content Include="rocket.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Composition" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
   </ItemGroup>
 </Project>
