@@ -20,17 +20,15 @@ extensions = [
     'sphinx_tabs.tabs',
     'sphinx-prompt',
 ]
+
 templates_path = ['_templates']
 
 source_suffix = ['.rst', '.md']
-source_parsers = {
-    '.md': CommonMarkParser,
-}
 
 master_doc = 'index'
-project = u'Mosa Project'
+project = 'Mosa Project'
 copyright = '2008-{}, Mosa Project & contributors'.format(
-    2020
+    2021
 )
 
 exclude_patterns = ['_build']
@@ -40,12 +38,12 @@ intersphinx_mapping = {
 }
 htmlhelp_basename = 'MosaDoc'
 latex_documents = [
-    ('default', 'mosa.tex', u'Mosa Project',
-     u'', 'manual'),
+    ('default', 'mosa.tex', 'Mosa Project',
+     '', 'manual'),
 ]
 man_pages = [
-    ('default', 'mosa', u'Mosa Project',
-     [u''], 1)
+    ('default', 'mosa', 'Mosa Project',
+     [''], 1)
 ]
 
 exclude_patterns = [
