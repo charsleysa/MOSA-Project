@@ -71,25 +71,34 @@ namespace Mosa.Demo.TestWorld.x86
 			Screen.WriteLine();
 			Screen.WriteLine();
 
-			UnitTest();
+			Screen.Write("CompilerBugTests: ");
 
-			KernelTest.RunTests();
-			StackTrace();
+			bool value1 = Test1();
 
-			TestHash();
-
-			int value = CallReturn10();
-
-			Screen.Write("Return10 Test: ");
-			if (value == 10)
+			if (value1)
 				Screen.WriteLine("Ok");
 			else
 				Screen.WriteLine("Failed");
 
-			StartThreadTest();
+			//UnitTest();
 
-			// should never get here
-			Screen.Write("!BAD!");
+			//KernelTest.RunTests();
+			//StackTrace();
+
+			//TestHash();
+
+			int value2 = CallReturn10();
+
+			Screen.Write("Return10 Test: ");
+			if (value2 == 10)
+				Screen.WriteLine("Ok");
+			else
+				Screen.WriteLine("Failed");
+
+			//StartThreadTest();
+
+			//// should never get here
+			//Screen.Write("!BAD!");
 
 			while (true)
 			{
@@ -270,12 +279,13 @@ namespace Mosa.Demo.TestWorld.x86
 		}
 
 		[MethodImpl(MethodImplOptions.NoInlining)]
-		public static void UnitTest()
+		public static bool Test1()
 		{
-			DevirtualizationTests.Test1();
+			return CompilerBugTests.Test();
 		}
 
-		public static int Test1()
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		public static int Test2()
 		{
 			return Unsafe.SizeOf<int>();
 		}

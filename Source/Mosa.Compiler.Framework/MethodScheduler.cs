@@ -10,14 +10,6 @@ using System.Threading.Channels;
 
 namespace Mosa.Compiler.Framework
 {
-	public class CompilerResult
-	{
-		public MosaMethod Method { get; set; }
-		public MosaMethod CompiledMethod { get; set; }
-		public string Result { get; set; }
-		public int Attemps { get; set; }
-	}
-
 	/// <summary>
 	/// Schedules compilation of types/methods.
 	/// </summary>
@@ -27,9 +19,11 @@ namespace Mosa.Compiler.Framework
 
 		public Compiler Compiler;
 
-		private readonly Channel<CompilerResult> _channel;
-		private int _totalMethods;
-		private int _totalQueued;
+		private HashSet<MosaMethod> methodSet = new HashSet<MosaMethod>();
+
+		private readonly Channel<MosaMethod> _channel;
+		private int totalMethods;
+		private int totalQueued;
 
 		#endregion Data Members
 
@@ -43,7 +37,7 @@ namespace Mosa.Compiler.Framework
 		/// <value>
 		/// The total methods.
 		/// </value>
-		public int TotalMethods => _totalMethods;
+		public int TotalMethods => totalMethods;
 
 		/// <summary>
 		/// Gets the queued methods.
@@ -51,13 +45,13 @@ namespace Mosa.Compiler.Framework
 		/// <value>
 		/// The queued methods.
 		/// </value>
-		public int TotalQueuedMethods => _totalQueued;
+		public int TotalQueuedMethods => totalQueued;
 
 		#endregion Properties
 
 		public MethodScheduler(Compiler compiler)
 		{
-			_channel = Channel.CreateUnbounded<CompilerResult>(new UnboundedChannelOptions { SingleWriter = false, SingleReader = false });
+			_channel = Channel.CreateUnbounded<MosaMethod>(new UnboundedChannelOptions { SingleWriter = false, SingleReader = false });
 			Compiler = compiler;
 			PassCount = 0;
 		}
@@ -119,36 +113,29 @@ namespace Mosa.Compiler.Framework
 
 		private void AddToQueue(MosaMethod method)
 		{
-			AddToQueue(new CompilerResult { Method = method });
-		}
-
-		public void AddToQueue(CompilerResult compilerResult)
-		{
-			if (compilerResult.Attemps == 0) //Count the method only on first try
-				Interlocked.Increment(ref _totalMethods);
-
-			if (compilerResult.Attemps++ > 5)
-				compilerResult.Result = "Method exceeded compile attemps: " + compilerResult.Result;
-			else
+			lock (methodSet)
 			{
-				Interlocked.Increment(ref _totalQueued);
-				if (!_channel.Writer.TryWrite(compilerResult))
+				if (!methodSet.Contains(method))
 				{
-					Debug.Assert(false);
+					methodSet.Add(method);
+
+					Interlocked.Increment(ref totalMethods);
 				}
+			}
+
+			Interlocked.Increment(ref totalQueued);
+
+			if (!_channel.Writer.TryWrite(method))
+			{
+				Debug.Assert(false);
 			}
 		}
 
-		public CompilerResult GetMethodToCompile()
-		{
-			return GetScheduledMethod();
-		}
-
-		private CompilerResult GetScheduledMethod()
+		public MosaMethod GetMethodToCompile()
 		{
 			if (_channel.Reader.TryRead(out var result))
 			{
-				Interlocked.Decrement(ref _totalQueued);
+				Interlocked.Decrement(ref totalQueued);
 			};
 
 			return result;
