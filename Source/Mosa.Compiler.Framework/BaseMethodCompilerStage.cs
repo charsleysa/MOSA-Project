@@ -706,7 +706,7 @@ namespace Mosa.Compiler.Framework
 
 		protected MosaExceptionHandler FindNextEnclosingFinallyContext(MosaExceptionHandler exceptionContext)
 		{
-			int index = Method.ExceptionHandlers.IndexOf(exceptionContext);
+			var index = Method.ExceptionHandlers.IndexOf(exceptionContext);
 
 			for (int i = index + 1; i < Method.ExceptionHandlers.Count; i++)
 			{

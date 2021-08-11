@@ -179,17 +179,10 @@ namespace Mosa.Tool.Debugger.Views
 		}
 		#endregion
 		private System.Windows.Forms.ToolStrip toolStrip1;
-		private System.Windows.Forms.ToolStripLabel toolStripLabel1;
-		private System.Windows.Forms.ToolStripTextBox tbAddress;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripButton btnClear;
-		private System.Windows.Forms.ToolStripLabel toolStripLabel4;
-		private System.Windows.Forms.ToolStripComboBox cbLength;
 		private System.Windows.Forms.DataGridView dataGridView1;
-		private System.Windows.Forms.ToolStripButton btnAdd;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-		private System.Windows.Forms.ToolStripButton toolStripButton2;
-		private System.Windows.Forms.ToolStripButton toolStripButton1;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;

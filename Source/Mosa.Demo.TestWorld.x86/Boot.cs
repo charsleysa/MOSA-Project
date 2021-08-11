@@ -4,7 +4,7 @@ using Mosa.Kernel.x86;
 using Mosa.Runtime;
 using Mosa.Runtime.Plug;
 using Mosa.Runtime.x86;
-using Mosa.TestWorld.x86.Tests;
+using Mosa.Demo.TestWorld.x86.Tests;
 using Mosa.UnitTests;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
