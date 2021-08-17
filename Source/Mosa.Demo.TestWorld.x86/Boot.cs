@@ -71,21 +71,30 @@ namespace Mosa.Demo.TestWorld.x86
 			Screen.WriteLine();
 			Screen.WriteLine();
 
-			Screen.Write("CompilerBugTests: ");
+			//Screen.Write("CompilerBugTests: ");
 
-			bool value1 = Test1();
+			//bool value1 = Test1();
 
-			if (value1)
-				Screen.WriteLine("Ok");
-			else
-				Screen.WriteLine("Failed");
+			//if (value1)
+			//	Screen.WriteLine("Ok");
+			//else
+			//	Screen.WriteLine("Failed");
+
+			//Screen.Write("FindTypeOfTest: ");
+
+			//bool value3 = Test3();
+
+			//if (value3)
+			//	Screen.WriteLine("Ok");
+			//else
+			//	Screen.WriteLine("Failed");
 
 			//UnitTest();
 
-			//KernelTest.RunTests();
-			//StackTrace();
+			KernelTest.RunTests();
+			StackTrace();
 
-			//TestHash();
+			TestHash();
 
 			int value2 = CallReturn10();
 
@@ -95,10 +104,10 @@ namespace Mosa.Demo.TestWorld.x86
 			else
 				Screen.WriteLine("Failed");
 
-			//StartThreadTest();
+			StartThreadTest();
 
-			//// should never get here
-			//Screen.Write("!BAD!");
+			// should never get here
+			Screen.Write("!BAD!");
 
 			while (true)
 			{
@@ -288,6 +297,12 @@ namespace Mosa.Demo.TestWorld.x86
 		public static int Test2()
 		{
 			return Unsafe.SizeOf<int>();
+		}
+
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		public static bool Test3()
+		{
+			return ReflectionTests.FindTypeOfTest();
 		}
 	}
 }

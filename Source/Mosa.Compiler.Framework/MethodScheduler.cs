@@ -1,6 +1,5 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
 
-using Mosa.Compiler.Framework.Trace;
 using Mosa.Compiler.MosaTypeSystem;
 
 using System.Collections.Generic;
@@ -19,9 +18,9 @@ namespace Mosa.Compiler.Framework
 
 		public Compiler Compiler;
 
-		private HashSet<MosaMethod> methodSet = new HashSet<MosaMethod>();
+		private HashSet<MosaMethod> workingSet = new HashSet<MosaMethod>();
+		private Queue<MosaMethod> queue = new Queue<MosaMethod>();
 
-		private readonly Channel<MosaMethod> _channel;
 		private int totalMethods;
 		private int totalQueued;
 
@@ -51,7 +50,7 @@ namespace Mosa.Compiler.Framework
 
 		public MethodScheduler(Compiler compiler)
 		{
-			_channel = Channel.CreateUnbounded<MosaMethod>(new UnboundedChannelOptions { SingleWriter = false, SingleReader = false });
+			//_channel = Channel.CreateUnbounded<MosaMethod>(new UnboundedChannelOptions { SingleWriter = false, SingleReader = false });
 			Compiler = compiler;
 			PassCount = 0;
 		}
@@ -113,32 +112,50 @@ namespace Mosa.Compiler.Framework
 
 		private void AddToQueue(MosaMethod method)
 		{
-			lock (methodSet)
+			lock (workingSet)
 			{
-				if (!methodSet.Contains(method))
+				if (!workingSet.Contains(method))
 				{
-					methodSet.Add(method);
+					workingSet.Add(method);
 
 					Interlocked.Increment(ref totalMethods);
 				}
 			}
 
-			Interlocked.Increment(ref totalQueued);
-
-			if (!_channel.Writer.TryWrite(method))
+			lock (queue)
 			{
-				Debug.Assert(false);
+				if (queue.Contains(method))
+				{
+					//Debug.WriteLine($"Already in Queue: {method}");
+
+					return; // already queued
+				}
+
+				//Debug.WriteLine($"Queued: {method}");
+
+				queue.Enqueue(method);
+
+				Interlocked.Increment(ref totalQueued);
 			}
 		}
 
 		public MosaMethod GetMethodToCompile()
 		{
-			if (_channel.Reader.TryRead(out var result))
+			lock (queue)
 			{
-				Interlocked.Decrement(ref totalQueued);
-			};
+				if (queue.TryDequeue(out var method))
+				{
+					Interlocked.Decrement(ref totalQueued);
 
-			return result;
+					//Debug.WriteLine($"Dequeued: {method}");
+
+					return method;
+				}
+				else
+				{
+					return null;
+				}
+			}
 		}
 
 		public void AddToRecompileQueue(HashSet<MosaMethod> methods)

@@ -691,7 +691,7 @@ namespace Mosa.Compiler.Framework
 
 		#region Protected Region Methods
 
-		protected MosaExceptionHandler FindImmediateExceptionContext(int label)
+		protected MosaExceptionHandler FindImmediateExceptionHandler(int label)
 		{
 			foreach (var handler in Method.ExceptionHandlers)
 			{
@@ -704,18 +704,17 @@ namespace Mosa.Compiler.Framework
 			return null;
 		}
 
-		protected MosaExceptionHandler FindNextEnclosingFinallyContext(MosaExceptionHandler exceptionContext)
+		protected MosaExceptionHandler FindNextEnclosingFinallyHandler(MosaExceptionHandler exceptionHandler)
 		{
-			var index = Method.ExceptionHandlers.IndexOf(exceptionContext);
+			var index = Method.ExceptionHandlers.IndexOf(exceptionHandler);
+			var at = exceptionHandler.TryStart;
 
 			for (int i = index + 1; i < Method.ExceptionHandlers.Count; i++)
 			{
 				var entry = Method.ExceptionHandlers[i];
 
-				if (!entry.IsLabelWithinTry(exceptionContext.TryStart))
-					return null;
-
-				if (entry.ExceptionHandlerType != ExceptionHandlerType.Finally)
+				if (entry.ExceptionHandlerType != ExceptionHandlerType.Finally
+				|| !entry.IsLabelWithinTry(at))
 					continue;
 
 				return entry;
@@ -724,58 +723,7 @@ namespace Mosa.Compiler.Framework
 			return null;
 		}
 
-		protected MosaExceptionHandler _NOT_USED_FindFinallyExceptionContext(InstructionNode node)
-		{
-			int label = node.Block.Label;
-
-			foreach (var handler in Method.ExceptionHandlers)
-			{
-				if (handler.IsLabelWithinHandler(label))
-				{
-					return handler;
-				}
-			}
-
-			return null;
-		}
-
-		protected bool IsSourceAndTargetWithinSameTryOrException(InstructionNode node)
-		{
-			int leaveLabel = TraverseBackToNonCompilerBlock(node.Block).Label;
-			int targetLabel = TraverseBackToNonCompilerBlock(node.BranchTargets[0]).Label;
-
-			foreach (var handler in Method.ExceptionHandlers)
-			{
-				bool one = handler.IsLabelWithinTry(leaveLabel);
-				bool two = handler.IsLabelWithinTry(targetLabel);
-
-				if (one && !two)
-					return false;
-
-				if (!one && two)
-					return false;
-
-				if (one && two)
-					return true;
-
-				one = handler.IsLabelWithinHandler(leaveLabel);
-				two = handler.IsLabelWithinHandler(targetLabel);
-
-				if (one && !two)
-					return false;
-
-				if (!one && two)
-					return false;
-
-				if (one && two)
-					return true;
-			}
-
-			// very odd
-			return true;
-		}
-
-		protected BasicBlock TraverseBackToNonCompilerBlock(BasicBlock block)
+		protected BasicBlock TraverseBackToNativeBlock(BasicBlock block)
 		{
 			var start = block;
 
