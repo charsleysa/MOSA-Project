@@ -369,7 +369,7 @@ namespace Mosa.Tool.Launcher
 			Settings.SetValue("Linker.StaticRelocations", cbRelocationTable.Checked);
 			Settings.SetValue("Linker.Drawf", cbEmitDwarf.Checked);
 			Settings.SetValue("Compiler.MethodScanner", cbEnableMethodScanner.Checked);
-			Settings.SetValue("CompilerDebug.CompileTimeFile", cbGenerateCompilerTime.Checked);
+			Settings.SetValue("CompilerDebug.CompileTimeFile", cbGenerateCompilerTime.Checked ? "%DEFAULT%" : string.Empty);
 			Settings.SetValue("Optimizations.BitTracker", cbBitTracker.Checked);
 			Settings.SetValue("Optimizations.Platform", cbPlatformOptimizations.Checked);
 			Settings.SetValue("Optimizations.LoopInvariantCodeMotion", cbLoopInvariantCodeMotion.Checked);
@@ -425,6 +425,7 @@ namespace Mosa.Tool.Launcher
 			{
 				case 0: Settings.SetValue("Compiler.Platform", "x86"); break;
 				case 1: Settings.SetValue("Compiler.Platform", "x64"); break;
+				case 2: Settings.SetValue("Compiler.Platform", "ARMv8A32"); break;
 				default: Settings.SetValue("Compiler.Platform", "x86"); break;
 			}
 
@@ -467,7 +468,7 @@ namespace Mosa.Tool.Launcher
 			cbTwoPassOptimizations.Checked = Settings.GetValue("Optimizations.TwoPass", true);
 			cbValueNumbering.Checked = Settings.GetValue("Optimizations.ValueNumbering", true);
 			cbEnableMethodScanner.Checked = Settings.GetValue("Compiler.MethodScanner", false);
-			cbGenerateCompilerTime.Checked = Settings.GetValue("CompilerDebug.CompileTimeFile", false);
+			cbGenerateCompilerTime.Checked = Settings.GetValue("CompilerDebug.CompileTimeFile", string.Empty) == "%DEFAULT%";
 			cbBitTracker.Checked = Settings.GetValue("Optimizations.BitTracker", false);
 			cbPlatformOptimizations.Checked = Settings.GetValue("Optimizations.Platform", false);
 			cbLoopInvariantCodeMotion.Checked = Settings.GetValue("Optimizations.LoopInvariantCodeMotion", false);
@@ -515,6 +516,7 @@ namespace Mosa.Tool.Launcher
 			{
 				case "x86": cbPlatform.SelectedIndex = 0; break;
 				case "x64": cbPlatform.SelectedIndex = 1; break;
+				case "armv8a32": cbPlatform.SelectedIndex = 2; break;
 				default: cbPlatform.SelectedIndex = 0; break;
 			}
 

@@ -18,7 +18,7 @@ The MOSA project is available as a `zip download <https://github.com/mosa/MOSA-P
 
    git clone https://github.com/mosa/MOSA-Project.git
 
-If download via zip, unzip the file.
+If downloaded via zip, unzip the file.
 
 Build
 =====
@@ -29,17 +29,20 @@ Execute the ``Compiler.bat`` script in the base directory in the root directory 
 
 	Compiler.bat
 
-A successful build will display a ``Build succedded`` message (like below). Warnings may be ignored.
+or compiled from the command line:
+
+.. code-block:: bash
+
+	dotnet build Source\Mosa.sln
+
+A successful build will display a ``Build succedded`` message (like below). Any warnings may be ignored.
 
 .. code-block:: bash
 
 	[... lines removed...]
 
 	Build succeeded.
-
-	[... lines removed...]
-
-	1 Warning(s)
+	0 Warning(s)
 	0 Error(s)
 
 	Time Elapsed 00:00:01.48
@@ -66,8 +69,11 @@ Open the ``Source\Mosa.sln`` solution with Visual Studio and locate the ``Mosa.D
 
 Next, set the project as ``Set as Startup Project``.
 
+To compile and launch the application within a virtual machine, select from the ``Debug`` menu the ``Start Without Debugging`` option, or press ``CTRL+F5``.
+
 **Option #2** (Only the starter project):
 
 Open the ``Source\Mosa.Demo.MyWorld.x86\Mosa.Demo.MyWorld.x86.csproj`` project with Visual Studio.
 
-To compile and launch the application within a virtual machine, simply click on the ``Start`` button.
+To compile and launch the application within a virtual machine, select from the ``Debug`` menu the ``Start Without Debugging`` option, or press ``CTRL+F5``.
+

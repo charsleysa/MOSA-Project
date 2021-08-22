@@ -4,18 +4,20 @@ using Mosa.Compiler.Common;
 using Mosa.Compiler.Common.Configuration;
 using Mosa.Compiler.Framework;
 using Mosa.Compiler.Framework.CompilerStages;
-using Mosa.Compiler.Framework.Linker;
+using Mosa.Compiler.Framework.Stages;
 using Mosa.Compiler.Framework.Trace;
 using Mosa.Compiler.MosaTypeSystem;
 using Mosa.Tool.Explorer.Stages;
 using Mosa.Utility.Configuration;
 using Mosa.Utility.Launcher;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+
 using static Mosa.Compiler.Framework.CompilerHooks;
 
 namespace Mosa.Tool.Explorer
@@ -48,16 +50,6 @@ namespace Mosa.Tool.Explorer
 		public MainForm()
 		{
 			InitializeComponent();
-
-			tbInstructions.Width = tabControl.Width - 12;
-			tbInstructions.Height = tabControl.Height - 52;
-			tbDebugResult.Width = tabControl.Width - 12;
-			tbDebugResult.Height = tabControl.Height - 52;
-			tbMethodCounters.Width = tabControl.Width - 12;
-			tbMethodCounters.Height = tabControl.Height - 22;
-
-			tbLogs.Width = tabControl.Width - 4;
-			tbLogs.Height = tabControl.Height - (22 + 32 + 8);
 
 			cbPlatform.SelectedIndex = 0;
 
@@ -418,16 +410,11 @@ namespace Mosa.Tool.Explorer
 
 			toolStrip1.Enabled = false;
 
-			var multithread = CBEnableMultithreading.Checked;
-
 			ThreadPool.QueueUserWorkItem(state =>
 			{
 				try
 				{
-					if (multithread)
-						Compiler.ThreadedCompile();
-					else
-						Compiler.Compile();
+					Compiler.Compile();
 				}
 				finally
 				{
@@ -680,9 +667,12 @@ namespace Mosa.Tool.Explorer
 			pipeline.Add(new DebugInfoStage());
 
 			//pipeline.InsertBefore<GreedyRegisterAllocatorStage>(new StopStage());
-
 			//pipeline.InsertBefore<EnterSSAStage>(new DominanceOutputStage());
 			//pipeline.InsertBefore<EnterSSAStage>(new GraphVizStage());
+
+			pipeline.Add(new GraphVizStage());
+
+			//pipeline.InsertAfterFirst<ExceptionStage>(new StopStage());
 		}
 
 		private CompilerHooks CreateCompilerHook()
@@ -760,7 +750,7 @@ namespace Mosa.Tool.Explorer
 
 		private void NotifyEvent(CompilerEvent compilerEvent, string message, int threadID)
 		{
-			message = string.IsNullOrWhiteSpace(message) ? string.Empty : $"{message}";
+			message = string.IsNullOrWhiteSpace(message) ? string.Empty : $" => {message}";
 
 			var status = $"{compilerEvent.ToText()}{message}";
 

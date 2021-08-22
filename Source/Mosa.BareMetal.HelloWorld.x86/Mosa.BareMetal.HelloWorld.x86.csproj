@@ -7,11 +7,15 @@
     <LangVersion>8.0</LangVersion>
     <OutputPath>..\..\bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <UseAppHost>false</UseAppHost>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>MSB3245</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mosa.Kernel.BareMetal.x86\Mosa.Kernel.BareMetal.x86.csproj" />
     <ProjectReference Include="..\Mosa.Kernel.BareMetal\Mosa.Kernel.BareMetal.csproj" />
+    <ProjectReference Include="..\Mosa.Korlib\Mosa.Korlib.csproj" />
   </ItemGroup>
 </Project>

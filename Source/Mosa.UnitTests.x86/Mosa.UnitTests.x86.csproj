@@ -7,6 +7,9 @@
     <LangVersion>8.0</LangVersion>
     <OutputPath>..\..\bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <UseAppHost>false</UseAppHost>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

@@ -28,8 +28,6 @@ namespace Mosa.Tool.Compiler
 
 		private DateTime CompileStartTime;
 
-		private readonly string codeName = "Neptune";
-
 		/// <summary>
 		/// A string holding a simple usage description.
 		/// </summary>
@@ -46,7 +44,7 @@ namespace Mosa.Tool.Compiler
 		{
 			usageString = @"Usage: Mosa.Tool.Compiler.exe -o outputfile --platform [x86|x64] {additional options} inputfiles.
 
-Example: Mosa.Tool.Compiler.exe -o Mosa.HelloWorld.x86.bin -platform x86 Mosa.HelloWorld.x86.exe mscorlib.dll Mosa.Plug.Korlib.dll Mosa.Plug.Korlib.x86.dll";
+Example: Mosa.Tool.Compiler.exe -o Mosa.HelloWorld.x86.bin -platform x86 Mosa.HelloWorld.x86.dll System.Runtime.dll Mosa.Plug.Korlib.dll Mosa.Plug.Korlib.x86.dll";
 		}
 
 		#endregion Constructors
@@ -215,7 +213,7 @@ Example: Mosa.Tool.Compiler.exe -o Mosa.HelloWorld.x86.bin -platform x86 Mosa.He
 		{
 			compiler.Load();
 
-			compiler.ThreadedCompile();
+			compiler.Compile();
 		}
 
 		private void NotifyEvent(CompilerEvent compilerEvent, string message, int threadID)

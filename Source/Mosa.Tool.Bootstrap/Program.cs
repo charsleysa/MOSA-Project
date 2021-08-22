@@ -19,7 +19,7 @@ namespace Mosa.Tool.Bootstrap
 		private static readonly string GlobalPackageDirectory = @".nuget\packages";
 		private static readonly string ToolsPackage = "mosa.tools.package";
 
-		private static readonly string Korlib = "mscorlib.dll";
+		private static readonly string Korlib = "System.Runtime.dll";
 
 		internal static int Main(string[] args)
 		{
@@ -57,7 +57,7 @@ namespace Mosa.Tool.Bootstrap
 			var location = FindLauncherInCurrentDirectory();
 
 			if (location != null)
-				return null;
+				return location;
 
 			var targetVersion = GetIdealFileVersion(Environment.CurrentDirectory);
 

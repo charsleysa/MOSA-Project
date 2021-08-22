@@ -12,6 +12,7 @@ using Mosa.Compiler.Framework.Linker;
 using Mosa.Compiler.Framework.Trace;
 using Mosa.Compiler.MosaTypeSystem;
 using Mosa.Utility.BootImage;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -108,12 +109,12 @@ namespace Mosa.Utility.Launcher
 
 			if (LauncherSettings.HuntForCorLib)
 			{
-				var fileCorlib = fileHunter.HuntFile("mscorlib.dll");
+				// var fileCorlib = fileHunter.HuntFile("mscorlib.dll");
 
-				if (fileCorlib != null)
-				{
-					Settings.AddPropertyListValue("Compiler.SourceFiles", fileCorlib.FullName);
-				}
+				// if (fileCorlib != null)
+				// {
+				// 	Settings.AddPropertyListValue("Compiler.SourceFiles", fileCorlib.FullName);
+				// }
 			}
 
 			if (LauncherSettings.PlugKorlib)
@@ -145,15 +146,7 @@ namespace Mosa.Utility.Launcher
 			compiler.Load();
 			compiler.Initialize();
 			compiler.Setup();
-
-			if (LauncherSettings.Multithreading)
-			{
-				compiler.ThreadedCompile();
-			}
-			else
-			{
-				compiler.Compile();
-			}
+			compiler.Compile();
 
 			Linker = compiler.Linker;
 			TypeSystem = compiler.TypeSystem;

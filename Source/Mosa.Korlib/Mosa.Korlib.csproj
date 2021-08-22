@@ -18,6 +18,11 @@
 
     <!-- Force System.Private.CoreLib.dll into a special IL output directory -->
     <!-- <OutputPath>$(BinDir)/IL/</OutputPath> -->
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>System.Runtime</AssemblyName>
+    <RootNamespace>System</RootNamespace>
+    <DebugType>full</DebugType>
+    <LangVersion>8.0</LangVersion>
     <OutputPath>..\..\bin\</OutputPath>
     <!-- <Configurations>Debug;Release;Checked</Configurations> -->
     <!-- <Platforms>x64;x86;arm;arm64</Platforms> -->
@@ -393,4 +398,6 @@
     <Compile Include="$(BclSourcesRoot)\System\Threading\Thread.Mosa.cs" />
     <Compile Include="$(BclSourcesRoot)\System\Threading\TimerQueue.Mosa.cs" />
   </ItemGroup>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+  </PropertyGroup>
 </Project>

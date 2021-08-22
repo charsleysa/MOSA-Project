@@ -21,7 +21,7 @@ namespace Mosa.Tool.Debugger.Views
 			[Browsable(false)]
 			public ulong IP { get; set; }
 
-			public string Address { get { return "0x" + IP.ToString((IP <= uint.MaxValue) ? "X4" : "X8"); } }
+			public string Address { get { return DebugDockContent.ToHex(IP); } }
 
 			public string Instruction { get; set; }
 
@@ -42,14 +42,13 @@ namespace Mosa.Tool.Debugger.Views
 			dataGridView1.Columns[2].Width = 400;
 		}
 
-		public override void OnPause()
+		protected override void ClearDisplay()
 		{
-			if (Platform == null)
-				return;
+			instructions.Clear();
+		}
 
-			if (Platform.Registers == null)
-				return;
-
+		protected override void UpdateDisplay()
+		{
 			var symbol = DebugSource.GetFirstSymbol(InstructionPointer);
 
 			tbMethod.Text = symbol == null ? string.Empty : symbol.CommonName;
@@ -157,27 +156,15 @@ namespace Mosa.Tool.Debugger.Views
 
 			foreach (var instruction in disassembler.Decode())
 			{
-				var text = instruction.Instruction.Replace('\t', ' ');
+				var addr = MainForm.ParseAddress(instruction.Instruction);
 
-				var info = string.Empty;
-
-				var value = ParseAddress(text);
-
-				if (value != 0)
-				{
-					var symbol = DebugSource.GetFirstSymbolsStartingAt(value);
-
-					if (symbol != null)
-					{
-						info = symbol.Name;
-					}
-				}
+				var info = MainForm.GetAddressInfo(addr);
 
 				var entry = new MethodInstructionEntry()
 				{
 					IP = instruction.Address,   // Offset?
 					Length = instruction.Length,
-					Instruction = text,
+					Instruction = instruction.Instruction,
 					Info = info
 				};
 
@@ -217,36 +204,6 @@ namespace Mosa.Tool.Debugger.Views
 			m.Items.Add(new ToolStripMenuItem("Set &Breakpoint", null, new EventHandler(MainForm.OnAddBreakPoint)) { Tag = new AddBreakPointArgs(null, clickedEntry.IP) });
 
 			m.Show(dataGridView1, relativeMousePosition);
-		}
-
-		public ulong ParseAddress(string decode)
-		{
-			if (String.IsNullOrWhiteSpace(decode))
-				return 0;
-
-			if (!decode.Contains("call"))
-				return 0;
-
-			try
-			{
-				int space = decode.IndexOf(' ');
-
-				if (space < 0)
-					space = decode.IndexOf('\t');
-
-				if (space <= 0)
-					return 0;
-
-				var value = decode.Substring(space + 1).Trim();
-
-				var address = MainForm.ParseHexAddress("0x" + value);
-
-				return address;
-			}
-			catch
-			{
-				return 0;
-			}
 		}
 	}
 }
