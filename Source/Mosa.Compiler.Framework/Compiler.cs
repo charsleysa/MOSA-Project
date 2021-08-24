@@ -296,7 +296,7 @@ namespace Mosa.Compiler.Framework
 
 					for (int i = 0; i < stubMethodAttributes.Length; i++)
 					{
-						var d = (StubMethodDelegate)Delegate.CreateDelegate(typeof(StubMethodDelegate), method);
+						var d = (StubMethodDelegate)System.Delegate.CreateDelegate(typeof(StubMethodDelegate), method);
 
 						// Finally add the dictionary entry mapping the target name and the delegate
 						InternalStubMethods.Add(stubMethodAttributes[i].Target, d);
