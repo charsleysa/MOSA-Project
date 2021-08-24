@@ -3,7 +3,6 @@
 using Mosa.Compiler.Common.Exceptions;
 using Mosa.Compiler.Framework.CIL;
 using Mosa.Compiler.MosaTypeSystem;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Mosa.Compiler.Framework.Stages
@@ -287,11 +286,47 @@ namespace Mosa.Compiler.Framework.Stages
 			}
 		}
 
+		private bool IsSourceAndTargetWithinSameTryOrException(InstructionNode node)
+		{
+			int leaveLabel = TraverseBackToNativeBlock(node.Block).Label;
+			int targetLabel = TraverseBackToNativeBlock(node.BranchTargets[0]).Label;
+
+			foreach (var handler in Method.ExceptionHandlers)
+			{
+				bool one = handler.IsLabelWithinTry(leaveLabel);
+				bool two = handler.IsLabelWithinTry(targetLabel);
+
+				if (one && !two)
+					return false;
+
+				if (!one && two)
+					return false;
+
+				if (one && two)
+					return true;
+
+				one = handler.IsLabelWithinHandler(leaveLabel);
+				two = handler.IsLabelWithinHandler(targetLabel);
+
+				if (one && !two)
+					return false;
+
+				if (!one && two)
+					return false;
+
+				if (one && two)
+					return true;
+			}
+
+			// very odd
+			return true;
+		}
+
 		private void InsertFlowOrJumpInstructions()
 		{
 			foreach (var block in BasicBlocks)
 			{
-				var label = TraverseBackToNonCompilerBlock(block).Label;
+				var label = TraverseBackToNativeBlock(block).Label;
 
 				for (var node = block.BeforeLast; !node.IsBlockStartInstruction; node = node.Previous)
 				{
@@ -311,7 +346,7 @@ namespace Mosa.Compiler.Framework.Stages
 						continue;
 					}
 
-					var entry = FindImmediateExceptionContext(label);
+					var entry = FindImmediateExceptionHandler(label);
 
 					if (!entry.IsLabelWithinTry(label))
 						break;
