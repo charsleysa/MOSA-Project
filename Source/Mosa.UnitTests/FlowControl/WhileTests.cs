@@ -43,7 +43,9 @@ namespace Mosa.UnitTests.FlowControl
 
 			while (false)
 			{
+#pragma warning disable 0162 // Unreachable code detected
 				called = true;
+#pragma warning restore 0162 // Unreachable code detected
 			}
 
 			return called;

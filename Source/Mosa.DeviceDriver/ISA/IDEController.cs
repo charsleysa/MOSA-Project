@@ -132,7 +132,8 @@ namespace Mosa.DeviceDriver.ISA
 		/// </summary>
 		public uint MaximumDriveCount { get; private set; }
 
-		public enum AddressingMode { NotSupported, LBA28, LBA48 }
+		public enum AddressingMode
+		{ NotSupported, LBA28, LBA48 }
 
 		/// <summary>
 		/// Drive Info
@@ -327,22 +328,8 @@ namespace Mosa.DeviceDriver.ISA
 			return WaitForReadyStatus();
 		}
 
-		/// <summary>
-		/// Opens the specified drive.
-		/// </summary>
-		/// <param name="drive">The drive.</param>
-		/// <returns></returns>
-		bool IDiskControllerDevice.Open(uint drive)
-		{
-			//HAL.DebugWriteLine("Open()" + drive.ToString() + " : " + MaximumDriveCount.ToString() + " : " + (driveInfo[drive].Present ? "Y" : "N"));
-
-			if (drive >= MaximumDriveCount || !driveInfo[drive].Present)
-				return false;
-
-			return true;
-		}
-
-		protected enum SectorOperation { Read, Write }
+		protected enum SectorOperation
+		{ Read, Write }
 
 		/// <summary>
 		/// Performs the LBA28.
@@ -455,6 +442,23 @@ namespace Mosa.DeviceDriver.ISA
 		}
 
 		#region IDiskControllerDevice
+
+#pragma warning disable CA1033
+
+		/// <summary>
+		/// Opens the specified drive.
+		/// </summary>
+		/// <param name="drive">The drive.</param>
+		/// <returns></returns>
+		bool IDiskControllerDevice.Open(uint drive)
+		{
+			//HAL.DebugWriteLine("Open()" + drive.ToString() + " : " + MaximumDriveCount.ToString() + " : " + (driveInfo[drive].Present ? "Y" : "N"));
+
+			if (drive >= MaximumDriveCount || !driveInfo[drive].Present)
+				return false;
+
+			return true;
+		}
 
 		/// <summary>
 		/// Releases the specified drive.
@@ -585,6 +589,8 @@ namespace Mosa.DeviceDriver.ISA
 				return true;
 			}
 		}
+
+#pragma warning restore CA1033
 
 		#endregion IDiskControllerDevice
 	}

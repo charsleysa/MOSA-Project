@@ -5,6 +5,7 @@ using Mosa.Runtime.Metadata;
 using Mosa.Runtime.Plug;
 using System;
 using System.Reflection;
+using Pointer = Mosa.Runtime.Pointer;
 
 namespace Mosa.Plug.Korlib.System
 {

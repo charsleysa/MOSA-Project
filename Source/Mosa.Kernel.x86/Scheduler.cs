@@ -22,7 +22,8 @@ namespace Mosa.Kernel.x86
 
 		private static int clockTicks = 0;
 
-		public static uint ClockTicks { get { return (uint)clockTicks; } }
+		public static uint ClockTicks
+		{ get { return (uint)clockTicks; } }
 
 		public static void Setup()
 		{
@@ -103,9 +104,9 @@ namespace Mosa.Kernel.x86
 		{
 			var thread = Threads[threadID];
 
-			if (thread.Status == ThreadStatus.Running)
+			if (thread.Status == ThreadState.Running)
 			{
-				thread.Status = ThreadStatus.Terminating;
+				thread.Status = ThreadState.StopRequested;
 
 				// TODO: release stack memory
 			}
@@ -127,7 +128,7 @@ namespace Mosa.Kernel.x86
 
 				var thread = Threads[threadID];
 
-				if (thread.Status == ThreadStatus.Running)
+				if (thread.Status == ThreadState.Running)
 					return threadID;
 
 				if (currentThreadID == threadID)
@@ -199,7 +200,7 @@ namespace Mosa.Kernel.x86
 			stackTop.Store32(-56, 0);     // ESI
 			stackTop.Store32(-60, 0);     // EDI
 
-			thread.Status = ThreadStatus.Running;
+			thread.Status = ThreadState.Running;
 			thread.StackBottom = stack;
 			thread.StackTop = stackTop;
 			thread.StackStatePointer = stackTop - 60;
@@ -249,7 +250,7 @@ namespace Mosa.Kernel.x86
 		{
 			for (uint i = 0; i < MaxThreads; i++)
 			{
-				if (Threads[i].Status == ThreadStatus.Empty)
+				if (Threads[i].Status == ThreadState.Unstarted)
 					return i;
 			}
 
@@ -260,9 +261,9 @@ namespace Mosa.Kernel.x86
 		{
 			for (uint i = 0; i < MaxThreads; i++)
 			{
-				if (Threads[i].Status == ThreadStatus.Terminated)
+				if (Threads[i].Status == ThreadState.Stopped)
 				{
-					Threads[i].Status = ThreadStatus.Empty;
+					Threads[i].Status = ThreadState.Unstarted;
 				}
 			}
 		}

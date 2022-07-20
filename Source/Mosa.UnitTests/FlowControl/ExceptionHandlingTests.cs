@@ -457,7 +457,9 @@ namespace Mosa.UnitTests.FlowControl
 				a = a + 25;
 			}
 
+#pragma warning disable 0162 // Unreachable code detected
 			a = a + 7;
+#pragma warning restore 0162 // Unreachable code detected
 
 			return a;
 		}

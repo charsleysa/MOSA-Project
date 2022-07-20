@@ -21,7 +21,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "<#= number.Value #>Mini<#= number.Value #>Mini")]
 		public static bool StructTestSet2<#= number.Value #>(<#= number.Key #> one, <#= number.Key #> two)
 		{
-			Struct3<#= number.Value #> structure;
+			Struct2<#= number.Value #> structure;
 			
 			structure.One = one;
 			structure.Two = two;

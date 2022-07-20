@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>System.Runtime</AssemblyName>
+    <AssemblyName>System.Private.Corelib</AssemblyName>
     <RootNamespace>System</RootNamespace>
     <DebugType>full</DebugType>
     <LangVersion>10.0</LangVersion>
@@ -15,6 +15,664 @@
     <SkipCommonResourcesIncludes>true</SkipCommonResourcesIncludes>
     <NoWarn>$(NoWarn),0419,0649,1573,1591,3021,CA2002</NoWarn>
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
-    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <AssemblyVersion>6.0.0.0</AssemblyVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <ContentWithTargetPath Include="DotnetLibraries\Microsoft.CSharp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Microsoft.CSharp.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\Microsoft.VisualBasic.Core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Microsoft.VisualBasic.Core.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\Microsoft.VisualBasic.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Microsoft.VisualBasic.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\Microsoft.Win32.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Microsoft.Win32.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\Microsoft.Win32.Registry.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Microsoft.Win32.Registry.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\mscorlib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>mscorlib.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\netstandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>netstandard.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.AppContext.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.AppContext.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Buffers.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Buffers.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Collections.Concurrent.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Collections.Concurrent.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Collections.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Collections.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Collections.Immutable.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Collections.Immutable.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Collections.NonGeneric.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Collections.NonGeneric.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Collections.Specialized.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Collections.Specialized.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.Annotations.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.Annotations.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.DataAnnotations.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.DataAnnotations.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.EventBasedAsync.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.EventBasedAsync.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ComponentModel.TypeConverter.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ComponentModel.TypeConverter.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Configuration.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Configuration.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Console.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Console.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Core.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Data.Common.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Data.Common.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Data.DataSetExtensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Data.DataSetExtensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Data.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Data.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.Contracts.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.Contracts.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.Debug.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.Debug.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.DiagnosticSource.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.DiagnosticSource.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.FileVersionInfo.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.FileVersionInfo.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.Process.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.Process.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.StackTrace.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.StackTrace.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.TextWriterTraceListener.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.TextWriterTraceListener.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.Tools.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.Tools.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.TraceSource.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.TraceSource.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Diagnostics.Tracing.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Diagnostics.Tracing.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Drawing.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Drawing.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Drawing.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Drawing.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Dynamic.Runtime.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Dynamic.Runtime.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Formats.Asn1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Formats.Asn1.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Globalization.Calendars.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Globalization.Calendars.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Globalization.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Globalization.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Globalization.Extensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Globalization.Extensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Compression.Brotli.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Compression.Brotli.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Compression.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Compression.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Compression.FileSystem.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Compression.FileSystem.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Compression.ZipFile.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Compression.ZipFile.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.FileSystem.AccessControl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.FileSystem.AccessControl.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.FileSystem.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.FileSystem.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.FileSystem.DriveInfo.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.FileSystem.DriveInfo.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.FileSystem.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.FileSystem.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.FileSystem.Watcher.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.FileSystem.Watcher.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.IsolatedStorage.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.IsolatedStorage.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.MemoryMappedFiles.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.MemoryMappedFiles.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Pipes.AccessControl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Pipes.AccessControl.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.Pipes.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.Pipes.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.IO.UnmanagedMemoryStream.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.IO.UnmanagedMemoryStream.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Linq.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Linq.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Linq.Expressions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Linq.Expressions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Linq.Parallel.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Linq.Parallel.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Linq.Queryable.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Linq.Queryable.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Memory.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Memory.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Http.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Http.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Http.Json.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Http.Json.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.HttpListener.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.HttpListener.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Mail.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Mail.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.NameResolution.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.NameResolution.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.NetworkInformation.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.NetworkInformation.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Ping.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Ping.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Quic.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Quic.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Requests.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Requests.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Security.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Security.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.ServicePoint.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.ServicePoint.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.Sockets.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.Sockets.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.WebClient.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.WebClient.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.WebHeaderCollection.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.WebHeaderCollection.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.WebProxy.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.WebProxy.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.WebSockets.Client.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.WebSockets.Client.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Net.WebSockets.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Net.WebSockets.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Numerics.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Numerics.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Numerics.Vectors.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Numerics.Vectors.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ObjectModel.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ObjectModel.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Private.DataContractSerialization.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Private.DataContractSerialization.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Private.Uri.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Private.Uri.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Private.Xml.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Private.Xml.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Private.Xml.Linq.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Private.Xml.Linq.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.DispatchProxy.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.DispatchProxy.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Emit.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Emit.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Emit.ILGeneration.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Emit.ILGeneration.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Emit.Lightweight.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Emit.Lightweight.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Extensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Extensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Metadata.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Metadata.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Reflection.TypeExtensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Reflection.TypeExtensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Resources.Reader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Resources.Reader.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Resources.ResourceManager.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Resources.ResourceManager.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Resources.Writer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Resources.Writer.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.CompilerServices.Unsafe.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.CompilerServices.Unsafe.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.CompilerServices.VisualC.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.CompilerServices.VisualC.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Extensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Extensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Handles.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Handles.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.InteropServices.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.InteropServices.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.InteropServices.RuntimeInformation.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.InteropServices.RuntimeInformation.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Intrinsics.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Intrinsics.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Loader.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Loader.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Numerics.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Numerics.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Serialization.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Serialization.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Serialization.Formatters.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Serialization.Formatters.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Serialization.Json.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Serialization.Json.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Serialization.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Serialization.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Runtime.Serialization.Xml.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Runtime.Serialization.Xml.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.AccessControl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.AccessControl.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Claims.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Claims.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.Algorithms.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.Algorithms.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.Cng.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.Cng.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.Csp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.Csp.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.Encoding.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.Encoding.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.OpenSsl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.OpenSsl.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.Primitives.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.Primitives.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Cryptography.X509Certificates.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Cryptography.X509Certificates.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Principal.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Principal.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.Principal.Windows.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.Principal.Windows.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Security.SecureString.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Security.SecureString.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ServiceModel.Web.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ServiceModel.Web.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ServiceProcess.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ServiceProcess.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.Encoding.CodePages.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.Encoding.CodePages.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.Encoding.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.Encoding.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.Encoding.Extensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.Encoding.Extensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.Encodings.Web.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.Encodings.Web.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.Json.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.Json.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Text.RegularExpressions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Text.RegularExpressions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Channels.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Channels.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Overlapped.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Overlapped.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Tasks.Dataflow.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Tasks.Dataflow.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Tasks.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Tasks.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Tasks.Extensions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Tasks.Extensions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Tasks.Parallel.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Tasks.Parallel.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Thread.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Thread.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.ThreadPool.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.ThreadPool.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Threading.Timer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Threading.Timer.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Transactions.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Transactions.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Transactions.Local.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Transactions.Local.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.ValueTuple.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.ValueTuple.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Web.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Web.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Web.HttpUtility.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Web.HttpUtility.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Windows.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Windows.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.Linq.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.Linq.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.ReaderWriter.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.ReaderWriter.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.Serialization.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.Serialization.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.XDocument.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.XDocument.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.XmlDocument.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.XmlDocument.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.XmlSerializer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.XmlSerializer.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.XPath.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.XPath.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\System.Xml.XPath.XDocument.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>System.Xml.XPath.XDocument.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="DotnetLibraries\WindowsBase.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>WindowsBase.dll</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
 </Project>

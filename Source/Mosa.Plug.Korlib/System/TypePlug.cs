@@ -16,7 +16,7 @@ namespace Mosa.Plug.Korlib.System
 			// Iterate through all the assemblies and look for the type name
 			foreach (var assembly in Internal.Assemblies)
 			{
-				foreach (var type in assembly.typeList)
+				foreach (var type in assembly.typeInfoList)
 				{
 					// Get type name for currently found type, if its not a match then skip
 					if (type.FullName != typeName) continue;
@@ -39,7 +39,7 @@ namespace Mosa.Plug.Korlib.System
 			// Iterate through all the assemblies and look for the type handle
 			foreach (var assembly in Internal.Assemblies)
 			{
-				foreach (var type in assembly.typeList)
+				foreach (var type in assembly.typeInfoList)
 				{
 					// If its not a match then skip
 					if (!type.TypeHandle.Equals(handle))

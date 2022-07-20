@@ -6,8 +6,6 @@
 		<NoWarn>168,162,649,0649</NoWarn>
 		<OutputPath>..\..\bin\</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
-		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -26,7 +24,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Mosa.Collections.Generic\Mosa.Collections.Generic.csproj" />
-		<ProjectReference Include="..\Mosa.Korlib\Mosa.Korlib.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Basic\CallTests.cs">

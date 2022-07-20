@@ -4,17 +4,20 @@ using Mosa.Runtime;
 using Mosa.Runtime.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Pointer = Mosa.Runtime.Pointer;
 
 namespace Mosa.Plug.Korlib.Runtime
 {
 	public sealed unsafe class RuntimeTypeInfo : TypeInfo
 	{
 		private readonly TypeDefinition typeDefinition;
-		private readonly TypeCode typeCode;
+		private readonly TypeElementCode typeCode;
 		private readonly Type baseType;
 		private readonly Type elementType;
-		private readonly Type asType;
 		private List<CustomAttributeData> customAttributesData = null;
 
 		internal readonly Type ValueType = typeof(ValueType);
@@ -24,9 +27,8 @@ namespace Mosa.Plug.Korlib.Runtime
 
 		public override Assembly Assembly { get; }
 
-		public override TypeAttributes Attributes { get; }
-
-		public override Type BaseType { get { return (IsInterface) ? null : baseType; } }
+		public override Type BaseType
+		{ get { return (IsInterface) ? null : baseType; } }
 
 		public override bool ContainsGenericParameters => throw new NotImplementedException();
 
@@ -103,12 +105,15 @@ namespace Mosa.Plug.Korlib.Runtime
 
 		public override string Namespace { get; }
 
-		public RuntimeTypeInfo(RuntimeType type, Assembly assembly)
-		{
-			asType = type;
-			Assembly = assembly;
+		public override Guid GUID => throw new NotImplementedException();
 
-			var handle = type.TypeHandle;
+		public override Module Module => throw new NotImplementedException();
+
+		public override Type UnderlyingSystemType => throw new NotImplementedException();
+
+		public RuntimeTypeInfo(RuntimeTypeHandle handle, Assembly assembly)
+		{
+			Assembly = assembly;
 
 			typeDefinition = new TypeDefinition(new Pointer(handle.Value));
 
@@ -118,12 +123,12 @@ namespace Mosa.Plug.Korlib.Runtime
 			FullName = typeDefinition.Name;
 
 			typeCode = typeDefinition.TypeCode;
-			Attributes = typeDefinition.Attributes;
 
 			// Base Type
 			if (!typeDefinition.ParentType.IsNull)
 			{
-				var parentHandle = new RuntimeTypeHandle(typeDefinition.ParentType.Ptr.ToIntPtr());
+				var parentTypeDefinition = typeDefinition.ParentType;
+				var parentHandle = Unsafe.As<TypeDefinition, RuntimeTypeHandle>(ref parentTypeDefinition);
 
 				baseType = Type.GetTypeFromHandle(parentHandle);
 			}
@@ -131,7 +136,8 @@ namespace Mosa.Plug.Korlib.Runtime
 			// Declaring Type
 			if (!typeDefinition.DeclaringType.IsNull)
 			{
-				var declaringHandle = new RuntimeTypeHandle(typeDefinition.DeclaringType.Ptr.ToIntPtr());
+				var declaringTypeDefinition = typeDefinition.DeclaringType;
+				var declaringHandle = Unsafe.As<TypeDefinition, RuntimeTypeHandle>(ref declaringTypeDefinition);
 
 				DeclaringType = Type.GetTypeFromHandle(declaringHandle);
 			}
@@ -139,7 +145,8 @@ namespace Mosa.Plug.Korlib.Runtime
 			// Element Type
 			if (!typeDefinition.ElementType.IsNull)
 			{
-				var elementHandle = new RuntimeTypeHandle(typeDefinition.ElementType.Ptr.ToIntPtr());
+				var elementTypeDefinition = typeDefinition.ElementType;
+				var elementHandle = Unsafe.As<TypeDefinition, RuntimeTypeHandle>(ref elementTypeDefinition);
 
 				elementType = Type.GetTypeFromHandle(elementHandle);
 			}
@@ -147,7 +154,7 @@ namespace Mosa.Plug.Korlib.Runtime
 
 		public override Type AsType()
 		{
-			return asType;
+			return this;
 		}
 
 		public override int GetArrayRank()
@@ -180,33 +187,27 @@ namespace Mosa.Plug.Korlib.Runtime
 
 		protected override bool IsArrayImpl()
 		{
-			return typeCode == TypeCode.Array || typeCode == TypeCode.SZArray;
+			return typeCode == TypeElementCode.Array || typeCode == TypeElementCode.SZArray;
 		}
 
 		protected override bool IsByRefImpl()
 		{
-			// We don't know so just return false
-			return false;
-		}
-
-		protected override bool IsNestedImpl()
-		{
-			return (Attributes & TypeAttributes.VisibilityMask) > TypeAttributes.Public;
+			return typeCode == TypeElementCode.ManagedPointer;
 		}
 
 		protected override bool IsPointerImpl()
 		{
-			return typeCode == TypeCode.ManagedPointer || typeCode == TypeCode.UnmanagedPointer;
+			return typeCode == TypeElementCode.UnmanagedPointer;
 		}
 
 		protected override bool IsPrimitiveImpl()
 		{
-			return typeCode == TypeCode.Boolean
-				|| typeCode == TypeCode.Char
-				|| (typeCode >= TypeCode.I && typeCode <= TypeCode.I8)
-				|| (typeCode >= TypeCode.U && typeCode <= TypeCode.U8)
-				|| typeCode == TypeCode.R4
-				|| typeCode == TypeCode.R8;
+			return typeCode == TypeElementCode.Boolean
+				|| typeCode == TypeElementCode.Char
+				|| (typeCode >= TypeElementCode.I && typeCode <= TypeElementCode.I8)
+				|| (typeCode >= TypeElementCode.U && typeCode <= TypeElementCode.U8)
+				|| typeCode == TypeElementCode.R4
+				|| typeCode == TypeElementCode.R8;
 		}
 
 		protected override bool IsValueTypeImpl()
@@ -246,6 +247,112 @@ namespace Mosa.Plug.Korlib.Runtime
 		{
 			// No planned support
 			throw new NotSupportedException();
+		}
+
+		protected override TypeAttributes GetAttributeFlagsImpl()
+		{
+			return typeDefinition.Attributes;
+		}
+
+		protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override EventInfo GetEvent(string name, BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override EventInfo[] GetEvents(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override FieldInfo GetField(string name, BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override FieldInfo[] GetFields(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		[return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+		public override Type GetInterface(string name, bool ignoreCase)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override Type[] GetInterfaces()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override Type GetNestedType(string name, BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override Type[] GetNestedTypes(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override bool IsCOMObjectImpl()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override object[] GetCustomAttributes(bool inherit)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool IsDefined(Type attributeType, bool inherit)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

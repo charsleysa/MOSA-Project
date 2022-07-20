@@ -37,9 +37,6 @@ namespace Mosa.Kernel.x86
 			SmbiosManager.Setup();
 			ConsoleManager.Setup();
 
-			// Setup the Encoding objects
-			Encoding.Setup();
-
 			Logger.Log("Kernel initialized");
 		}
 	}

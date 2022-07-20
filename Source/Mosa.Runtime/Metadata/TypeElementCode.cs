@@ -1,8 +1,8 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
-namespace System.Reflection
+namespace Mosa.Runtime.Metadata
 {
-	public enum TypeCode
+	public enum TypeElementCode
 	{
 		Void = 1,
 		Boolean = 2,

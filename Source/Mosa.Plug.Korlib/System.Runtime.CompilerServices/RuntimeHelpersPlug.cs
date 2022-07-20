@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using Pointer = Mosa.Runtime.Pointer;
 
 namespace Mosa.Plug.Korlib.System.Runtime.CompilerServices
 {
@@ -15,7 +16,7 @@ namespace Mosa.Plug.Korlib.System.Runtime.CompilerServices
 		internal static int ObjectSequence = 0;
 
 		[Plug("System.Runtime.CompilerServices.RuntimeHelpers::GetHashCode")]
-		internal unsafe static int GetHashCode(object o)
+		internal static unsafe int GetHashCode(object o)
 		{
 			return (int)Mosa.Runtime.Internal.GetObjectHashValue(o);
 		}
@@ -41,7 +42,7 @@ namespace Mosa.Plug.Korlib.System.Runtime.CompilerServices
 		}
 
 		[Plug("System.Runtime.CompilerServices.RuntimeHelpers::UnsafeCast")]
-		internal unsafe static object UnsafeCast(object o)
+		internal static unsafe object UnsafeCast(object o)
 		{
 			return o;
 		}

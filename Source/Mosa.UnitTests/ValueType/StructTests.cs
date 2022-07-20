@@ -21,7 +21,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "U1MiniU1Mini")]
 		public static bool StructTestSet2U1(byte one, byte two)
 		{
-			Struct3U1 structure;
+			Struct2U1 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -54,7 +54,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "U2MiniU2Mini")]
 		public static bool StructTestSet2U2(ushort one, ushort two)
 		{
-			Struct3U2 structure;
+			Struct2U2 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -87,7 +87,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "U4MiniU4Mini")]
 		public static bool StructTestSet2U4(uint one, uint two)
 		{
-			Struct3U4 structure;
+			Struct2U4 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -120,7 +120,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "U8MiniU8Mini")]
 		public static bool StructTestSet2U8(ulong one, ulong two)
 		{
-			Struct3U8 structure;
+			Struct2U8 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -153,7 +153,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "I1MiniI1Mini")]
 		public static bool StructTestSet2I1(sbyte one, sbyte two)
 		{
-			Struct3I1 structure;
+			Struct2I1 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -186,7 +186,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "I2MiniI2Mini")]
 		public static bool StructTestSet2I2(short one, short two)
 		{
-			Struct3I2 structure;
+			Struct2I2 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -219,7 +219,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "I4MiniI4Mini")]
 		public static bool StructTestSet2I4(int one, int two)
 		{
-			Struct3I4 structure;
+			Struct2I4 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -252,7 +252,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "I8MiniI8Mini")]
 		public static bool StructTestSet2I8(long one, long two)
 		{
-			Struct3I8 structure;
+			Struct2I8 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -285,7 +285,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "R4MiniR4Mini")]
 		public static bool StructTestSet2R4(float one, float two)
 		{
-			Struct3R4 structure;
+			Struct2R4 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -318,7 +318,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "R8MiniR8Mini")]
 		public static bool StructTestSet2R8(double one, double two)
 		{
-			Struct3R8 structure;
+			Struct2R8 structure;
 			
 			structure.One = one;
 			structure.Two = two;
@@ -351,7 +351,7 @@ namespace Mosa.UnitTests.ValueType
 		//[MosaUnitTest(Series = "CMiniCMini")]
 		public static bool StructTestSet2C(char one, char two)
 		{
-			Struct3C structure;
+			Struct2C structure;
 			
 			structure.One = one;
 			structure.Two = two;

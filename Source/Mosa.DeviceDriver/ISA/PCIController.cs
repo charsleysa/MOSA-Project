@@ -13,19 +13,19 @@ namespace Mosa.DeviceDriver.ISA
 	{
 		#region Definitions
 
-		protected static readonly uint BaseValue = 0x80000000;
+		private static readonly uint BaseValue = 0x80000000;
 
 		#endregion Definitions
 
 		/// <summary>
 		/// The configuration address
 		/// </summary>
-		protected BaseIOPortReadWrite configAddress;
+		private BaseIOPortReadWrite configAddress;
 
 		/// <summary>
 		/// The configuration data
 		/// </summary>
-		protected BaseIOPortReadWrite configData;
+		private BaseIOPortReadWrite configData;
 
 		public override void Initialize()
 		{
@@ -74,7 +74,7 @@ namespace Mosa.DeviceDriver.ISA
 		/// <param name="function">The function.</param>
 		/// <param name="register">The register.</param>
 		/// <returns></returns>
-		protected uint GetIndex(byte bus, byte slot, byte function, byte register)
+		private uint GetIndex(byte bus, byte slot, byte function, byte register)
 		{
 			return BaseValue
 				| (uint)((bus & 0xFF) << 16)

@@ -5,15 +5,16 @@ using Mosa.Runtime.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Pointer = Mosa.Runtime.Pointer;
 
 namespace Mosa.Plug.Korlib.Runtime
 {
 	public sealed unsafe class RuntimeAssembly : Assembly
 	{
-		internal readonly List<RuntimeType> typeList;
 		internal AssemblyDefinition assemblyDefinition;
+		internal readonly List<RuntimeTypeInfo> typeInfoList;
 		internal readonly List<RuntimeTypeHandle> typeHandles;
-		internal List<RuntimeTypeInfo> typeInfoList = null;
 		internal List<CustomAttributeData> customAttributesData = null;
 
 		private readonly string fullName;
@@ -47,16 +48,6 @@ namespace Mosa.Plug.Korlib.Runtime
 		{
 			get
 			{
-				if (typeInfoList == null)
-				{
-					// Type Info - Lazy load
-					typeInfoList = new List<RuntimeTypeInfo>();
-					foreach (var type in typeList)
-					{
-						typeInfoList.Add(new RuntimeTypeInfo(type, this));
-					}
-				}
-
 				var types = new List<TypeInfo>();
 
 				foreach (var type in typeInfoList)
@@ -75,10 +66,10 @@ namespace Mosa.Plug.Korlib.Runtime
 		{
 			get
 			{
-				var list = new List<RuntimeType>();
-				foreach (var type in typeList)
+				var list = new List<RuntimeTypeInfo>();
+				foreach (var type in typeInfoList)
 				{
-					if ((type.attributes & TypeAttributes.VisibilityMask) != TypeAttributes.Public)
+					if ((type.Attributes & TypeAttributes.VisibilityMask) != TypeAttributes.Public)
 						continue;
 					list.Add(type);
 				}
@@ -91,23 +82,24 @@ namespace Mosa.Plug.Korlib.Runtime
 			assemblyDefinition = new AssemblyDefinition(new Pointer(pointer));
 			fullName = assemblyDefinition.Name;
 
-			typeList = new List<RuntimeType>();
 			typeHandles = new List<RuntimeTypeHandle>();
+			typeInfoList = new List<RuntimeTypeInfo>();
 
 			var typeCount = assemblyDefinition.NumberOfTypes;
 
 			for (uint i = 0; i < typeCount; i++)
 			{
-				var handle = new RuntimeTypeHandle(assemblyDefinition.GetTypeDefinition(i).Ptr.ToIntPtr());
+				var typeDefinition = assemblyDefinition.GetTypeDefinition(i);
+				var handle = Unsafe.As<TypeDefinition, RuntimeTypeHandle>(ref typeDefinition);
 
 				if (typeHandles.Contains(handle))
 					continue;
 
 				typeHandles.Add(handle);
 
-				var type = new RuntimeType(handle);
+				var type = new RuntimeTypeInfo(handle, this);
 
-				typeList.Add(type);
+				typeInfoList.Add(type);
 			}
 		}
 	}

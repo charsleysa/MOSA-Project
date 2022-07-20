@@ -1,7 +1,9 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
+using Mosa.Runtime.Metadata;
 using Mosa.Runtime.Plug;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Mosa.Plug.Korlib.System
 {
@@ -23,7 +25,7 @@ namespace Mosa.Plug.Korlib.System
 			// Iterate through all the assemblies and look for the type handle
 			foreach (var assembly in Internal.Assemblies)
 			{
-				foreach (var type in assembly.typeList)
+				foreach (var type in assembly.typeInfoList)
 				{
 					// If its not a match then skip
 					if (!type.TypeHandle.Equals(handle))
@@ -41,7 +43,8 @@ namespace Mosa.Plug.Korlib.System
 		[Plug("System.Object::GetTypeHandle")]
 		internal static RuntimeTypeHandle GetTypeHandle(object obj)
 		{
-			return new RuntimeTypeHandle(Mosa.Runtime.Internal.GetTypeDefinition(obj).ToIntPtr());
+			var typeDefinition = new TypeDefinition(Mosa.Runtime.Internal.GetTypeDefinition(obj));
+			return Unsafe.As<TypeDefinition, RuntimeTypeHandle>(ref typeDefinition);
 		}
 	}
 }

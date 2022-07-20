@@ -195,7 +195,7 @@ namespace Mosa.DeviceSystem
 			var newG = (byte)(((foreground.G * alphac + invAlpha * background.G) >> 8) & 0xFF);
 			var newB = (byte)(((foreground.B * alphac + invAlpha * background.B) >> 8) & 0xFF);
 
-			return Color.ToArgb(newR, newG, newB);
+			return Color.FromArgb(newR, newG, newB).ToArgb();
 		}
 
 		/// <summary>Fills a rectangle with color.</summary>

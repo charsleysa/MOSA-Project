@@ -7,7 +7,7 @@ namespace Mosa.Kernel.x86
 {
 	internal class Thread
 	{
-		public ThreadStatus Status = ThreadStatus.Empty;
+		public ThreadState Status = ThreadState.Unstarted;
 		public Pointer StackTop;
 		public Pointer StackBottom;
 		public Pointer StackStatePointer;

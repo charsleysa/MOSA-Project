@@ -51,7 +51,7 @@ namespace Mosa.DeviceSystem
 		/// <param name="blue">The blue.</param>
 		public void SetColor(byte colorIndex, byte red, byte green, byte blue)
 		{
-			colors[colorIndex] = new Color(red, green, blue);
+			colors[colorIndex] = Color.FromArgb(red, green, blue);
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Mosa.DeviceSystem
 
 			for (byte i = 0; i < entries; i++)
 			{
-				if (colors[i].IsEqual(color))
+				if (colors[i] == color)
 					return i;
 
 				// very simple implementation
@@ -98,7 +98,7 @@ namespace Mosa.DeviceSystem
 		/// Gets the Standard 16 color palette.
 		/// </summary>
 		/// <returns></returns>
-		static public ColorPalette CreateStandard16ColorPalette()
+		public static ColorPalette CreateStandard16ColorPalette()
 		{
 			ColorPalette palette = new ColorPalette(16);
 
@@ -126,7 +126,7 @@ namespace Mosa.DeviceSystem
 		/// Gets the Netscape 256 color palette.
 		/// </summary>
 		/// <returns></returns>
-		static public ColorPalette CreateNetscape256ColorPalette()
+		public static ColorPalette CreateNetscape256ColorPalette()
 		{
 			ColorPalette palette = new ColorPalette(256);
 
@@ -394,7 +394,7 @@ namespace Mosa.DeviceSystem
 		/// Gets the Standard 256 color palette.
 		/// </summary>
 		/// <returns></returns>
-		static public ColorPalette CreateStandardIBM256ColorPalette()
+		public static ColorPalette CreateStandardIBM256ColorPalette()
 		{
 			ColorPalette palette = new ColorPalette(256);
 

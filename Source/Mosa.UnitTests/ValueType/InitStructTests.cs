@@ -1,12 +1,12 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
-
 // No run-time tests
 
 namespace Mosa.UnitTests.ValueType
 {
 	internal struct InitStruct
 	{
+#pragma warning disable 0649 // Field is never assigned to
 		public byte ValueU1;
 		public ushort ValueU2;
 		public uint ValueU4;
@@ -19,6 +19,7 @@ namespace Mosa.UnitTests.ValueType
 		public double ValueR8;
 		public bool ValueB;
 		public char ValueC;
+#pragma warning restore 0649 // Field is never assigned to
 	}
 
 	public static class InitStructTests
@@ -106,6 +107,5 @@ namespace Mosa.UnitTests.ValueType
 			InitStruct d = new InitStruct();
 			return d.ValueC;
 		}
-
 	}
 }

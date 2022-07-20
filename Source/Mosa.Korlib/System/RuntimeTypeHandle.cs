@@ -7,21 +7,21 @@ namespace System
 	/// </summary>
 	public struct RuntimeTypeHandle
 	{
-		private readonly IntPtr m_type;
-
-		public RuntimeTypeHandle(IntPtr handle) // FIXME: hack - should be internal, but the plug needs access
+		internal RuntimeTypeHandle(IntPtr handle)
 		{
-			m_type = handle;
+			m_ptr = handle;
 		}
+
+		private readonly IntPtr m_ptr;
 
 		/// <summary>
 		/// Gets a handle to the type represented by this instance.
 		/// </summary>
-		public IntPtr Value { get { return m_type; } }
+		public IntPtr Value { get { return m_ptr; } }
 
 		public bool Equals(RuntimeTypeHandle obj)
 		{
-			return obj.m_type == m_type;
+			return obj.m_ptr == m_ptr;
 		}
 
 		public override bool Equals(object obj)
@@ -31,7 +31,7 @@ namespace System
 
 			var handle = (RuntimeTypeHandle)obj;
 
-			return handle.m_type == m_type;
+			return handle.m_ptr == m_ptr;
 		}
 
 		public static bool operator ==(RuntimeTypeHandle left, object right)
@@ -56,7 +56,7 @@ namespace System
 
 		public override int GetHashCode()
 		{
-			return m_type.ToInt32();
+			return m_ptr.ToInt32();
 		}
 	}
 }

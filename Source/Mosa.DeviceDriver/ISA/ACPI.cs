@@ -192,11 +192,15 @@ namespace Mosa.DeviceDriver.ISA
 	public unsafe class ACPI : BaseDeviceDriver, IACPI
 	{
 		private RSDPDescriptor* Descriptor;
+#pragma warning disable 0649 // Field is never used
 		private RSDPDescriptor20* Descriptor20;
+#pragma warning restore 0649 // Field us never used
 
 		private FADT* FADT;
 		private RSDT* RSDT;
+#pragma warning disable 0649 // Field is never used
 		private XSDT* XSDT;
+#pragma warning restore 0649 // Field us never used
 		private MADT* MADT;
 
 		private BaseIOPortWrite SMI_CommandPort;
@@ -238,7 +242,8 @@ namespace Mosa.DeviceDriver.ISA
 			{
 				Descriptor20 = (RSDPDescriptor20*)rsdpPtr;
 				XSDT = (XSDT*)HAL.GetPhysicalMemory((Pointer)Descriptor20->XsdtAddress, 0xFFFF).Address;
-			} else */RSDT = (RSDT*)HAL.GetPhysicalMemory((Pointer)Descriptor->RsdtAddress, 0xFFFF).Address;
+			} else */
+			RSDT = (RSDT*)HAL.GetPhysicalMemory((Pointer)Descriptor->RsdtAddress, 0xFFFF).Address;
 
 			FADT = (FADT*)HAL.GetPhysicalMemory(FindBySignature("FACP"), 0xFFFF).Address;
 			MADT = (MADT*)HAL.GetPhysicalMemory(FindBySignature("APIC"), 0xFFFF).Address;

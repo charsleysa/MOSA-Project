@@ -28,7 +28,9 @@ namespace Mosa.UnitTests.Other
 				return false;
 			}
 
+#pragma warning disable 0162 // Unreachable code detected
 			return true;
+#pragma warning restore 0162 // Unreachable code detected
 		}
 	}
 }

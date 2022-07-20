@@ -7,8 +7,7 @@ namespace System.Reflection
 	/// <summary>
 	/// Obtains information about the attributes of a member and provides access to member metadata.
 	/// </summary>
-	[SerializableAttribute]
-	public abstract class MemberInfo
+	public abstract class MemberInfo : ICustomAttributeProvider
 	{
 		/// <summary>
 		/// A collection that contains this member's custom attributes.
@@ -38,6 +37,10 @@ namespace System.Reflection
 			return this == obj;
 		}
 
+		public abstract object[] GetCustomAttributes(bool inherit);
+
+		public abstract object[] GetCustomAttributes(Type attributeType, bool inherit);
+
 		/// <summary>
 		/// Returns the hash code for this instance.
 		/// </summary>
@@ -46,5 +49,7 @@ namespace System.Reflection
 		{
 			return base.GetHashCode();
 		}
+
+		public abstract bool IsDefined(Type attributeType, bool inherit);
 	}
 }

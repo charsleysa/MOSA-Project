@@ -1,5 +1,6 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
+using System;
 using System.Reflection;
 
 namespace Mosa.Runtime.Metadata
@@ -42,7 +43,7 @@ namespace Mosa.Runtime.Metadata
 
 		public CustomAttributeTable CustomAttributes => new CustomAttributeTable(Ptr.LoadPointer(Pointer.Size));
 
-		public TypeCode TypeCode => (TypeCode)(Ptr.Load32(Pointer.Size * 2) >> 24);
+		public TypeElementCode TypeCode => (TypeElementCode)(Ptr.Load32(Pointer.Size * 2) >> 24);
 
 		public TypeAttributes Attributes => (TypeAttributes)(Ptr.Load32(Pointer.Size * 2) & 0x00FFFFFF);
 
