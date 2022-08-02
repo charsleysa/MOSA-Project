@@ -1,25 +1,32 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+//using System.Runtime.Serialization;
 
 namespace System
 {
-	/// <summary>
-	/// Implementation of the "System.ArgumentException" class
-	/// </summary>
+	[Serializable]
 	public class FormatException : Exception
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FormatException"/> class.
-		/// </summary>
 		public FormatException()
-			: this("Bad Format")
-		{ }
+			: base(SR.Arg_FormatException)
+		{
+			HResult = HResults.COR_E_FORMAT;
+		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FormatException"/> class.
-		/// </summary>
-		/// <param name="message">The message.</param>
-		public FormatException(string message)
+		public FormatException(string? message)
 			: base(message)
-		{ }
+		{
+			HResult = HResults.COR_E_FORMAT;
+		}
+
+		public FormatException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.COR_E_FORMAT;
+		}
+
+		//protected FormatException(SerializationInfo info, StreamingContext context) : base(info, context)
+		//{ }
 	}
 }

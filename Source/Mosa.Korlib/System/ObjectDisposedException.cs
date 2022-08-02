@@ -1,25 +1,101 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+using System.Runtime.CompilerServices;
+
+//using System.Runtime.Serialization;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System
 {
 	/// <summary>
-	/// Implementation of the "System.ObjectDisposedException" class
+	/// The exception that is thrown when accessing an object that was disposed.
 	/// </summary>
+	[Serializable]
 	public class ObjectDisposedException : InvalidOperationException
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ObjectDisposedException"/> class.
-		/// </summary>
-		public ObjectDisposedException()
-			: this("The object was used after being disposed.")
-		{ }
+		private readonly string? _objectName;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ObjectDisposedException"/> class.
+		/// This constructor should only be called by the runtime
 		/// </summary>
-		/// <param name="message">The message.</param>
-		public ObjectDisposedException(string message)
-			: base(message)
+		private ObjectDisposedException() :
+			this(null, SR.ObjectDisposed_Generic)
 		{ }
+
+		public ObjectDisposedException(string? objectName) :
+			this(objectName, SR.ObjectDisposed_Generic)
+		{ }
+
+		public ObjectDisposedException(string? objectName, string? message) : base(message)
+		{
+			HResult = HResults.COR_E_OBJECTDISPOSED;
+			_objectName = objectName;
+		}
+
+		public ObjectDisposedException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.COR_E_OBJECTDISPOSED;
+		}
+
+		//protected ObjectDisposedException(SerializationInfo info, StreamingContext context)
+		//	: base(info, context)
+		//{
+		//	_objectName = info.GetString("ObjectName");
+		//}
+
+		/// <summary>Throws an <see cref="ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
+		/// <param name="condition">The condition to evaluate.</param>
+		/// <param name="instance">The object whose type's full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
+		/// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
+		[StackTraceHidden]
+		public static void ThrowIf([DoesNotReturnIf(true)] bool condition, object instance)
+		{
+			if (condition)
+			{
+				ThrowHelper.ThrowObjectDisposedException(instance);
+			}
+		}
+
+		/// <summary>Throws an <see cref="ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
+		/// <param name="condition">The condition to evaluate.</param>
+		/// <param name="type">The type whose full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
+		/// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
+		[StackTraceHidden]
+		public static void ThrowIf([DoesNotReturnIf(true)] bool condition, Type type)
+		{
+			if (condition)
+			{
+				ThrowHelper.ThrowObjectDisposedException(type);
+			}
+		}
+
+		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		//{
+		//	base.GetObjectData(info, context);
+		//	info.AddValue("ObjectName", ObjectName, typeof(string));
+		//}
+
+		/// <summary>
+		/// Gets the text for the message for this exception.
+		/// </summary>
+		public override string Message
+		{
+			get
+			{
+				string name = ObjectName;
+				if (string.IsNullOrEmpty(name))
+				{
+					return base.Message;
+				}
+
+				string objectDisposed = SR.Format(SR.ObjectDisposed_ObjectName_Name, name);
+				return base.Message + Environment.NewLineConst + objectDisposed;
+			}
+		}
+
+		public string ObjectName => _objectName ?? string.Empty;
 	}
 }

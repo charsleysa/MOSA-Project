@@ -1,49 +1,80 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+//using System.Runtime.Serialization;
 
 namespace System
 {
 	/// <summary>
-	/// Implementation of the "System.ArgumentOutOfRangeException" class
+	/// The ArgumentOutOfRangeException is thrown when an argument is outside the legal range for that argument.
 	/// </summary>
+	[Serializable]
 	public class ArgumentOutOfRangeException : ArgumentException
 	{
-		private int millisecond;
-		private string v;
-
-		//private object _actualValue;
+		private readonly object? _actualValue;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ArgumentOutOfRangeException"/> class.
+		/// Creates a new ArgumentOutOfRangeException with its message string set to a default message explaining an argument was out of range.
 		/// </summary>
 		public ArgumentOutOfRangeException()
-			: this("Argument is out of range.")
-		{ }
+			: base(SR.Arg_ArgumentOutOfRangeException)
+		{
+			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
+		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ArgumentOutOfRangeException"/> class with the name of the parameter that causes this exception.
-		/// </summary>
-		/// <param name="paramName"></param>
-		public ArgumentOutOfRangeException(string paramName)
-			: base("Argument is out of range.", paramName)
-		{ }
+		public ArgumentOutOfRangeException(string? paramName)
+			: base(SR.Arg_ArgumentOutOfRangeException, paramName)
+		{
+			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
+		}
 
-		/// <summary>
-		/// Initializes an instance of the <see cref="ArgumentOutOfRangeException"/> class with the name of the parameter that causes this exception and a specified error message.
-		/// </summary>
-		/// <param name="paramName">The name of the parameter that caused the exception.</param>
-		/// <param name="message">A message that describes the error.</param>
-		public ArgumentOutOfRangeException(string paramName, string message)
+		public ArgumentOutOfRangeException(string? paramName, string? message)
 			: base(message, paramName)
-		{ }
-
-		public ArgumentOutOfRangeException(string paramName, int millisecond, string v) : this(paramName)
 		{
-			this.millisecond = millisecond;
-			this.v = v;
+			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
 		}
 
-		public ArgumentOutOfRangeException(string paramName, double value, string argumentOutOfRange_AddValue) : this(paramName)
+		public ArgumentOutOfRangeException(string? message, Exception? innerException)
+			: base(message, innerException)
 		{
+			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
 		}
+
+		public ArgumentOutOfRangeException(string? paramName, object? actualValue, string? message)
+			: base(message, paramName)
+		{
+			_actualValue = actualValue;
+			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
+		}
+
+		//protected ArgumentOutOfRangeException(SerializationInfo info, StreamingContext context)
+		//	: base(info, context)
+		//{
+		//	_actualValue = info.GetValue("ActualValue", typeof(object));
+		//}
+
+		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		//{
+		//	base.GetObjectData(info, context);
+		//	info.AddValue("ActualValue", _actualValue, typeof(object));
+		//}
+
+		public override string Message
+		{
+			get
+			{
+				string s = base.Message;
+				if (_actualValue != null)
+				{
+					string valueMessage = SR.Format(SR.ArgumentOutOfRange_ActualValue, _actualValue);
+					if (s == null)
+						return valueMessage;
+					return s + Environment.NewLineConst + valueMessage;
+				}
+				return s;
+			}
+		}
+
+		public virtual object? ActualValue => _actualValue;
 	}
 }

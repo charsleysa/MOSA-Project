@@ -1,26 +1,32 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+//using System.Runtime.Serialization;
 
 namespace System
 {
-	/// <summary>
-	/// Implementation of the "System.NotImplementedException" class
-	/// </summary>
 	[Serializable]
 	public class NotImplementedException : SystemException
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NotImplementedException"/> class.
-		/// </summary>
 		public NotImplementedException()
-			: base("A Not Implemented exception was thrown.")
-		{ }
+			: base(SR.Arg_NotImplementedException)
+		{
+			HResult = HResults.E_NOTIMPL;
+		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NotImplementedException"/> class.
-		/// </summary>
-		/// <param name="message">The message.</param>
-		public NotImplementedException(string message)
+		public NotImplementedException(string? message)
 			: base(message)
-		{ }
+		{
+			HResult = HResults.E_NOTIMPL;
+		}
+
+		public NotImplementedException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.E_NOTIMPL;
+		}
+
+		//protected NotImplementedException(SerializationInfo info, StreamingContext context) : base(info, context)
+		//{ }
 	}
 }

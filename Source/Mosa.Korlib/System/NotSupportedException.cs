@@ -1,27 +1,32 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+//using System.Runtime.Serialization;
 
 namespace System
 {
-	/// <summary>
-	/// Implementation of the "System.NotSupportedException" class
-	/// </summary>
+	[Serializable]
 	public class NotSupportedException : Exception
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NotSupportedException"/> class.
-		/// </summary>
-		public NotSupportedException() :
-			this("Operation is not supported.")
+		public NotSupportedException()
+			: base(SR.Arg_NotSupportedException)
 		{
+			HResult = HResults.COR_E_NOTSUPPORTED;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NotSupportedException"/> class.
-		/// </summary>
-		/// <param name="message">The message.</param>
-		public NotSupportedException(string message) :
-			base(message)
+		public NotSupportedException(string? message)
+			: base(message)
 		{
+			HResult = HResults.COR_E_NOTSUPPORTED;
 		}
+
+		public NotSupportedException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.COR_E_NOTSUPPORTED;
+		}
+
+		//protected NotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context)
+		//{ }
 	}
 }

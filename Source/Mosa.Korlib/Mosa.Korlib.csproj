@@ -7,7 +7,6 @@
     <LangVersion>10.0</LangVersion>
     <OutputPath>..\..\bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
@@ -16,7 +15,24 @@
     <NoWarn>$(NoWarn),0419,0649,1573,1591,3021,CA2002</NoWarn>
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <AssemblyVersion>6.0.0.0</AssemblyVersion>
+    <GenerateResxSourceOmitGetResourceString>true</GenerateResxSourceOmitGetResourceString>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
+
+  <ItemGroup Label="Embedded Resources">
+    <EmbeddedResource Include="Properties\Strings.resx">
+      <GenerateSource>true</GenerateSource>
+      <ClassName>System.SR</ClassName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Import Project="GenerateResxSource.targets" />
+
+  <ItemGroup>
+    <Compile Remove="System\Runtime\Serialization\**" />
+    <None Remove="System\Runtime\Serialization\**" />
+  </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="DotnetLibraries\Microsoft.CSharp.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

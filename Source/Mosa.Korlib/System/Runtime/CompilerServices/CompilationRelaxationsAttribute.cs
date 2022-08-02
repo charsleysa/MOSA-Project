@@ -7,6 +7,9 @@ namespace System.Runtime.CompilerServices
 	{
 		public CompilationRelaxationsAttribute(int relaxations)
 		{
+			CompilationRelaxations = relaxations;
 		}
+
+		public int CompilationRelaxations { get; }
 	}
 }

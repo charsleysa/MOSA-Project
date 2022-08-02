@@ -14,16 +14,18 @@ namespace System
 	/// <summary>
 	/// Implementation of the "System.String" class
 	/// </summary>
-	public sealed class String : IEnumerable, IEnumerable<char>, IEquatable<String>, IComparable, IComparable<String>
+	public partial class String : IEnumerable, IEnumerable<char>, IEquatable<String>, IComparable, IComparable<String>
 	{
 		/// <summary>
 		/// Length
 		/// </summary>
 		internal int length;
 
-		private readonly char start_char;
+		// This field is readonly but the compiler complains if marked as readonly
+		private char _firstChar;
 
-		public int Length { get { return length; } }
+		public int Length
+		{ get { return length; } }
 
 		public static string Empty = "";
 
@@ -31,13 +33,12 @@ namespace System
 		{
 			get
 			{
-				fixed (char* c = &start_char)
+				fixed (char* c = &_firstChar)
 				{
 					return c;
 				}
 			}
 		}
-
 
 		internal unsafe ref char GetRawStringData() => ref *first_char;
 
@@ -75,13 +76,15 @@ namespace System
 		//public unsafe extern String(sbyte* value, int startIndex, int length, Encoding enc);
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
-		public unsafe extern String(char* value);
+		public extern unsafe String(char* value);
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
-		public unsafe extern String(char* value, int startIndex, int length);
+		public extern unsafe String(char* value, int startIndex, int length);
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		internal static extern string InternalAllocateString(int length);
+
+		internal static string FastAllocateString(int length) => InternalAllocateString(length);
 
 		private static unsafe string Ctor(ReadOnlySpan<char> value)
 		{
@@ -89,7 +92,7 @@ namespace System
 
 			if (len == 0)
 				return Empty;
- 
+
 			// TODO: Actually move memory instead of copying it
 			string result = InternalAllocateString(len);
 			char* chars = result.first_char;
@@ -253,69 +256,69 @@ namespace System
 			return result;
 		}
 
-		public string[] Split(char c)
-		{
-			var str = this;
-			var ls = new List<string>();
+		//public string[] Split(char c)
+		//{
+		//	var str = this;
+		//	var ls = new List<string>();
 
-			int indx;
+		//	int indx;
 
-			while ((indx = str.IndexOf(c)) != -1)
-			{
-				ls.Add(str.Substring(0, indx));
-				str = str.Substring(indx + 1);
-			}
+		//	while ((indx = str.IndexOf(c)) != -1)
+		//	{
+		//		ls.Add(str.Substring(0, indx));
+		//		str = str.Substring(indx + 1);
+		//	}
 
-			if (str.Length > 0)
-				ls.Add(str);
+		//	if (str.Length > 0)
+		//		ls.Add(str);
 
-			return ls.ToArray();
-		}
+		//	return ls.ToArray();
+		//}
 
-		public string[] Split(string s)
-		{
-			var str = this;
-			var ls = new List<string>();
+		//public string[] Split(string s)
+		//{
+		//	var str = this;
+		//	var ls = new List<string>();
 
-			int indx;
+		//	int indx;
 
-			while ((indx = str.IndexOf(s)) != -1)
-			{
-				ls.Add(str.Substring(0, indx));
-				str = str.Substring(indx + s.length);
-			}
+		//	while ((indx = str.IndexOf(s)) != -1)
+		//	{
+		//		ls.Add(str.Substring(0, indx));
+		//		str = str.Substring(indx + s.length);
+		//	}
 
-			if (str.Length > 0)
-				ls.Add(str);
+		//	if (str.Length > 0)
+		//		ls.Add(str);
 
-			return ls.ToArray();
-		}
+		//	return ls.ToArray();
+		//}
 
-		public string Replace(string s1, string s2)
-		{
-			if (IsNullOrEmpty(s1) || !Contains(s1))
-				return this;
+		//public string Replace(string s1, string s2)
+		//{
+		//	if (IsNullOrEmpty(s1) || !Contains(s1))
+		//		return this;
 
-			var str = this;
+		//	var str = this;
 
-			string start;
+		//	string start;
 
-			while (str.IndexOf(s1) > -1)
-			{
-				var index = str.IndexOf(s1);
+		//	while (str.IndexOf(s1) > -1)
+		//	{
+		//		var index = str.IndexOf(s1);
 
-				// Get start
-				start = str.Substring(0, index);
+		//		// Get start
+		//		start = str.Substring(0, index);
 
-				// Get end
-				str = str.Substring(index + s1.Length);
+		//		// Get end
+		//		str = str.Substring(index + s1.Length);
 
-				// Replace occurence
-				str = $"{start}{s2}{str}";
-			}
+		//		// Replace occurence
+		//		str = $"{start}{s2}{str}";
+		//	}
 
-			return str;
-		}
+		//	return str;
+		//}
 
 		public bool Equals(string s)
 		{
@@ -366,13 +369,13 @@ namespace System
 		}
 
 		// Favor Invariant Culture & Ignore Case
-		public int CompareTo (string obj)
+		public int CompareTo(string obj)
 		{
 			return Compare(this, obj);
 		}
 
 		// Favor Invariant Culture & Ignore Case
-		public int Compare (string left, string right)
+		public int Compare(string left, string right)
 		{
 			left = left.ToLower();
 			right = right.ToLower();
@@ -407,276 +410,276 @@ namespace System
 			return this;
 		}
 
-		public List<string> Split(char delimiter, string text)
-		{
-			var ret = new List<string>();
-			int startPos = 0;
-			string temp = Empty;
+		//public List<string> Split(char delimiter, string text)
+		//{
+		//	var ret = new List<string>();
+		//	int startPos = 0;
+		//	string temp = Empty;
 
-			for (int i = 0; i < text.Length; i++)
-			{
-				if (text[i] == delimiter)
-				{
-					temp = text.Substring(startPos, text.IndexOf(delimiter) - startPos);
+		//	for (int i = 0; i < text.Length; i++)
+		//	{
+		//		if (text[i] == delimiter)
+		//		{
+		//			temp = text.Substring(startPos, text.IndexOf(delimiter) - startPos);
 
-					startPos = i + 1;
-				}
-			}
-			if (temp != Empty)
-			{
-				ret.Add(temp);
-			}
+		//			startPos = i + 1;
+		//		}
+		//	}
+		//	if (temp != Empty)
+		//	{
+		//		ret.Add(temp);
+		//	}
 
-			return ret;
-		}
+		//	return ret;
+		//}
 
-		public unsafe string ToUpper()
-		{
-			string result = InternalAllocateString(length);
-			char* chars = result.first_char;
-			char* self = first_char;
+		//public unsafe string ToUpper()
+		//{
+		//	string result = InternalAllocateString(length);
+		//	char* chars = result.first_char;
+		//	char* self = first_char;
 
-			for (int i = 0; i < length; i++)
-			{
-				if (self[i] >= 97 && self[i] <= 122)
-					*chars = (char)(self[i] - 32);
-				else
-					*chars = self[i];
-				chars++;
-			}
+		//	for (int i = 0; i < length; i++)
+		//	{
+		//		if (self[i] >= 97 && self[i] <= 122)
+		//			*chars = (char)(self[i] - 32);
+		//		else
+		//			*chars = self[i];
+		//		chars++;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe string ToLower()
-		{
-			string result = InternalAllocateString(length);
-			char* chars = result.first_char;
-			char* self = first_char;
+		//public unsafe string ToLower()
+		//{
+		//	string result = InternalAllocateString(length);
+		//	char* chars = result.first_char;
+		//	char* self = first_char;
 
-			for (int i = 0; i < length; i++)
-			{
-				if (self[i] >= 65 && self[i] <= 90)
-					*chars = (char)(self[i] + 32);
-				else
-					*chars = self[i];
-				chars++;
-			}
+		//	for (int i = 0; i < length; i++)
+		//	{
+		//		if (self[i] >= 65 && self[i] <= 90)
+		//			*chars = (char)(self[i] + 32);
+		//		else
+		//			*chars = self[i];
+		//		chars++;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		// TODO: Seems some compiler bugs prevent the original algorithms from working...
-		public unsafe static string Concat(string a, string b)
-		{
-			string result = InternalAllocateString(a.length + b.length);
-			char* chars = result.first_char;
+		//// TODO: Seems some compiler bugs prevent the original algorithms from working...
+		//public unsafe static string Concat(string a, string b)
+		//{
+		//	string result = InternalAllocateString(a.length + b.length);
+		//	char* chars = result.first_char;
 
-			char* aPtr = a.first_char;
-			char* bPtr = b.first_char;
-			for (int i = 0; i < a.length; i++)
-			{
-				*chars = aPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < b.length; i++)
-			{
-				*chars = bPtr[i];
-				chars++;
-			}
+		//	char* aPtr = a.first_char;
+		//	char* bPtr = b.first_char;
+		//	for (int i = 0; i < a.length; i++)
+		//	{
+		//		*chars = aPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < b.length; i++)
+		//	{
+		//		*chars = bPtr[i];
+		//		chars++;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe static string Concat(string a, string b, string c)
-		{
-			string result = InternalAllocateString(a.length + b.length + c.length);
-			char* chars = result.first_char;
+		//public unsafe static string Concat(string a, string b, string c)
+		//{
+		//	string result = InternalAllocateString(a.length + b.length + c.length);
+		//	char* chars = result.first_char;
 
-			char* aPtr = a.first_char;
-			char* bPtr = b.first_char;
-			char* cPtr = c.first_char;
-			for (int i = 0; i < a.length; i++)
-			{
-				*chars = aPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < b.length; i++)
-			{
-				*chars = bPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < c.length; i++)
-			{
-				*chars = cPtr[i];
-				chars++;
-			}
+		//	char* aPtr = a.first_char;
+		//	char* bPtr = b.first_char;
+		//	char* cPtr = c.first_char;
+		//	for (int i = 0; i < a.length; i++)
+		//	{
+		//		*chars = aPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < b.length; i++)
+		//	{
+		//		*chars = bPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < c.length; i++)
+		//	{
+		//		*chars = cPtr[i];
+		//		chars++;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe static string Concat(string a, string b, string c, string d)
-		{
-			string result = InternalAllocateString(a.length + b.length + c.length + d.length);
-			char* chars = result.first_char;
+		//public unsafe static string Concat(string a, string b, string c, string d)
+		//{
+		//	string result = InternalAllocateString(a.length + b.length + c.length + d.length);
+		//	char* chars = result.first_char;
 
-			char* aPtr = a.first_char;
-			char* bPtr = b.first_char;
-			char* cPtr = c.first_char;
-			char* dPtr = d.first_char;
-			for (int i = 0; i < a.length; i++)
-			{
-				*chars = aPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < b.length; i++)
-			{
-				*chars = bPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < c.length; i++)
-			{
-				*chars = cPtr[i];
-				chars++;
-			}
-			for (int i = 0; i < d.length; i++)
-			{
-				*chars = dPtr[i];
-				chars++;
-			}
+		//	char* aPtr = a.first_char;
+		//	char* bPtr = b.first_char;
+		//	char* cPtr = c.first_char;
+		//	char* dPtr = d.first_char;
+		//	for (int i = 0; i < a.length; i++)
+		//	{
+		//		*chars = aPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < b.length; i++)
+		//	{
+		//		*chars = bPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < c.length; i++)
+		//	{
+		//		*chars = cPtr[i];
+		//		chars++;
+		//	}
+		//	for (int i = 0; i < d.length; i++)
+		//	{
+		//		*chars = dPtr[i];
+		//		chars++;
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public static string Concat(object a)
-		{
-			return a.ToString();
-		}
+		//public static string Concat(object a)
+		//{
+		//	return a.ToString();
+		//}
 
-		public static string Concat(object a, object b)
-		{
-			return Concat(a.ToString(), b.ToString());
-		}
+		//public static string Concat(object a, object b)
+		//{
+		//	return Concat(a.ToString(), b.ToString());
+		//}
 
-		public static string Concat(object a, object b, object c)
-		{
-			return Concat(a.ToString(), b.ToString(), c.ToString());
-		}
+		//public static string Concat(object a, object b, object c)
+		//{
+		//	return Concat(a.ToString(), b.ToString(), c.ToString());
+		//}
 
-		public static string Concat(object a, object b, object c, object d)
-		{
-			return Concat(a.ToString(), b.ToString(), c.ToString(), d.ToString());
-		}
+		//public static string Concat(object a, object b, object c, object d)
+		//{
+		//	return Concat(a.ToString(), b.ToString(), c.ToString(), d.ToString());
+		//}
 
-		public static string Concat(params object[] args)
-		{
-			if (args.Length == 0)
-				return Empty;
+		//public static string Concat(params object[] args)
+		//{
+		//	if (args.Length == 0)
+		//		return Empty;
 
-			string result = args[0].ToString();
+		//	string result = args[0].ToString();
 
-			for (int i = 1; i < args.Length; ++i)
-				result = Concat(result, args[i].ToString());
+		//	for (int i = 1; i < args.Length; ++i)
+		//		result = Concat(result, args[i].ToString());
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public static string Concat(string[] objects)
-		{
-			if (objects.Length == 0)
-				return Empty;
+		//public static string Concat(string[] objects)
+		//{
+		//	if (objects.Length == 0)
+		//		return Empty;
 
-			string result = objects[0].ToString();
+		//	string result = objects[0].ToString();
 
-			for (int i = 1; i < objects.Length; ++i)
-				result = Concat(result, objects[i].ToString());
+		//	for (int i = 1; i < objects.Length; ++i)
+		//		result = Concat(result, objects[i].ToString());
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe string Substring(int startIndex)
-		{
-			if (startIndex == 0)
-				return Empty;
+		//public unsafe string Substring(int startIndex)
+		//{
+		//	if (startIndex == 0)
+		//		return Empty;
 
-			// FIXME: Following line does not compile correctly
-			if (startIndex < 0 || startIndex > length)
-				throw new ArgumentOutOfRangeException("startIndex");
+		//	// FIXME: Following line does not compile correctly
+		//	if (startIndex < 0 || startIndex > length)
+		//		throw new ArgumentOutOfRangeException("startIndex");
 
-			if (startIndex < 0)
-				throw new ArgumentOutOfRangeException("startIndex");
+		//	if (startIndex < 0)
+		//		throw new ArgumentOutOfRangeException("startIndex");
 
-			if (startIndex > length)
-				throw new ArgumentOutOfRangeException("startIndex");
+		//	if (startIndex > length)
+		//		throw new ArgumentOutOfRangeException("startIndex");
 
-			int newlen = length - startIndex;
-			string result = InternalAllocateString(newlen);
+		//	int newlen = length - startIndex;
+		//	string result = InternalAllocateString(newlen);
 
-			char* chars = result.first_char;
+		//	char* chars = result.first_char;
 
-			for (int index = 0; index < newlen; index++)
-				*chars++ = this[startIndex + index];
+		//	for (int index = 0; index < newlen; index++)
+		//		*chars++ = this[startIndex + index];
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe string Substring(int startIndex, int length)
-		{
-			if (length < 0)
-				throw new ArgumentOutOfRangeException("length", "< 0");
+		//public unsafe string Substring(int startIndex, int length)
+		//{
+		//	if (length < 0)
+		//		throw new ArgumentOutOfRangeException("length", "< 0");
 
-			if (startIndex < 0 || startIndex > this.length)
-				throw new ArgumentOutOfRangeException("startIndex");
+		//	if (startIndex < 0 || startIndex > this.length)
+		//		throw new ArgumentOutOfRangeException("startIndex");
 
-			string result = InternalAllocateString(length);
+		//	string result = InternalAllocateString(length);
 
-			char* chars = result.first_char;
+		//	char* chars = result.first_char;
 
-			for (int index = 0; index < length; index++)
-				*chars++ = this[startIndex + index];
+		//	for (int index = 0; index < length; index++)
+		//		*chars++ = this[startIndex + index];
 
-			return result;
-		}
+		//	return result;
+		//}
 
-		public unsafe bool StartsWith(string value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		//public unsafe bool StartsWith(string value)
+		//{
+		//	if (value == null)
+		//		throw new ArgumentNullException(nameof(value));
 
-			if (value.length > length)
-				return false;
+		//	if (value.length > length)
+		//		return false;
 
-			var thisChar = first_char;
-			var cmpChar = value.first_char;
-			for (var i = 0; i < value.length; i++)
-			{
-				if (*thisChar != *cmpChar)
-					return false;
-				thisChar++;
-				cmpChar++;
-			}
-			return true;
-		}
+		//	var thisChar = first_char;
+		//	var cmpChar = value.first_char;
+		//	for (var i = 0; i < value.length; i++)
+		//	{
+		//		if (*thisChar != *cmpChar)
+		//			return false;
+		//		thisChar++;
+		//		cmpChar++;
+		//	}
+		//	return true;
+		//}
 
-		public unsafe bool EndsWith(string value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		//public unsafe bool EndsWith(string value)
+		//{
+		//	if (value == null)
+		//		throw new ArgumentNullException(nameof(value));
 
-			if (value.length > length)
-				return false;
+		//	if (value.length > length)
+		//		return false;
 
-			var thisChar = first_char + (length - value.length);
-			var cmpChar = value.first_char;
-			for (var i = 0; i < value.length; i++)
-			{
-				if (*thisChar != *cmpChar)
-					return false;
-				thisChar++;
-				cmpChar++;
-			}
-			return true;
-		}
+		//	var thisChar = first_char + (length - value.length);
+		//	var cmpChar = value.first_char;
+		//	for (var i = 0; i < value.length; i++)
+		//	{
+		//		if (*thisChar != *cmpChar)
+		//			return false;
+		//		thisChar++;
+		//		cmpChar++;
+		//	}
+		//	return true;
+		//}
 
 		public char[] ToCharArray()
 		{

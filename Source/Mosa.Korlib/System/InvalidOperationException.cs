@@ -1,25 +1,31 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 
+//using System.Runtime.Serialization;
+
 namespace System
 {
-	/// <summary>
-	/// Implementation of the "System.InvalidOperationException" class
-	/// </summary>
-	public class InvalidOperationException : Exception
+	[Serializable]
+	public class InvalidOperationException : SystemException
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="InvalidOperationException"/> class.
-		/// </summary>
 		public InvalidOperationException()
-			: this("The requested operation cannot be performed.")
-		{ }
+			: base(SR.Arg_InvalidOperationException)
+		{
+			HResult = HResults.COR_E_INVALIDOPERATION;
+		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="InvalidOperationException"/> class.
-		/// </summary>
-		/// <param name="message">The message.</param>
-		public InvalidOperationException(string message)
+		public InvalidOperationException(string? message)
 			: base(message)
-		{ }
+		{
+			HResult = HResults.COR_E_INVALIDOPERATION;
+		}
+
+		public InvalidOperationException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.COR_E_INVALIDOPERATION;
+		}
+
+		//protected InvalidOperationException(SerializationInfo info, StreamingContext context) : base(info, context)
+		//{ }
 	}
 }
