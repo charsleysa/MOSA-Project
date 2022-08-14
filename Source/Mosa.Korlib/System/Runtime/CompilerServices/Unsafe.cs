@@ -16,6 +16,10 @@ namespace System.Runtime.CompilerServices
 		public static void* AsPointer<T>(ref T value)
 		{
 			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// conv.u
+			// ret
 		}
 
 		/// <summary>
@@ -27,6 +31,9 @@ namespace System.Runtime.CompilerServices
 		public static int SizeOf<T>()
 		{
 			throw new PlatformNotSupportedException();
+
+			// sizeof !!0
+			// ret
 		}
 
 		/// <summary>
@@ -36,9 +43,12 @@ namespace System.Runtime.CompilerServices
 		[NonVersionable]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[return: NotNullIfNotNull("value")]
-		public static T As<T>([AllowNull] object value) where T : class
+		public static T As<T>(object? value) where T : class?
 		{
 			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// ret
 		}
 
 		/// <summary>
@@ -50,6 +60,9 @@ namespace System.Runtime.CompilerServices
 		public static ref TTo As<TFrom, TTo>(ref TFrom source)
 		{
 			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// ret
 		}
 
 		/// <summary>
@@ -86,6 +99,17 @@ namespace System.Runtime.CompilerServices
 		}
 
 		/// <summary>
+		/// Adds an byte offset to the given reference.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static ref T AddByteOffset<T>(ref T source, nuint byteOffset)
+		{
+			return ref AddByteOffset(ref source, (IntPtr)(void*)byteOffset);
+		}
+
+		/// <summary>
 		/// Determines whether the specified references point to the same location.
 		/// </summary>
 		[Intrinsic]
@@ -94,6 +118,11 @@ namespace System.Runtime.CompilerServices
 		public static bool AreSame<T>([AllowNull] ref T left, [AllowNull] ref T right)
 		{
 			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// ldarg.1
+			// ceq
+			// ret
 		}
 
 		/// <summary>
@@ -109,6 +138,11 @@ namespace System.Runtime.CompilerServices
 		public static bool IsAddressGreaterThan<T>([AllowNull] ref T left, [AllowNull] ref T right)
 		{
 			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// ldarg.1
+			// cgt.un
+			// ret
 		}
 
 		/// <summary>
@@ -124,28 +158,11 @@ namespace System.Runtime.CompilerServices
 		public static bool IsAddressLessThan<T>([AllowNull] ref T left, [AllowNull] ref T right)
 		{
 			throw new PlatformNotSupportedException();
-		}
 
-		/// <summary>
-		/// Adds an byte offset to the given reference.
-		/// </summary>
-		[Intrinsic]
-		[NonVersionable]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
-		{
-			throw new PlatformNotSupportedException();
-		}
-
-		/// <summary>
-		/// Adds an byte offset to the given reference.
-		/// </summary>
-		[Intrinsic]
-		[NonVersionable]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static ref T AddByteOffset<T>(ref T source, nuint byteOffset)
-		{
-			return ref AddByteOffset(ref source, (IntPtr)(void*)byteOffset);
+			// ldarg.0
+			// ldarg.1
+			// clt.un
+			// ret
 		}
 
 		/// <summary>
@@ -161,25 +178,6 @@ namespace System.Runtime.CompilerServices
 				AddByteOffset(ref startAddress, i) = value;
 		}
 
-		[Intrinsic]
-		[NonVersionable]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void WriteUnaligned<T>(ref byte destination, T value)
-		{
-			As<byte, T>(ref destination) = value;
-		}
-
-		/// <summary>
-		/// Writes a value of type <typeparamref name="T"/> to the given location.
-		/// </summary>
-		[Intrinsic]
-		[NonVersionable]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static void WriteUnaligned<T>(void* destination, T value)
-		{
-			As<byte, T>(ref *(byte*)destination) = value;
-		}
-
 		/// <summary>
 		/// Reads a value of type <typeparamref name="T"/> from the given location.
 		/// </summary>
@@ -188,7 +186,7 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T ReadUnaligned<T>(void* source)
 		{
-			return As<byte, T>(ref *(byte*)source);
+			return Unsafe.As<byte, T>(ref *(byte*)source);
 		}
 
 		/// <summary>
@@ -199,7 +197,46 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T ReadUnaligned<T>(ref byte source)
 		{
-			return As<byte, T>(ref source);
+			return Unsafe.As<byte, T>(ref source);
+		}
+
+		/// <summary>
+		/// Writes a value of type <typeparamref name="T"/> to the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void WriteUnaligned<T>(void* destination, T value)
+		{
+			Unsafe.As<byte, T>(ref *(byte*)destination) = value;
+		}
+
+		/// <summary>
+		/// Writes a value of type <typeparamref name="T"/> to the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void WriteUnaligned<T>(ref byte destination, T value)
+		{
+			Unsafe.As<byte, T>(ref destination) = value;
+		}
+
+		/// <summary>
+		/// Adds an byte offset to the given reference.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
+		{
+			// This method is implemented by the toolchain
+			throw new PlatformNotSupportedException();
+
+			// ldarg.0
+			// ldarg.1
+			// add
+			// ret
 		}
 
 		/// <summary>
@@ -210,7 +247,7 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Read<T>(void* source)
 		{
-			return As<byte, T>(ref *(byte*)source);
+			return Unsafe.As<byte, T>(ref *(byte*)source);
 		}
 
 		/// <summary>
@@ -221,7 +258,7 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T Read<T>(ref byte source)
 		{
-			return As<byte, T>(ref source);
+			return Unsafe.As<byte, T>(ref source);
 		}
 
 		/// <summary>
@@ -232,7 +269,7 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Write<T>(void* destination, T value)
 		{
-			As<byte, T>(ref *(byte*)destination) = value;
+			Unsafe.As<byte, T>(ref *(byte*)destination) = value;
 		}
 
 		/// <summary>
@@ -243,7 +280,7 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Write<T>(ref byte destination, T value)
 		{
-			As<byte, T>(ref destination) = value;
+			Unsafe.As<byte, T>(ref destination) = value;
 		}
 
 		/// <summary>
@@ -254,7 +291,18 @@ namespace System.Runtime.CompilerServices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ref T AsRef<T>(void* source)
 		{
-			return ref As<byte, T>(ref *(byte*)source);
+			return ref Unsafe.As<byte, T>(ref *(byte*)source);
+		}
+
+		/// <summary>
+		/// Reinterprets the given location as a reference to a value of type <typeparamref name="T"/>.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ref T AsRef<T>(in T source)
+		{
+			throw new PlatformNotSupportedException();
 		}
 
 		/// <summary>
@@ -266,6 +314,54 @@ namespace System.Runtime.CompilerServices
 		public static IntPtr ByteOffset<T>([AllowNull] ref T origin, [AllowNull] ref T target)
 		{
 			throw new PlatformNotSupportedException();
+		}
+
+		/// <summary>
+		/// Returns a by-ref to type <typeparamref name="T"/> that is a null reference.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ref T NullRef<T>()
+		{
+			return ref Unsafe.AsRef<T>(null);
+
+			// ldc.i4.0
+			// conv.u
+			// ret
+		}
+
+		/// <summary>
+		/// Returns if a given by-ref to type <typeparamref name="T"/> is a null reference.
+		/// </summary>
+		/// <remarks>
+		/// This check is conceptually similar to "(void*)(&amp;source) == nullptr".
+		/// </remarks>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsNullRef<T>(ref T source)
+		{
+			return Unsafe.AsPointer(ref source) == null;
+
+			// ldarg.0
+			// ldc.i4.0
+			// conv.u
+			// ceq
+			// ret
+		}
+
+		/// <summary>
+		/// Bypasses definite assignment rules by taking advantage of <c>out</c> semantics.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void SkipInit<T>(out T value)
+		{
+			throw new PlatformNotSupportedException();
+
+			// ret
 		}
 	}
 }

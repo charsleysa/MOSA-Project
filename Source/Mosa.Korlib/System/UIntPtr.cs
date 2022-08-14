@@ -33,7 +33,7 @@ namespace System
 			_value = value;
 		}
 
-		public unsafe override bool Equals(Object obj)
+		public override unsafe bool Equals(Object obj)
 		{
 			if (obj is UIntPtr)
 			{
@@ -42,7 +42,7 @@ namespace System
 			return false;
 		}
 
-		public unsafe override int GetHashCode()
+		public override unsafe int GetHashCode()
 		{
 			return ((int)_value);
 		}
@@ -141,12 +141,21 @@ namespace System
 		}
 
 		[NonVersionable]
-		public unsafe void* ToPointer()
+		public unsafe void* ToPointer() => _value;
+
+		public static UIntPtr MaxValue
 		{
-			return _value;
+			[NonVersionable]
+			get => (UIntPtr)(Size == 8 ? UInt64.MaxValue : UInt32.MaxValue);
 		}
 
-		public unsafe override string ToString()
+		public static UIntPtr MinValue
+		{
+			[NonVersionable]
+			get => (UIntPtr)(Size == 8 ? UInt64.MinValue : UInt32.MinValue);
+		}
+
+		public override unsafe string ToString()
 		{
 			return ((long)_value).ToString();
 		}
