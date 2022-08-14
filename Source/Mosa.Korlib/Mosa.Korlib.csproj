@@ -20,6 +20,11 @@
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Ignore all previous constants since SPCL is sensitive to what is defined and the Sdk adds some by default -->
+    <DefineConstants>CORECLR;NETCOREAPP;SYSTEM_PRIVATE_CORELIB;TARGET_64BIT</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup Label="Embedded Resources">
     <EmbeddedResource Include="Properties\Strings.resx">
       <GenerateSource>true</GenerateSource>
@@ -690,5 +695,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>WindowsBase.dll</TargetPath>
     </ContentWithTargetPath>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="System\Runtime\Serialization\" />
   </ItemGroup>
 </Project>

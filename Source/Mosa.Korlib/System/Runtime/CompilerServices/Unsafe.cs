@@ -97,17 +97,34 @@ namespace System.Runtime.CompilerServices
 		}
 
 		/// <summary>
-        /// Initializes a block of memory at the given location with a given initial value
-        /// without assuming architecture dependent alignment of the address.
-        /// </summary>
-        /*[Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void InitBlockUnaligned(ref byte startAddress, byte value, uint byteCount)
-        {
-            for (uint i = 0; i < byteCount; i++)
-                AddByteOffset(ref startAddress, i) = value;
-        }*/
+		/// Determines whether the memory address referenced by <paramref name="left"/> is greater than
+		/// the memory address referenced by <paramref name="right"/>.
+		/// </summary>
+		/// <remarks>
+		/// This check is conceptually similar to "(void*)(&amp;left) &gt; (void*)(&amp;right)".
+		/// </remarks>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsAddressGreaterThan<T>([AllowNull] ref T left, [AllowNull] ref T right)
+		{
+			throw new PlatformNotSupportedException();
+		}
+
+		/// <summary>
+		/// Determines whether the memory address referenced by <paramref name="left"/> is less than
+		/// the memory address referenced by <paramref name="right"/>.
+		/// </summary>
+		/// <remarks>
+		/// This check is conceptually similar to "(void*)(&amp;left) &lt; (void*)(&amp;right)".
+		/// </remarks>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsAddressLessThan<T>([AllowNull] ref T left, [AllowNull] ref T right)
+		{
+			throw new PlatformNotSupportedException();
+		}
 
 		/// <summary>
 		/// Adds an byte offset to the given reference.
@@ -121,16 +138,28 @@ namespace System.Runtime.CompilerServices
 		}
 
 		/// <summary>
-        /// Adds an byte offset to the given reference.
-        /// </summary>
-		// TODO: Implement nuint
-        /*[Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ref T AddByteOffset<T>(ref T source, nuint byteOffset)
-        {
-            return ref AddByteOffset(ref source, (IntPtr)(void*)byteOffset);
-        }*/
+		/// Adds an byte offset to the given reference.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static ref T AddByteOffset<T>(ref T source, nuint byteOffset)
+		{
+			return ref AddByteOffset(ref source, (IntPtr)(void*)byteOffset);
+		}
+
+		/// <summary>
+		/// Initializes a block of memory at the given location with a given initial value
+		/// without assuming architecture dependent alignment of the address.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void InitBlockUnaligned(ref byte startAddress, byte value, uint byteCount)
+		{
+			for (uint i = 0; i < byteCount; i++)
+				AddByteOffset(ref startAddress, i) = value;
+		}
 
 		[Intrinsic]
 		[NonVersionable]
@@ -141,16 +170,30 @@ namespace System.Runtime.CompilerServices
 		}
 
 		/// <summary>
-        /// Writes a value of type <typeparamref name="T"/> to the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteUnaligned<T>(void* destination, T value)
-        {
-        	As<byte, T>(ref *(byte*)destination) = value;
-        }
+		/// Writes a value of type <typeparamref name="T"/> to the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void WriteUnaligned<T>(void* destination, T value)
+		{
+			As<byte, T>(ref *(byte*)destination) = value;
+		}
 
+		/// <summary>
+		/// Reads a value of type <typeparamref name="T"/> from the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T ReadUnaligned<T>(void* source)
+		{
+			return As<byte, T>(ref *(byte*)source);
+		}
+
+		/// <summary>
+		/// Reads a value of type <typeparamref name="T"/> from the given location.
+		/// </summary>
 		[Intrinsic]
 		[NonVersionable]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -160,86 +203,69 @@ namespace System.Runtime.CompilerServices
 		}
 
 		/// <summary>
-        /// Reads a value of type <typeparamref name="T"/> from the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T ReadUnaligned<T>(void* source)
-        {
-        	return As<byte, T>(ref *(byte*)source);
-        }
-
-        /// <summary>
-        /// Reads a value of type <typeparamref name="T"/> from the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Read<T>(void* source)
-        {
-            return As<byte, T>(ref *(byte*)source);
-        }
-
-        /// <summary>
-        /// Reads a value of type <typeparamref name="T"/> from the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Read<T>(ref byte source)
-        {
-            return As<byte, T>(ref source);
-        }
+		/// Reads a value of type <typeparamref name="T"/> from the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Read<T>(void* source)
+		{
+			return As<byte, T>(ref *(byte*)source);
+		}
 
 		/// <summary>
-        /// Writes a value of type <typeparamref name="T"/> to the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Write<T>(void* destination, T value)
-        {
-            As<byte, T>(ref *(byte*)destination) = value;
-        }
+		/// Reads a value of type <typeparamref name="T"/> from the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Read<T>(ref byte source)
+		{
+			return As<byte, T>(ref source);
+		}
 
-        /// <summary>
-        /// Writes a value of type <typeparamref name="T"/> to the given location.
-        /// </summary>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Write<T>(ref byte destination, T value)
-        {
-            As<byte, T>(ref destination) = value;
-        }
+		/// <summary>
+		/// Writes a value of type <typeparamref name="T"/> to the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Write<T>(void* destination, T value)
+		{
+			As<byte, T>(ref *(byte*)destination) = value;
+		}
 
-        /// <summary>
-        /// Returns if a given by-ref to type <typeparamref name="T"/> is a null reference.
-        /// </summary>
-        /// <remarks>
-        /// This check is conceptually similar to "(void*)(&amp;source) == nullptr".
-        /// </remarks>
-        [Intrinsic]
-        [NonVersionable]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullRef<T>(ref T source)
-        {
-            return Unsafe.AsPointer(ref source) == null;
- 
-            // ldarg.0
-            // ldc.i4.0
-            // conv.u
-            // ceq
-            // ret
-        }
+		/// <summary>
+		/// Writes a value of type <typeparamref name="T"/> to the given location.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void Write<T>(ref byte destination, T value)
+		{
+			As<byte, T>(ref destination) = value;
+		}
 
-		//[Intrinsic]
-		//[NonVersionable]
-		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		//public static ref T AsRef<T>(void* source)
-		//{
-		//	return ref As<byte, T>(ref *(byte*)source);
-		//}
+		/// <summary>
+		/// Reinterprets the given location as a reference to a value of type <typeparamref name="T"/>.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ref T AsRef<T>(void* source)
+		{
+			return ref As<byte, T>(ref *(byte*)source);
+		}
+
+		/// <summary>
+		/// Determines the byte offset from origin to target from the given references.
+		/// </summary>
+		[Intrinsic]
+		[NonVersionable]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static IntPtr ByteOffset<T>([AllowNull] ref T origin, [AllowNull] ref T target)
+		{
+			throw new PlatformNotSupportedException();
+		}
 	}
 }

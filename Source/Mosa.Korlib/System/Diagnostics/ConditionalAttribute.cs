@@ -1,20 +1,19 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace System.Diagnostics
 {
-	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 	public sealed class ConditionalAttribute : Attribute
 	{
-		private readonly string conditionString;
-
-		public string ConditionString
-		{
-			get { return conditionString; }
-		}
-
 		public ConditionalAttribute(string conditionString)
 		{
-			this.conditionString = ConditionString;
+			ConditionString = conditionString;
 		}
+
+		public string ConditionString { get; }
 	}
 }
