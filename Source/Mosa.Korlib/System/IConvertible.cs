@@ -1,8 +1,8 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System
 {
@@ -21,7 +21,7 @@ namespace System
 	// does not exist (because the particular conversion is not supported), the
 	// IConvertible implementation should simply throw an InvalidCastException.
 
-	//[CLSCompliant(false)]
+	[CLSCompliant(false)]
 	public interface IConvertible
 	{
 		// Returns the type code of this object. An implementation of this method
@@ -34,45 +34,46 @@ namespace System
 		// of this method should return the TypeCode that best describes the
 		// internal representation of the object.
 
-		//TypeCode GetTypeCode();
+		TypeCode GetTypeCode();
 
 		// The ToXXX methods convert the value of the underlying object to the
 		// given type. If a particular conversion is not supported, the
 		// implementation must throw an InvalidCastException. If the value of the
 		// underlying object is not within the range of the target type, the
 		// implementation must throw an OverflowException.  The
-		// IFormatProvider will be used to get a NumberFormatInfo or similar
+		// IFormatProvider? will be used to get a NumberFormatInfo or similar
 		// appropriate service object, and may safely be null.
 
-		bool ToBoolean(IFormatProvider provider);
+		bool ToBoolean(IFormatProvider? provider);
 
-		char ToChar(IFormatProvider provider);
+		char ToChar(IFormatProvider? provider);
 
-		sbyte ToSByte(IFormatProvider provider);
+		sbyte ToSByte(IFormatProvider? provider);
 
-		byte ToByte(IFormatProvider provider);
+		byte ToByte(IFormatProvider? provider);
 
-		short ToInt16(IFormatProvider provider);
+		short ToInt16(IFormatProvider? provider);
 
-		ushort ToUInt16(IFormatProvider provider);
+		ushort ToUInt16(IFormatProvider? provider);
 
-		int ToInt32(IFormatProvider provider);
+		int ToInt32(IFormatProvider? provider);
 
-		uint ToUInt32(IFormatProvider provider);
+		uint ToUInt32(IFormatProvider? provider);
 
-		long ToInt64(IFormatProvider provider);
+		long ToInt64(IFormatProvider? provider);
 
-		ulong ToUInt64(IFormatProvider provider);
+		ulong ToUInt64(IFormatProvider? provider);
 
-		float ToSingle(IFormatProvider provider);
+		float ToSingle(IFormatProvider? provider);
 
-		double ToDouble(IFormatProvider provider);
+		double ToDouble(IFormatProvider? provider);
 
-		decimal ToDecimal(IFormatProvider provider);
+		decimal ToDecimal(IFormatProvider? provider);
 
-		//DateTime ToDateTime(IFormatProvider provider);
-		string ToString(IFormatProvider provider);
+		DateTime ToDateTime(IFormatProvider? provider);
 
-		object ToType(Type conversionType, IFormatProvider provider);
+		string ToString(IFormatProvider? provider);
+
+		object ToType(Type conversionType, IFormatProvider? provider);
 	}
 }

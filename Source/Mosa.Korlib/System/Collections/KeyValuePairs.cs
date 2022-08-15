@@ -2,9 +2,9 @@
 
 using System.Diagnostics;
 
-namespace System.System.Collections
+namespace System.Collections
 {
-	//TODO [DebuggerDisplay("{value}", Name = "[{key}]", Type = "")]
+	[DebuggerDisplay("{value}", Name = "[{key}]", Type = "")]
 	internal class KeyValuePairs
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]

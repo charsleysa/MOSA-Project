@@ -1,55 +1,79 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace System.Reflection
 {
-	/// <summary>
-	/// Obtains information about the attributes of a member and provides access to member metadata.
-	/// </summary>
-	public abstract class MemberInfo : ICustomAttributeProvider
+	public abstract partial class MemberInfo : ICustomAttributeProvider
 	{
-		/// <summary>
-		/// A collection that contains this member's custom attributes.
-		/// </summary>
-		public virtual IEnumerable<CustomAttributeData> CustomAttributes
-		{
-			get { return new CustomAttributeData[0]; }
-		}
+		protected MemberInfo()
+		{ }
 
-		/// <summary>
-		/// Gets the class that declares this member.
-		/// </summary>
-		public abstract Type DeclaringType { get; }
-
-		/// <summary>
-		/// Gets the name of the current member.
-		/// </summary>
+		public abstract MemberTypes MemberType { get; }
 		public abstract string Name { get; }
+		public abstract Type? DeclaringType { get; }
+		public abstract Type? ReflectedType { get; }
 
-		/// <summary>
-		/// Returns a value that indicates whether this instance is equal to a specified object.
-		/// </summary>
-		/// <param name="obj">An object to compare with this instance, or null.</param>
-		/// <returns>True if obj equals the type and value of this instance; otherwise, False.</returns>
-		public override bool Equals(object obj)
+		public virtual Module Module
 		{
-			return this == obj;
+			get
+			{
+				// This check is necessary because for some reason, Type adds a new "Module" property that hides the inherited one instead
+				// of overriding.
+
+				if (this is Type type)
+					return type.Module;
+
+				throw NotImplemented.ByDesign;
+			}
 		}
+
+		public virtual bool HasSameMetadataDefinitionAs(MemberInfo other)
+		{ throw NotImplemented.ByDesign; }
+
+		public abstract bool IsDefined(Type attributeType, bool inherit);
 
 		public abstract object[] GetCustomAttributes(bool inherit);
 
 		public abstract object[] GetCustomAttributes(Type attributeType, bool inherit);
 
-		/// <summary>
-		/// Returns the hash code for this instance.
-		/// </summary>
-		/// <returns>A 32-bit signed integer hash code.</returns>
-		public override int GetHashCode()
+		public virtual IEnumerable<CustomAttributeData> CustomAttributes => GetCustomAttributesData();
+
+		public virtual IList<CustomAttributeData> GetCustomAttributesData()
+		{ throw NotImplemented.ByDesign; }
+
+		public virtual bool IsCollectible => true;
+		public virtual int MetadataToken => throw new InvalidOperationException();
+
+		public override bool Equals(object? obj) => base.Equals(obj);
+
+		public override int GetHashCode() => base.GetHashCode();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool operator ==(MemberInfo? left, MemberInfo? right)
 		{
-			return base.GetHashCode();
+			// Test "right" first to allow branch elimination when inlined for null checks (== null)
+			// so it can become a simple test
+			if (right is null)
+			{
+				// return true/false not the test result https://github.com/dotnet/runtime/issues/4207
+				return (left is null) ? true : false;
+			}
+
+			// Try fast reference equality and opposite null check prior to calling the slower virtual Equals
+			if ((object?)left == (object)right)
+			{
+				return true;
+			}
+
+			return (left is null) ? false : left.Equals(right);
 		}
 
-		public abstract bool IsDefined(Type attributeType, bool inherit);
+		public static bool operator !=(MemberInfo? left, MemberInfo? right) => !(left == right);
 	}
 }

@@ -1,21 +1,34 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+/*============================================================
+**
+**
+**
+** Purpose: Enumerates the characters on a string.  skips range
+**          checks.
+**
+**
+============================================================*/
 
 using System.Collections;
 using System.Collections.Generic;
 
 namespace System
 {
-	[Serializable]
-	public sealed class CharEnumerator : IEnumerator, ICloneable, IEnumerator<char>, IDisposable
+	public sealed class CharEnumerator : IEnumerator, IEnumerator<char>, IDisposable, ICloneable
 	{
-		private string str;
-		private int currentPosition;
-		private char currentElement;
+		private string? _str;
+		private int _index;
+		private char _currentElement;
 
 		internal CharEnumerator(string str)
 		{
-			this.str = str;
-			currentPosition = -1;
+			_str = str;
+			_index = -1;
 		}
 
 		public object Clone()
@@ -25,54 +38,42 @@ namespace System
 
 		public bool MoveNext()
 		{
-			if (currentPosition < (str.Length - 1))
+			if (_index < (_str!.Length - 1))
 			{
-				currentPosition++;
-				currentElement = str[currentPosition];
+				_index++;
+				_currentElement = _str[_index];
 				return true;
 			}
 			else
-				currentPosition = str.Length;
+				_index = _str.Length;
 			return false;
 		}
 
 		public void Dispose()
 		{
-			if (str != null)
-				currentPosition = str.Length;
-			str = null;
+			if (_str != null)
+				_index = _str.Length;
+			_str = null;
 		}
 
-		/// <internalonly/>
-		object IEnumerator.Current
-		{
-			get
-			{
-				if (currentPosition == -1)
-					throw new InvalidOperationException("Enumeration has not started.");
-				if (currentPosition >= str.Length)
-					throw new InvalidOperationException("Enumeration has already ended.");
-
-				return currentElement;
-			}
-		}
+		object? IEnumerator.Current => Current;
 
 		public char Current
 		{
 			get
 			{
-				if (currentPosition == -1)
-					throw new InvalidOperationException("Enumeration has not started.");
-				if (currentPosition >= str.Length)
-					throw new InvalidOperationException("Enumeration has already ended.");
-				return currentElement;
+				if (_index == -1)
+					throw new InvalidOperationException(SR.InvalidOperation_EnumNotStarted);
+				if (_index >= _str!.Length)
+					throw new InvalidOperationException(SR.InvalidOperation_EnumEnded);
+				return _currentElement;
 			}
 		}
 
 		public void Reset()
 		{
-			currentElement = (char)0;
-			currentPosition = -1;
+			_currentElement = (char)0;
+			_index = -1;
 		}
 	}
 }
