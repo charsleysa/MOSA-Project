@@ -118,7 +118,7 @@ namespace System
 			typeof(decimal),
 			typeof(DateTime),
 			typeof(object), // TypeCode is discontinuous so we need a placeholder.
-            typeof(string)
+			typeof(string)
 		};
 
 		// Need to special case Enum because typecode will be underlying type, e.g. Int32

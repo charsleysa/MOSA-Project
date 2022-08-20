@@ -16,7 +16,7 @@
 
 using System.Globalization;
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System.Runtime.InteropServices
 {
@@ -49,10 +49,9 @@ namespace System.Runtime.InteropServices
 			HResult = errorCode;
 		}
 
-		//protected ExternalException(SerializationInfo info, StreamingContext context)
-		//	: base(info, context)
-		//{
-		//}
+		protected ExternalException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{ }
 
 		public virtual int ErrorCode => HResult;
 

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
-using System.Runtime.CompilerServices;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-//using System.Runtime.Serialization;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -17,9 +17,7 @@ namespace System
 	{
 		private readonly string? _objectName;
 
-		/// <summary>
-		/// This constructor should only be called by the runtime
-		/// </summary>
+		// This constructor should only be called by the EE (COMPlusThrow)
 		private ObjectDisposedException() :
 			this(null, SR.ObjectDisposed_Generic)
 		{ }
@@ -40,43 +38,17 @@ namespace System
 			HResult = HResults.COR_E_OBJECTDISPOSED;
 		}
 
-		//protected ObjectDisposedException(SerializationInfo info, StreamingContext context)
-		//	: base(info, context)
-		//{
-		//	_objectName = info.GetString("ObjectName");
-		//}
-
-		/// <summary>Throws an <see cref="ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
-		/// <param name="condition">The condition to evaluate.</param>
-		/// <param name="instance">The object whose type's full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
-		/// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
-		[StackTraceHidden]
-		public static void ThrowIf([DoesNotReturnIf(true)] bool condition, object instance)
+		protected ObjectDisposedException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
-			if (condition)
-			{
-				ThrowHelper.ThrowObjectDisposedException(instance);
-			}
+			_objectName = info.GetString("ObjectName");
 		}
 
-		/// <summary>Throws an <see cref="ObjectDisposedException"/> if the specified <paramref name="condition"/> is <see langword="true"/>.</summary>
-		/// <param name="condition">The condition to evaluate.</param>
-		/// <param name="type">The type whose full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
-		/// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
-		[StackTraceHidden]
-		public static void ThrowIf([DoesNotReturnIf(true)] bool condition, Type type)
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			if (condition)
-			{
-				ThrowHelper.ThrowObjectDisposedException(type);
-			}
+			base.GetObjectData(info, context);
+			info.AddValue("ObjectName", ObjectName, typeof(string));
 		}
-
-		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	base.GetObjectData(info, context);
-		//	info.AddValue("ObjectName", ObjectName, typeof(string));
-		//}
 
 		/// <summary>
 		/// Gets the text for the message for this exception.

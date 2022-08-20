@@ -4,12 +4,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System
 {
 	[Serializable]
-	public partial class WeakReference/* : ISerializable*/
+	public partial class WeakReference : ISerializable
 	{
 		// If you fix bugs here, please fix them in WeakReference<T> at the same time.
 
@@ -26,27 +26,27 @@ namespace System
 			Create(target, trackResurrection);
 		}
 
-		//protected WeakReference(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//	{
-		//		throw new ArgumentNullException(nameof(info));
-		//	}
+		protected WeakReference(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+			{
+				throw new ArgumentNullException(nameof(info));
+			}
 
-		//	object? target = info.GetValue("TrackedObject", typeof(object)); // Do not rename (binary serialization)
-		//	bool trackResurrection = info.GetBoolean("TrackResurrection"); // Do not rename (binary serialization)
+			object? target = info.GetValue("TrackedObject", typeof(object)); // Do not rename (binary serialization)
+			bool trackResurrection = info.GetBoolean("TrackResurrection"); // Do not rename (binary serialization)
 
-		//	Create(target, trackResurrection);
-		//}
+			Create(target, trackResurrection);
+		}
 
-		//public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//	{
-		//		throw new ArgumentNullException(nameof(info));
-		//	}
-		//	info.AddValue("TrackedObject", Target, typeof(object)); // Do not rename (binary serialization)
-		//	info.AddValue("TrackResurrection", IsTrackResurrection()); // Do not rename (binary serialization)
-		//}
+		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+			{
+				throw new ArgumentNullException(nameof(info));
+			}
+			info.AddValue("TrackedObject", Target, typeof(object)); // Do not rename (binary serialization)
+			info.AddValue("TrackResurrection", IsTrackResurrection()); // Do not rename (binary serialization)
+		}
 	}
 }

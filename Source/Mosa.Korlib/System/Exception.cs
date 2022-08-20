@@ -1,14 +1,18 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
+using System.Runtime.Serialization;
+
 namespace System
 {
 	/// <summary>
 	/// Implementation of the "System.Exception" class
 	/// </summary>
 	[Serializable]
-	public class Exception
+	public class Exception : ISerializable
 	{
+		private protected const string InnerExceptionPrefix = " ---> ";
+
 		internal string? message;
 		private readonly Exception? innerException;
 		private int _HResult;
@@ -70,12 +74,17 @@ namespace System
 			this.innerException = innerException;
 		}
 
-		//protected Exception(SerializationInfo info, StreamingContext context)
-		//{
-		//	ArgumentNullException.ThrowIfNull(info);
+		protected Exception(SerializationInfo info, StreamingContext context)
+		{
+			ArgumentNullException.ThrowIfNull(info);
 
-		//	// TODO
-		//}
+			throw new NotImplementedException();
+		}
+
+		public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// Gets the message.
@@ -89,6 +98,14 @@ namespace System
 		{
 			get => _HResult;
 			set => _HResult = value;
+		}
+
+		public virtual string? StackTrace
+		{
+			get
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

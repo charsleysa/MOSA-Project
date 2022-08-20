@@ -4,28 +4,28 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System
 {
 	[Serializable]
-	public sealed class DBNull : /*ISerializable, */IConvertible
+	public sealed class DBNull : ISerializable, IConvertible
 	{
 		private DBNull()
 		{
 		}
 
-		//private DBNull(SerializationInfo info, StreamingContext context)
-		//{
-		//	throw new NotSupportedException(SR.NotSupported_DBNullSerial);
-		//}
+		private DBNull(SerializationInfo info, StreamingContext context)
+		{
+			throw new NotSupportedException(SR.NotSupported_DBNullSerial);
+		}
 
 		public static readonly DBNull Value = new DBNull();
 
-		//public void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	UnitySerializationHolder.GetUnitySerializationInfo(info, UnitySerializationHolder.NullUnity);
-		//}
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			UnitySerializationHolder.GetUnitySerializationInfo(info, UnitySerializationHolder.NullUnity);
+		}
 
 		public override string ToString()
 		{

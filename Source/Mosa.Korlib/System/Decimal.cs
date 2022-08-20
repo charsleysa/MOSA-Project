@@ -11,7 +11,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using System.Runtime.Versioning;
 
 namespace System
@@ -61,7 +61,7 @@ namespace System
 	[StructLayout(LayoutKind.Sequential)]
 	[Serializable]
 	[System.Runtime.Versioning.NonVersionable] // This only applies to field layout
-	public readonly partial struct Decimal : ISpanFormattable, IComparable, IConvertible, IComparable<decimal>, IEquatable<decimal>/*, ISerializable, IDeserializationCallback*/
+	public readonly partial struct Decimal : ISpanFormattable, IComparable, IConvertible, IComparable<decimal>, IEquatable<decimal>, ISerializable, IDeserializationCallback
 	{
 		// Sign mask for the flags field. A value of zero in this bit indicates a
 		// positive Decimal value, and a value of one in this bit indicates a
@@ -180,27 +180,27 @@ namespace System
 			DecCalc.VarDecFromR8(value, out AsMutable(ref this));
 		}
 
-		//private Decimal(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//		throw new ArgumentNullException(nameof(info));
+		private Decimal(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+				throw new ArgumentNullException(nameof(info));
 
-		//	_flags = info.GetInt32("flags");
-		//	_hi32 = (uint)info.GetInt32("hi");
-		//	_lo64 = (uint)info.GetInt32("lo") + ((ulong)info.GetInt32("mid") << 32);
-		//}
+			_flags = info.GetInt32("flags");
+			_hi32 = (uint)info.GetInt32("hi");
+			_lo64 = (uint)info.GetInt32("lo") + ((ulong)info.GetInt32("mid") << 32);
+		}
 
-		//void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//		throw new ArgumentNullException(nameof(info));
+		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+				throw new ArgumentNullException(nameof(info));
 
-		//	// Serialize both the old and the new format
-		//	info.AddValue("flags", _flags);
-		//	info.AddValue("hi", (int)High);
-		//	info.AddValue("lo", (int)Low);
-		//	info.AddValue("mid", (int)Mid);
-		//}
+			// Serialize both the old and the new format
+			info.AddValue("flags", _flags);
+			info.AddValue("hi", (int)High);
+			info.AddValue("lo", (int)Low);
+			info.AddValue("mid", (int)Mid);
+		}
 
 		//
 		// Decimal <==> Currency conversion.
@@ -303,13 +303,13 @@ namespace System
 				_flags |= SignMask;
 		}
 
-		//void IDeserializationCallback.OnDeserialization(object? sender)
-		//{
-		//	// OnDeserialization is called after each instance of this class is deserialized.
-		//	// This callback method performs decimal validation after being deserialized.
-		//	if (!IsValid(_flags))
-		//		throw new SerializationException(SR.Overflow_Decimal);
-		//}
+		void IDeserializationCallback.OnDeserialization(object? sender)
+		{
+			// OnDeserialization is called after each instance of this class is deserialized.
+			// This callback method performs decimal validation after being deserialized.
+			if (!IsValid(_flags))
+				throw new SerializationException(SR.Overflow_Decimal);
+		}
 
 		// Constructs a Decimal from its constituent parts.
 		private Decimal(int lo, int mid, int hi, int flags)

@@ -4,14 +4,14 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 
 namespace System
 {
 	[Serializable]
-	public sealed partial class WeakReference<T>/* : ISerializable*/
+	public sealed partial class WeakReference<T> : ISerializable
 		where T : class?
 	{
 		// If you fix bugs here, please fix them in WeakReference at the same time.
@@ -31,18 +31,18 @@ namespace System
 			Create(target, trackResurrection);
 		}
 
-		//private WeakReference(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//	{
-		//		throw new ArgumentNullException(nameof(info));
-		//	}
+		private WeakReference(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+			{
+				throw new ArgumentNullException(nameof(info));
+			}
 
-		//	T target = (T)info.GetValue("TrackedObject", typeof(T))!; // Do not rename (binary serialization)
-		//	bool trackResurrection = info.GetBoolean("TrackResurrection"); // Do not rename (binary serialization)
+			T target = (T)info.GetValue("TrackedObject", typeof(T))!; // Do not rename (binary serialization)
+			bool trackResurrection = info.GetBoolean("TrackResurrection"); // Do not rename (binary serialization)
 
-		//	Create(target, trackResurrection);
-		//}
+			Create(target, trackResurrection);
+		}
 
 		//
 		// We are exposing TryGetTarget instead of a simple getter to avoid a common problem where people write incorrect code like:
@@ -60,15 +60,15 @@ namespace System
 			return o != null;
 		}
 
-		//public void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	if (info == null)
-		//	{
-		//		throw new ArgumentNullException(nameof(info));
-		//	}
+		public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+			{
+				throw new ArgumentNullException(nameof(info));
+			}
 
-		//	info.AddValue("TrackedObject", this.Target, typeof(T)); // Do not rename (binary serialization)
-		//	info.AddValue("TrackResurrection", IsTrackResurrection()); // Do not rename (binary serialization)
-		//}
+			info.AddValue("TrackedObject", this.Target, typeof(T)); // Do not rename (binary serialization)
+			info.AddValue("TrackResurrection", IsTrackResurrection()); // Do not rename (binary serialization)
+		}
 	}
 }

@@ -35,10 +35,6 @@
   <Import Project="GenerateResxSource.targets" />
 
   <ItemGroup>
-    <Compile Remove="System\Runtime\Serialization\**" />
-    <None Remove="System\Runtime\Serialization\**" />
-  </ItemGroup>
-  <ItemGroup>
     <ContentWithTargetPath Include="DotnetLibraries\Microsoft.CSharp.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Microsoft.CSharp.dll</TargetPath>
@@ -695,8 +691,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>WindowsBase.dll</TargetPath>
     </ContentWithTargetPath>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="System\Runtime\Serialization\" />
   </ItemGroup>
 </Project>

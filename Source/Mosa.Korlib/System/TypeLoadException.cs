@@ -1,7 +1,10 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
-//using System.Runtime.Serialization;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -74,22 +77,22 @@ namespace System
 
 		public string TypeName => _className ?? string.Empty;
 
-		//protected TypeLoadException(SerializationInfo info, StreamingContext context) : base(info, context)
-		//{
-		//	_className = info.GetString("TypeLoadClassName");
-		//	_assemblyName = info.GetString("TypeLoadAssemblyName");
-		//	_messageArg = info.GetString("TypeLoadMessageArg");
-		//	_resourceId = info.GetInt32("TypeLoadResourceID");
-		//}
+		protected TypeLoadException(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
+			_className = info.GetString("TypeLoadClassName");
+			_assemblyName = info.GetString("TypeLoadAssemblyName");
+			_messageArg = info.GetString("TypeLoadMessageArg");
+			_resourceId = info.GetInt32("TypeLoadResourceID");
+		}
 
-		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	base.GetObjectData(info, context);
-		//	info.AddValue("TypeLoadClassName", _className, typeof(string));
-		//	info.AddValue("TypeLoadAssemblyName", _assemblyName, typeof(string));
-		//	info.AddValue("TypeLoadMessageArg", _messageArg, typeof(string));
-		//	info.AddValue("TypeLoadResourceID", _resourceId);
-		//}
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			base.GetObjectData(info, context);
+			info.AddValue("TypeLoadClassName", _className, typeof(string));
+			info.AddValue("TypeLoadAssemblyName", _assemblyName, typeof(string));
+			info.AddValue("TypeLoadMessageArg", _messageArg, typeof(string));
+			info.AddValue("TypeLoadResourceID", _resourceId);
+		}
 
 		private string? _className;
 		private string? _assemblyName;

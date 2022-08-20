@@ -10,7 +10,7 @@
 **
 =============================================================================*/
 
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -41,8 +41,8 @@ namespace System
 			HResult = errorCode;
 		}
 
-		//protected InvalidCastException(SerializationInfo info, StreamingContext context) : base(info, context)
-		//{
-		//}
+		protected InvalidCastException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{ }
 	}
 }

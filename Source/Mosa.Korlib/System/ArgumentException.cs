@@ -1,10 +1,12 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -55,17 +57,17 @@ namespace System
 			HResult = HResults.COR_E_ARGUMENT;
 		}
 
-		//protected ArgumentException(SerializationInfo info, StreamingContext context)
-		//	: base(info, context)
-		//{
-		//	_paramName = info.GetString("ParamName");
-		//}
+		protected ArgumentException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
+			_paramName = info.GetString("ParamName");
+		}
 
-		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	base.GetObjectData(info, context);
-		//	info.AddValue("ParamName", _paramName, typeof(string));
-		//}
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			base.GetObjectData(info, context);
+			info.AddValue("ParamName", _paramName, typeof(string));
+		}
 
 		public override string Message
 		{

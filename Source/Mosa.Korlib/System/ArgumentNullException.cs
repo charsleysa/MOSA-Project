@@ -1,10 +1,12 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -41,8 +43,9 @@ namespace System
 			HResult = HResults.E_POINTER;
 		}
 
-		//protected ArgumentNullException(SerializationInfo info, StreamingContext context) : base(info, context)
-		//{ }
+		protected ArgumentNullException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{ }
 
 		/// <summary>Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.</summary>
 		/// <param name="argument">The reference type argument to validate as non-null.</param>

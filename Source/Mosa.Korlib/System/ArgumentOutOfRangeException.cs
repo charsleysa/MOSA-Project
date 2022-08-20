@@ -1,7 +1,10 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
-//using System.Runtime.Serialization;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -47,17 +50,17 @@ namespace System
 			HResult = HResults.COR_E_ARGUMENTOUTOFRANGE;
 		}
 
-		//protected ArgumentOutOfRangeException(SerializationInfo info, StreamingContext context)
-		//	: base(info, context)
-		//{
-		//	_actualValue = info.GetValue("ActualValue", typeof(object));
-		//}
+		protected ArgumentOutOfRangeException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{
+			_actualValue = info.GetValue("ActualValue", typeof(object));
+		}
 
-		//public override void GetObjectData(SerializationInfo info, StreamingContext context)
-		//{
-		//	base.GetObjectData(info, context);
-		//	info.AddValue("ActualValue", _actualValue, typeof(object));
-		//}
+		public override void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			base.GetObjectData(info, context);
+			info.AddValue("ActualValue", _actualValue, typeof(object));
+		}
 
 		public override string Message
 		{

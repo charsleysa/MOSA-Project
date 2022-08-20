@@ -336,9 +336,6 @@ namespace System.Runtime.Serialization
 		{
 			ArgumentNullException.ThrowIfNull(type);
 
-			if (type is not RuntimeType)
-				throw new ArgumentException(SR.Argument_MustBeRuntimeType);
-
 			object? value = GetElement(name, out Type foundType);
 
 			if (ReferenceEquals(foundType, type) || type.IsAssignableFrom(foundType) || value == null)
@@ -353,7 +350,6 @@ namespace System.Runtime.Serialization
 		internal object? GetValueNoThrow(string name, Type type)
 		{
 			Debug.Assert(type is not null, "[SerializationInfo.GetValue]type ==null");
-			Debug.Assert(type is RuntimeType, "[SerializationInfo.GetValue]type is not a runtime type");
 
 			object? value = GetElementNoThrow(name, out Type? foundType);
 			if (value == null)

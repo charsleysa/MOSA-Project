@@ -9,8 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Unicode;
 
@@ -20,7 +19,7 @@ namespace System.Globalization
 	/// This class implements a set of methods for comparing strings.
 	/// </summary>
 	[Serializable]
-	public sealed partial class CompareInfo/* : IDeserializationCallback*/
+	public sealed partial class CompareInfo : IDeserializationCallback
 	{
 		// Mask used to check if IndexOf()/LastIndexOf()/IsPrefix()/IsPostfix() has the right flags.
 		private const CompareOptions ValidIndexMaskOffFlags =
@@ -190,46 +189,46 @@ namespace System.Globalization
 			IcuInitSortHandle();
 		}
 
-		//[OnDeserializing]
-		//private void OnDeserializing(StreamingContext ctx)
-		//{
-		//	// this becomes null for a brief moment before deserialization
-		//	// after serialization is finished it is never null.
-		//	m_name = null!;
-		//}
+		[OnDeserializing]
+		private void OnDeserializing(StreamingContext ctx)
+		{
+			// this becomes null for a brief moment before deserialization
+			// after serialization is finished it is never null.
+			m_name = null!;
+		}
 
-		//void IDeserializationCallback.OnDeserialization(object? sender)
-		//{
-		//	OnDeserialized();
-		//}
+		void IDeserializationCallback.OnDeserialization(object? sender)
+		{
+			OnDeserialized();
+		}
 
-		//[OnDeserialized]
-		//private void OnDeserialized(StreamingContext ctx)
-		//{
-		//	OnDeserialized();
-		//}
+		[OnDeserialized]
+		private void OnDeserialized(StreamingContext ctx)
+		{
+			OnDeserialized();
+		}
 
-		//private void OnDeserialized()
-		//{
-		//	// If we didn't have a name, use the LCID
-		//	if (m_name == null)
-		//	{
-		//		// From whidbey, didn't have a name
-		//		m_name = CultureInfo.GetCultureInfo(culture)._name;
-		//	}
-		//	else
-		//	{
-		//		InitSort(CultureInfo.GetCultureInfo(m_name));
-		//	}
-		//}
+		private void OnDeserialized()
+		{
+			// If we didn't have a name, use the LCID
+			if (m_name == null)
+			{
+				// From whidbey, didn't have a name
+				m_name = CultureInfo.GetCultureInfo(culture)._name;
+			}
+			else
+			{
+				InitSort(CultureInfo.GetCultureInfo(m_name));
+			}
+		}
 
-		//[OnSerializing]
-		//private void OnSerializing(StreamingContext ctx)
-		//{
-		//	// This is merely for serialization compatibility with Whidbey/Orcas, it can go away when we don't want that compat any more.
-		//	culture = CultureInfo.GetCultureInfo(Name).LCID; // This is the lcid of the constructing culture (still have to dereference to get target sort)
-		//	Debug.Assert(m_name != null, "CompareInfo.OnSerializing - expected m_name to be set already");
-		//}
+		[OnSerializing]
+		private void OnSerializing(StreamingContext ctx)
+		{
+			// This is merely for serialization compatibility with Whidbey/Orcas, it can go away when we don't want that compat any more.
+			culture = CultureInfo.GetCultureInfo(Name).LCID; // This is the lcid of the constructing culture (still have to dereference to get target sort)
+			Debug.Assert(m_name != null, "CompareInfo.OnSerializing - expected m_name to be set already");
+		}
 
 		/// <summary>
 		///  Returns the name of the culture (well actually, of the sort).

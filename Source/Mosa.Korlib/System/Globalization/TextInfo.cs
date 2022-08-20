@@ -8,8 +8,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-//using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Unicode;
 
@@ -20,7 +19,7 @@ namespace System.Globalization
 	/// A writing system is the collection of scripts and orthographic rules
 	/// required to represent a language as text.
 	/// </summary>
-	public sealed partial class TextInfo : ICloneable/*, IDeserializationCallback*/
+	public sealed partial class TextInfo : ICloneable, IDeserializationCallback
 	{
 		private enum Tristate : byte
 		{
@@ -57,10 +56,10 @@ namespace System.Globalization
 			SetReadOnlyState(readOnly);
 		}
 
-		//void IDeserializationCallback.OnDeserialization(object? sender)
-		//{
-		//	throw new PlatformNotSupportedException();
-		//}
+		void IDeserializationCallback.OnDeserialization(object? sender)
+		{
+			throw new PlatformNotSupportedException();
+		}
 
 		public int ANSICodePage => _cultureData.ANSICodePage;
 

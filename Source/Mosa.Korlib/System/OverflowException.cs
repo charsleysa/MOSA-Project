@@ -1,7 +1,10 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
-//using System.Runtime.Serialization;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Runtime.Serialization;
 
 namespace System
 {
@@ -26,7 +29,8 @@ namespace System
 			HResult = HResults.COR_E_OVERFLOW;
 		}
 
-		//protected OverflowException(SerializationInfo info, StreamingContext context) : base(info, context)
-		//{ }
+		protected OverflowException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{ }
 	}
 }
