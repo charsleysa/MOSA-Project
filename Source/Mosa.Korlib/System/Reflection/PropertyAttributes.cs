@@ -1,26 +1,27 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// PropertyAttributes is an enum which defines the attributes that may be associated
+// with a property.  The values here are defined in Corhdr.h.
 
 namespace System.Reflection
 {
-	/// <summary>
-	/// Property Attributes.
-	/// </summary>
+	// This Enum matchs the CorPropertyAttr defined in CorHdr.h
 	[Flags]
-	public enum PropertyAttributes : ushort
+	public enum PropertyAttributes
 	{
-		/// <summary>
-		/// Property is special. Name describes how.
-		/// </summary>
-		SpecialName = 0x0200,
+		None = 0x0000,
+		SpecialName = 0x0200,     // property is special.  Name describes how.
 
-		/// <summary>
-		/// Runtime(metadata internal APIs) should check name encoding.
-		/// </summary>
-		RTSpecialName = 0x0400,
+		RTSpecialName = 0x0400,     // Runtime(metadata internal APIs) should check name encoding.
+		HasDefault = 0x1000,     // Property has default
 
-		/// <summary>
-		/// Property has default
-		/// </summary>
-		HasDefault = 0x1000,
+		Reserved2 = 0x2000,
+		Reserved3 = 0x4000,
+		Reserved4 = 0x8000,
+		ReservedMask = 0xf400,
 	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
 #nullable enable
 
 // Licensed to the .NET Foundation under one or more agreements.
@@ -6,13 +6,10 @@
 
 using System.Runtime.Serialization;
 
-namespace System
+namespace System.IO
 {
-	/// <summary>
-	/// The ArithmeticException is thrown when overflow or underflow occurs.
-	/// </summary>
 	[Serializable]
-	public class EndOfStreamException : SystemException
+	public class EndOfStreamException : IOException
 	{
 		public EndOfStreamException()
 			: base(SR.Arg_EndOfStreamException)
@@ -34,6 +31,7 @@ namespace System
 
 		protected EndOfStreamException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
-		{ }
+		{
+		}
 	}
 }

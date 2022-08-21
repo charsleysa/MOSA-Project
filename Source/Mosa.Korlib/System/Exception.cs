@@ -13,7 +13,7 @@ namespace System
 	{
 		private protected const string InnerExceptionPrefix = " ---> ";
 
-		internal string? message;
+		internal string? _message;
 		private readonly Exception? innerException;
 		private int _HResult;
 
@@ -59,7 +59,7 @@ namespace System
 		public Exception(string? message)
 			: this()
 		{
-			this.message = message;
+			this._message = message;
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace System
 		public Exception(string? message, Exception? innerException)
 			: this()
 		{
-			this.message = message;
+			this._message = message;
 			this.innerException = innerException;
 		}
 
@@ -90,7 +90,7 @@ namespace System
 		/// Gets the message.
 		/// </summary>
 		/// <value>The message.</value>
-		public virtual string Message => message ?? SR.Format(SR.Exception_WasThrown, GetClassName());
+		public virtual string Message => _message ?? SR.Format(SR.Exception_WasThrown, GetClassName());
 
 		private string GetClassName() => GetType().ToString();
 

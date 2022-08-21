@@ -1,107 +1,279 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace System
 {
-	/// <summary>
-	///
-	/// </summary>
 	[Serializable]
-	public struct Int16: IComparable, IComparable<short>, IEquatable<short>
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly struct Int16 : IComparable, IConvertible, ISpanFormattable, IComparable<short>, IEquatable<short>
 	{
-		internal short m_value;
+		private readonly short m_value; // Do not rename (binary serialization)
 
-		public const short MaxValue = 32767;
-		public const short MinValue = -32768;
+		public const short MaxValue = (short)0x7FFF;
+		public const short MinValue = unchecked((short)0x8000);
 
-		public int CompareTo(object value)
+		// Compares this object to another object, returning an integer that
+		// indicates the relationship.
+		// Returns a value less than zero if this  object
+		// null is considered to be less than any instance.
+		// If object is not of type Int16, this method throws an ArgumentException.
+		//
+		public int CompareTo(object? value)
 		{
-			if (value == null) { return 1; }
+			if (value == null)
+			{
+				return 1;
+			}
 
-			if (!(value is short)) { throw new ArgumentException("Argument Type Must Be Int16", "value"); }
+			if (value is short)
+			{
+				return m_value - ((short)value).m_value;
+			}
 
-			short s_value = ((short)value).m_value;
-
-			if (m_value < s_value) return -1;
-			if (m_value > s_value) return 1;
-
-			return 0;
+			throw new ArgumentException(SR.Arg_MustBeInt16);
 		}
 
 		public int CompareTo(short value)
 		{
-			if (m_value < value) return -1;
-			if (m_value > value) return 1;
-
-			return 0;
+			return m_value - value;
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals([NotNullWhen(true)] object? obj)
 		{
-			if (!(obj is short)) { return false; }
-
+			if (!(obj is short))
+			{
+				return false;
+			}
 			return m_value == ((short)obj).m_value;
 		}
 
+		[NonVersionable]
 		public bool Equals(short obj)
 		{
 			return m_value == obj;
 		}
 
-		public override string ToString()
-		{
-			return int.CreateString((uint)m_value, true, false);
-		}
-
+		// Returns a HashCode for the Int16
 		public override int GetHashCode()
 		{
 			return m_value;
 		}
 
-		public static bool TryParse(string s, out short result)
+		public override string ToString()
 		{
-			try
-			{
-				result = Parse(s);
-				return true;
-			}
-			catch
-			{
-				result = 0;
-				return false;
-			}
+			return Number.Int32ToDecStr(m_value);
+		}
+
+		public string ToString(IFormatProvider? provider)
+		{
+			return Number.FormatInt32(m_value, 0, null, provider);
+		}
+
+		public string ToString(string? format)
+		{
+			return ToString(format, null);
+		}
+
+		public string ToString(string? format, IFormatProvider? provider)
+		{
+			return Number.FormatInt32(m_value, 0x0000FFFF, format, provider);
+		}
+
+		public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+		{
+			return Number.TryFormatInt32(m_value, 0x0000FFFF, format, provider, destination, out charsWritten);
 		}
 
 		public static short Parse(string s)
 		{
-			const string digits = "0123456789";
-			short result = 0;
+			if (s == null) ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
+			return Parse((ReadOnlySpan<char>)s, NumberStyles.Integer, NumberFormatInfo.CurrentInfo);
+		}
 
-			int z = 0;
-			bool neg = false;
+		public static short Parse(string s, NumberStyles style)
+		{
+			NumberFormatInfo.ValidateParseStyleInteger(style);
+			if (s == null) ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
+			return Parse((ReadOnlySpan<char>)s, style, NumberFormatInfo.CurrentInfo);
+		}
 
-			if (s.Length >= 1)
+		public static short Parse(string s, IFormatProvider? provider)
+		{
+			if (s == null) ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
+			return Parse((ReadOnlySpan<char>)s, NumberStyles.Integer, NumberFormatInfo.GetInstance(provider));
+		}
+
+		public static short Parse(string s, NumberStyles style, IFormatProvider? provider)
+		{
+			NumberFormatInfo.ValidateParseStyleInteger(style);
+			if (s == null) ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
+			return Parse((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider));
+		}
+
+		public static short Parse(ReadOnlySpan<char> s, NumberStyles style = NumberStyles.Integer, IFormatProvider? provider = null)
+		{
+			NumberFormatInfo.ValidateParseStyleInteger(style);
+			return Parse(s, style, NumberFormatInfo.GetInstance(provider));
+		}
+
+		private static short Parse(ReadOnlySpan<char> s, NumberStyles style, NumberFormatInfo info)
+		{
+			Number.ParsingStatus status = Number.TryParseInt32(s, style, info, out int i);
+			if (status != Number.ParsingStatus.OK)
 			{
-				if (s[0] == '+') z = 1;
-				if (s[0] == '-')
-				{
-					z = 1;
-					neg = true;
-				}
+				Number.ThrowOverflowOrFormatException(status, TypeCode.Int16);
 			}
 
-			for (int i = z; i < s.Length; i++)
+			// For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
+			// For integer styles it's zero and the effective check is (uint)(i - MinValue) > ushort.MaxValue
+			if ((uint)(i - MinValue - ((int)(style & NumberStyles.AllowHexSpecifier) << 6)) > ushort.MaxValue)
 			{
-				int ind = digits.IndexOf(s[i]);
-				if (ind == -1)
-				{
-					throw new Exception("Format is incorrect");
-				}
-				result = (short)((result * 10) + ind);
+				Number.ThrowOverflowException(TypeCode.Int16);
+			}
+			return (short)i;
+		}
+
+		public static bool TryParse([NotNullWhen(true)] string? s, out short result)
+		{
+			if (s == null)
+			{
+				result = 0;
+				return false;
 			}
 
-			if (neg) result *= -1;
+			return TryParse((ReadOnlySpan<char>)s, NumberStyles.Integer, NumberFormatInfo.CurrentInfo, out result);
+		}
 
-			return result;
+		public static bool TryParse(ReadOnlySpan<char> s, out short result)
+		{
+			return TryParse(s, NumberStyles.Integer, NumberFormatInfo.CurrentInfo, out result);
+		}
+
+		public static bool TryParse([NotNullWhen(true)] string? s, NumberStyles style, IFormatProvider? provider, out short result)
+		{
+			NumberFormatInfo.ValidateParseStyleInteger(style);
+
+			if (s == null)
+			{
+				result = 0;
+				return false;
+			}
+
+			return TryParse((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out result);
+		}
+
+		public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out short result)
+		{
+			NumberFormatInfo.ValidateParseStyleInteger(style);
+			return TryParse(s, style, NumberFormatInfo.GetInstance(provider), out result);
+		}
+
+		private static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, NumberFormatInfo info, out short result)
+		{
+			// For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
+			// For integer styles it's zero and the effective check is (uint)(i - MinValue) > ushort.MaxValue
+			if (Number.TryParseInt32(s, style, info, out int i) != Number.ParsingStatus.OK
+				|| (uint)(i - MinValue - ((int)(style & NumberStyles.AllowHexSpecifier) << 6)) > ushort.MaxValue)
+			{
+				result = 0;
+				return false;
+			}
+			result = (short)i;
+			return true;
+		}
+
+		//
+		// IConvertible implementation
+		//
+
+		public TypeCode GetTypeCode()
+		{
+			return TypeCode.Int16;
+		}
+
+		bool IConvertible.ToBoolean(IFormatProvider? provider)
+		{
+			return Convert.ToBoolean(m_value);
+		}
+
+		char IConvertible.ToChar(IFormatProvider? provider)
+		{
+			return Convert.ToChar(m_value);
+		}
+
+		sbyte IConvertible.ToSByte(IFormatProvider? provider)
+		{
+			return Convert.ToSByte(m_value);
+		}
+
+		byte IConvertible.ToByte(IFormatProvider? provider)
+		{
+			return Convert.ToByte(m_value);
+		}
+
+		short IConvertible.ToInt16(IFormatProvider? provider)
+		{
+			return m_value;
+		}
+
+		ushort IConvertible.ToUInt16(IFormatProvider? provider)
+		{
+			return Convert.ToUInt16(m_value);
+		}
+
+		int IConvertible.ToInt32(IFormatProvider? provider)
+		{
+			return Convert.ToInt32(m_value);
+		}
+
+		uint IConvertible.ToUInt32(IFormatProvider? provider)
+		{
+			return Convert.ToUInt32(m_value);
+		}
+
+		long IConvertible.ToInt64(IFormatProvider? provider)
+		{
+			return Convert.ToInt64(m_value);
+		}
+
+		ulong IConvertible.ToUInt64(IFormatProvider? provider)
+		{
+			return Convert.ToUInt64(m_value);
+		}
+
+		float IConvertible.ToSingle(IFormatProvider? provider)
+		{
+			return Convert.ToSingle(m_value);
+		}
+
+		double IConvertible.ToDouble(IFormatProvider? provider)
+		{
+			return Convert.ToDouble(m_value);
+		}
+
+		decimal IConvertible.ToDecimal(IFormatProvider? provider)
+		{
+			return Convert.ToDecimal(m_value);
+		}
+
+		DateTime IConvertible.ToDateTime(IFormatProvider? provider)
+		{
+			throw new InvalidCastException(SR.Format(SR.InvalidCast_FromTo, "Int16", "DateTime"));
+		}
+
+		object IConvertible.ToType(Type type, IFormatProvider? provider)
+		{
+			return Convert.DefaultToType((IConvertible)this, type, provider);
 		}
 	}
 }

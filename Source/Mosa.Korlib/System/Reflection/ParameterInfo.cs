@@ -1,128 +1,121 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace System.Reflection
 {
-	[Serializable]
-	public class ParameterInfo
+	public class ParameterInfo : ICustomAttributeProvider, IObjectReference
 	{
-		/// <summary>
-		/// The attributes of the parameter.
-		/// </summary>
+		protected ParameterInfo()
+		{ }
+
+		public virtual ParameterAttributes Attributes => AttrsImpl;
+		public virtual MemberInfo Member => MemberImpl;
+		public virtual string? Name => NameImpl;
+		public virtual Type ParameterType => ClassImpl!;
+		public virtual int Position => PositionImpl;
+
+		public bool IsIn => (Attributes & ParameterAttributes.In) != 0;
+		public bool IsLcid => (Attributes & ParameterAttributes.Lcid) != 0;
+		public bool IsOptional => (Attributes & ParameterAttributes.Optional) != 0;
+		public bool IsOut => (Attributes & ParameterAttributes.Out) != 0;
+		public bool IsRetval => (Attributes & ParameterAttributes.Retval) != 0;
+
+		public virtual object? DefaultValue => throw NotImplemented.ByDesign;
+		public virtual object? RawDefaultValue => throw NotImplemented.ByDesign;
+		public virtual bool HasDefaultValue => throw NotImplemented.ByDesign;
+
+		public virtual bool IsDefined(Type attributeType, bool inherit)
+		{
+			if (attributeType == null)
+				throw new ArgumentNullException(nameof(attributeType));
+
+			return false;
+		}
+
+		public virtual IEnumerable<CustomAttributeData> CustomAttributes => GetCustomAttributesData();
+
+		public virtual IList<CustomAttributeData> GetCustomAttributesData()
+		{ throw NotImplemented.ByDesign; }
+
+		public virtual object[] GetCustomAttributes(bool inherit) => Array.Empty<object>();
+
+		public virtual object[] GetCustomAttributes(Type attributeType, bool inherit)
+		{
+			if (attributeType == null)
+				throw new ArgumentNullException(nameof(attributeType));
+
+			return Array.Empty<object>();
+		}
+
+		public virtual Type[] GetOptionalCustomModifiers() => Type.EmptyTypes;
+
+		public virtual Type[] GetRequiredCustomModifiers() => Type.EmptyTypes;
+
+		public virtual int MetadataToken => MetadataToken_ParamDef;
+
+		public object GetRealObject(StreamingContext context)
+		{
+			// Once all the serializable fields have come in we can set up the real
+			// instance based on just two of them (MemberImpl and PositionImpl).
+
+			if (MemberImpl == null)
+				throw new SerializationException(SR.Serialization_InsufficientState);
+
+			ParameterInfo[] args;
+			switch (MemberImpl.MemberType)
+			{
+				case MemberTypes.Constructor:
+				case MemberTypes.Method:
+					if (PositionImpl == -1)
+					{
+						if (MemberImpl.MemberType == MemberTypes.Method)
+							return ((MethodInfo)MemberImpl).ReturnParameter;
+						else
+							throw new SerializationException(SR.Serialization_BadParameterInfo);
+					}
+					else
+					{
+						args = ((MethodBase)MemberImpl).GetParametersNoCopy();
+
+						if (args != null && PositionImpl < args.Length)
+							return args[PositionImpl];
+						else
+							throw new SerializationException(SR.Serialization_BadParameterInfo);
+					}
+
+				case MemberTypes.Property:
+					args = ((PropertyInfo)MemberImpl).GetIndexParameters();
+
+					if (args != null && PositionImpl > -1 && PositionImpl < args.Length)
+						return args[PositionImpl];
+					else
+						throw new SerializationException(SR.Serialization_BadParameterInfo);
+
+				default:
+					throw new SerializationException(SR.Serialization_NoParameterInfo);
+			}
+		}
+
+		public override string ToString()
+		{
+			string typeName = ParameterType.FormatTypeName();
+			string? name = Name;
+			return name is null ? typeName : typeName + " " + name;
+		}
+
 		protected ParameterAttributes AttrsImpl;
-
-		/// <summary>
-		/// The <see cref="System.Type">Type</see> of the parameter.
-		/// </summary>
-		protected Type ClassImpl;
-
-		/// <summary>
-		/// The default value of the parameter.
-		/// </summary>
-		protected Object DefaultValueImpl;
-
-		/// <summary>
-		/// The member in which the field is implemented.
-		/// </summary>
-		protected MemberInfo MemberImpl;
-
-		/// <summary>
-		/// The name of the parameter.
-		/// </summary>
-		protected string NameImpl;
-
-		/// <summary>
-		/// The zero-based position of the parameter in the parameter list.
-		/// </summary>
+		protected Type? ClassImpl;
+		protected object? DefaultValueImpl;
+		protected MemberInfo MemberImpl = null!;
+		protected string? NameImpl;
 		protected int PositionImpl;
 
-		/// <summary>
-		/// Gets the attributes for this parameter.
-		/// </summary>
-		public virtual ParameterAttributes Attributes
-		{
-			get { return AttrsImpl; }
-		}
-
-		/// <summary>
-		/// Gets a collection that contains this parameter's custom attributes.
-		/// </summary>
-		public virtual IEnumerable<CustomAttributeData> CustomAttributes
-		{
-			get { return new CustomAttributeData[0]; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating the default value if the parameter has a default value.
-		/// </summary>
-		public virtual object DefaultValue
-		{
-			get { return DefaultValueImpl; }
-		}
-
-		/// <summary>
-		/// Gets a value that indicates whether this parameter has a default value.
-		/// </summary>
-		public virtual bool HasDefaultValue
-		{
-			get { return (AttrsImpl & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether this is an input parameter.
-		/// </summary>
-		public bool IsIn
-		{
-			get { return (AttrsImpl & ParameterAttributes.In) == ParameterAttributes.In; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether this parameter is optional.
-		/// </summary>
-		public bool IsOptional
-		{
-			get { return (AttrsImpl & ParameterAttributes.Optional) == ParameterAttributes.Optional; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether this is an output parameter.
-		/// </summary>
-		public bool IsOut
-		{
-			get { return (AttrsImpl & ParameterAttributes.Out) == ParameterAttributes.Out; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating the member in which the parameter is implemented.
-		/// </summary>
-		public virtual MemberInfo Member
-		{
-			get { return MemberImpl; }
-		}
-
-		/// <summary>
-		/// Gets the name of the parameter.
-		/// </summary>
-		public virtual string Name
-		{
-			get { return NameImpl; }
-		}
-
-		/// <summary>
-		/// Gets the <see cref="System.Type">Type</see> of this parameter.
-		/// </summary>
-		public virtual Type ParameterType
-		{
-			get { return ClassImpl; }
-		}
-
-		/// <summary>
-		/// Gets the zero-based position of the parameter in the formal parameter list.
-		/// </summary>
-		public virtual int Position
-		{
-			get { return PositionImpl; }
-		}
+		private const int MetadataToken_ParamDef = 0x08000000;
 	}
 }

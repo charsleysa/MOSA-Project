@@ -1,156 +1,94 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace System.Reflection
 {
-	/// <summary>
-	/// Discovers the attributes of a field and provides access to field metadata.
-	/// </summary>
-	[SerializableAttribute]
-	public abstract class FieldInfo : MemberInfo
+	public abstract partial class FieldInfo : MemberInfo
 	{
-		/// <summary>
-		/// Gets the attributes associated with this field.
-		/// </summary>
-		public abstract FieldAttributes Attributes { get; }
+		protected FieldInfo()
+		{ }
 
-		/// <summary>
-		/// Gets the type of this field object.
-		/// </summary>
+		public override MemberTypes MemberType => MemberTypes.Field;
+
+		public abstract FieldAttributes Attributes { get; }
 		public abstract Type FieldType { get; }
 
-		/// <summary>
-		/// Gets a value indicating whether the potential visibility of this field is described by FieldAttributes.Assembly; that is, the field is visible at most to other types in the same assembly, and is not visible to derived types outside the assembly.
-		/// </summary>
-		public bool IsAssembly
+		public bool IsInitOnly => (Attributes & FieldAttributes.InitOnly) != 0;
+		public bool IsLiteral => (Attributes & FieldAttributes.Literal) != 0;
+		public bool IsNotSerialized => (Attributes & FieldAttributes.NotSerialized) != 0;
+		public bool IsPinvokeImpl => (Attributes & FieldAttributes.PinvokeImpl) != 0;
+		public bool IsSpecialName => (Attributes & FieldAttributes.SpecialName) != 0;
+		public bool IsStatic => (Attributes & FieldAttributes.Static) != 0;
+
+		public bool IsAssembly => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Assembly;
+		public bool IsFamily => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Family;
+		public bool IsFamilyAndAssembly => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.FamANDAssem;
+		public bool IsFamilyOrAssembly => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.FamORAssem;
+		public bool IsPrivate => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Private;
+		public bool IsPublic => (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Public;
+
+		public virtual bool IsSecurityCritical => true;
+		public virtual bool IsSecuritySafeCritical => false;
+		public virtual bool IsSecurityTransparent => false;
+
+		public abstract RuntimeFieldHandle FieldHandle { get; }
+
+		public override bool Equals(object? obj) => base.Equals(obj);
+
+		public override int GetHashCode() => base.GetHashCode();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool operator ==(FieldInfo? left, FieldInfo? right)
 		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Assembly; }
+			// Test "right" first to allow branch elimination when inlined for null checks (== null)
+			// so it can become a simple test
+			if (right is null)
+			{
+				// return true/false not the test result https://github.com/dotnet/runtime/issues/4207
+				return (left is null) ? true : false;
+			}
+
+			// Try fast reference equality and opposite null check prior to calling the slower virtual Equals
+			if ((object?)left == (object)right)
+			{
+				return true;
+			}
+
+			return (left is null) ? false : left.Equals(right);
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether the visibility of this field is described by FieldAttributes.Family; that is, the field is visible only within its class and derived classes.
-		/// </summary>
-		public bool IsFamily
-		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Family; }
-		}
+		public static bool operator !=(FieldInfo? left, FieldInfo? right) => !(left == right);
 
-		/// <summary>
-		/// Gets a value indicating whether the visibility of this field is described by FieldAttributes.FamANDAssem; that is, the field can be accessed from derived classes, but only if they are in the same assembly.
-		/// </summary>
-		public bool IsFamilyAndAssembly
-		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.FamANDAssem; }
-		}
+		public abstract object? GetValue(object? obj);
 
-		/// <summary>
-		/// Gets a value indicating whether the potential visibility of this field is described by FieldAttributes.FamORAssem; that is, the field can be accessed by derived classes wherever they are, and by classes in the same assembly.
-		/// </summary>
-		public bool IsFamilyOrAssembly
-		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.FamORAssem; }
-		}
+		[DebuggerHidden]
+		[DebuggerStepThrough]
+		public void SetValue(object? obj, object? value) => SetValue(obj, value, BindingFlags.Default, Type.DefaultBinder, null);
 
-		/// <summary>
-		/// Gets a value indicating whether the field can only be set in the body of the constructor.
-		/// </summary>
-		public bool IsInitOnly
-		{
-			get { return (Attributes & FieldAttributes.InitOnly) == FieldAttributes.InitOnly; }
-		}
+		public abstract void SetValue(object? obj, object? value, BindingFlags invokeAttr, Binder? binder, CultureInfo? culture);
 
-		/// <summary>
-		/// Gets a value indicating whether the value is written at compile time and cannot be changed.
-		/// </summary>
-		public bool IsLiteral
-		{
-			get { return (Attributes & FieldAttributes.Literal) == FieldAttributes.Literal; }
-		}
+		[CLSCompliant(false)]
+		public virtual void SetValueDirect(TypedReference obj, object value)
+		{ throw new NotSupportedException(SR.NotSupported_AbstractNonCLS); }
 
-		/// <summary>
-		/// Gets a value indicating whether the field is private.
-		/// </summary>
-		public bool IsPrivate
-		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Private; }
-		}
+		[CLSCompliant(false)]
+		public virtual object? GetValueDirect(TypedReference obj)
+		{ throw new NotSupportedException(SR.NotSupported_AbstractNonCLS); }
 
-		/// <summary>
-		/// Gets a value indicating whether the field is public.
-		/// </summary>
-		public bool IsPublic
-		{
-			get { return (Attributes & FieldAttributes.FieldAccessMask) == FieldAttributes.Public; }
-		}
+		public virtual object? GetRawConstantValue()
+		{ throw new NotSupportedException(SR.NotSupported_AbstractNonCLS); }
 
-		/// <summary>
-		/// Gets a value indicating whether the corresponding SpecialName attribute is set in the FieldAttributes enumerator.
-		/// </summary>
-		public bool IsSpecialName
-		{
-			get { return (Attributes & FieldAttributes.SpecialName) == FieldAttributes.SpecialName; }
-		}
+		public virtual Type[] GetOptionalCustomModifiers()
+		{ throw NotImplemented.ByDesign; }
 
-		/// <summary>
-		/// Gets a value indicating whether the field is static.
-		/// </summary>
-		public bool IsStatic
-		{
-			get { return (Attributes & FieldAttributes.Static) == FieldAttributes.Static; }
-		}
-
-		/// <summary>
-		/// Returns a value that indicates whether this instance is equal to a specified object.
-		/// </summary>
-		/// <param name="obj">An object to compare with this instance, or null.</param>
-		/// <returns>True if obj equals the type and value of this instance; otherwise, False.</returns>
-		public override bool Equals(object obj)
-		{
-			return this == obj;
-		}
-
-		/// <summary>
-		/// Gets a FieldInfo for the field represented by the specified handle.
-		/// </summary>
-		/// <param name="handle">A RuntimeFieldHandle structure that contains the handle to the internal metadata representation of a field.</param>
-		/// <returns>A FieldInfo object representing the field specified by handle.</returns>
-		public static FieldInfo GetFieldFromHandle(RuntimeFieldHandle handle)
-		{
-			// TODO
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Gets a FieldInfo for the field represented by the specified handle, for the specified generic type.
-		/// </summary>
-		/// <param name="handle">A RuntimeFieldHandle structure that contains the handle to the internal metadata representation of a field.</param>
-		/// <param name="declaringType">A RuntimeTypeHandle structure that contains the handle to the generic type that defines the field.</param>
-		/// <returns>A FieldInfo object representing the field specified by handle, in the generic type specified by declaringType.</returns>
-		public static FieldInfo GetFieldFromHandle(RuntimeFieldHandle handle, RuntimeTypeHandle declaringType)
-		{
-			// TODO
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Returns the hash code for this instance.
-		/// </summary>
-		/// <returns>A 32-bit signed integer hash code.</returns>
-		public override int GetHashCode()
-		{
-			return base.GetHashCode();
-		}
-
-		/// <summary>
-		/// When overridden in a derived class, returns the value of a field supported by a given object.
-		/// </summary>
-		/// <param name="obj">The object whose field value will be returned.</param>
-		/// <returns>An object containing the value of the field reflected by this instance.</returns>
-		public abstract object GetValue(object obj);
-
-		public void SetValue(object obj, object value)
-		{
-			// TODO
-			throw new NotImplementedException();
-		}
+		public virtual Type[] GetRequiredCustomModifiers()
+		{ throw NotImplemented.ByDesign; }
 	}
 }

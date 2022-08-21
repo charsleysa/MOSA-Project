@@ -24,6 +24,8 @@ namespace System.Reflection
 			set => _byRef[index] = value;
 		}
 
+#if CORECLR
 		internal bool[] IsByRefArray => _byRef;
+#endif
 	}
 }

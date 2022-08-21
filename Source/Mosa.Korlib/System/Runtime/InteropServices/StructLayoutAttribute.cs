@@ -1,27 +1,28 @@
 // Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace System.Runtime.InteropServices
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false)]
 	public sealed class StructLayoutAttribute : Attribute
 	{
-		private readonly LayoutKind lkind;
-		public int Pack = 8;
-		public int Size = 0;
+		public StructLayoutAttribute(LayoutKind layoutKind)
+		{
+			Value = layoutKind;
+		}
 
 		public StructLayoutAttribute(short layoutKind)
 		{
-			lkind = (LayoutKind)layoutKind;
+			Value = (LayoutKind)layoutKind;
 		}
 
-		public StructLayoutAttribute(LayoutKind layoutKind)
-		{
-			lkind = layoutKind;
-		}
+		public LayoutKind Value { get; }
 
-		public LayoutKind Value
-		{
-			get { return lkind; }
-		}
+		public int Pack;
+		public int Size;
+		public CharSet CharSet;
 	}
 }

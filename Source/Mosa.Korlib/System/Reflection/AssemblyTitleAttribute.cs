@@ -1,27 +1,19 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace System.Reflection
 {
 	[AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
 	public sealed class AssemblyTitleAttribute : Attribute
 	{
-		private readonly string title;
-
-		/// <summary>
-		/// The assembly title.
-		/// </summary>
-		public string Title
-		{
-			get { return title; }
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the AssemblyTitleAttribute class.
-		/// </summary>
-		/// <param name="title">The assembly title.</param>
 		public AssemblyTitleAttribute(string title)
 		{
-			this.title = title;
+			Title = title;
 		}
+
+		public string Title { get; }
 	}
 }

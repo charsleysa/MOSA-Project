@@ -87,9 +87,9 @@ namespace System
 
 		private void SetMessageField()
 		{
-			if (message == null)
+			if (_message == null)
 			{
-				message = SR.Arg_ArgumentException;
+				_message = SR.Arg_ArgumentException;
 			}
 		}
 

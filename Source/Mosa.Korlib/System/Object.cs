@@ -1,123 +1,88 @@
 ﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
 
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 namespace System
 {
-	/// <summary>
-	/// Supports all classes in the .NET Framework class hierarchy and provides low-level
-	/// services to derived classes. This is the ultimate base class of all classes
-	/// in the .NET Framework; it is the root of the type hierarchy.
-	/// </summary>
+	// The Object is the root class for all object in the CLR System. Object
+	// is the super class for all other CLR objects and provide a set of methods and low level
+	// services to subclasses.  These services include object synchronization and support for clone
+	// operations.
+	//
 	[Serializable]
-	public class Object
+	[ClassInterface(ClassInterfaceType.AutoDispatch)]
+	[ComVisible(true)]
+	public partial class Object
 	{
-		/// <summary>
-		/// Initializes a new instance of the System.Object class.
-		/// </summary>
+		// Creates a new instance of an Object.
 		[NonVersionable]
 		public Object()
 		{
 		}
 
-		/// <summary>
-		/// Object destructor.
-		/// </summary>
+		// Allow an object to free resources before the object is reclaimed by the GC.
+		// This method's virtual slot number is hardcoded in runtimes. Do not add any virtual methods ahead of this.
 		[NonVersionable]
+#pragma warning disable CA1821 // Remove empty Finalizers
 		~Object()
 		{
 		}
 
-		/// <summary>
-		/// Determines whether the specified <see cref="Object"/> is equal to the current <see cref="Object"/>.
-		/// </summary>
-		/// <param name="obj">
-		/// The <see cref="Object"/> to compare with the current <see cref="Object"/>.
-		/// </param>
-		/// <returns>
-		/// true if the specified <see cref="Object"/> is equal to the current <see cref="Object"/>;
-		/// otherwise, false.
-		/// </returns>
-		public virtual bool Equals(object obj)
+#pragma warning restore CA1821
+
+		// Returns a String which represents the object instance.  The default
+		// for an object is to return the fully qualified name of the class.
+		public virtual string? ToString()
+		{
+			return GetType().ToString();
+		}
+
+		// Returns a boolean indicating if the passed in object obj is
+		// Equal to this.  Equality is defined as object equality for reference
+		// types and bitwise equality for value types using a loader trick to
+		// replace Equals with EqualsValue for value types).
+		public virtual bool Equals(object? obj)
 		{
 			return RuntimeHelpers.Equals(this, obj);
 		}
 
-		/// <summary>
-		/// Determines whether the specified <see cref="Object"/> instances are considered equal.
-		/// </summary>
-		/// <param name="left">The first <see cref="Object"/> to compare.</param>
-		/// <param name="right">The second <see cref="Object"/> to compare.</param>
-		/// <returns>
-		/// true if left is the same instance as right or if both are null references
-		/// or if left.Equals(right) returns true; otherwise, false.
-		/// </returns>
-		public static bool Equals(object left, object right)
+		public static bool Equals(object? objA, object? objB)
 		{
-			if (left == right)
+			if (objA == objB)
+			{
 				return true;
-
-			if (left == null || right == null)
+			}
+			if (objA == null || objB == null)
+			{
 				return false;
-
-			return left.Equals(right);
+			}
+			return objA.Equals(objB);
 		}
 
-		/// <summary>
-		/// Serves as a hash function for a particular type.
-		/// </summary>
-		/// <returns>
-		/// A hash code for the current System.Object.
-		/// </returns>
+		[NonVersionable]
+		public static bool ReferenceEquals(object? objA, object? objB)
+		{
+			return objA == objB;
+		}
+
+		// GetHashCode is intended to serve as a hash function for this object.
+		// Based on the contents of the object, the hash function will return a suitable
+		// value with a relatively random distribution over the various inputs.
+		//
+		// The default implementation returns the sync block index for this instance.
+		// Calling it on the same object multiple times will return the same value, so
+		// it will technically meet the needs of a hash function, but it's less than ideal.
+		// Objects (& especially value classes) should override this method.
 		public virtual int GetHashCode()
 		{
 			return RuntimeHelpers.GetHashCode(this);
-		}
-
-		/// <summary>
-		/// Gets the <see cref="Type"/> of the current instance.
-		/// </summary>
-		/// <returns>
-		/// The <see cref="Type"/> instance that represents the exact runtime type of the current
-		/// instance.
-		/// </returns>
-		[MethodImpl(MethodImplOptions.InternalCall)]
-		public extern Type GetType();
-
-		/// <summary>
-		/// Creates a shallow copy of the current <see cref="Object"/>.
-		/// </summary>
-		/// <returns>
-		/// A shallow copy of the current System.Object.
-		/// </returns>
-		[MethodImpl(MethodImplOptions.InternalCall)]
-		protected extern object MemberwiseClone();
-
-		/// <summary>
-		/// Determines whether the specified <see cref="Object"/> instances are the same instance.
-		/// </summary>
-		/// <param name="left">The first <see cref="Object"/> to compare.</param>
-		/// <param name="right">The second <see cref="Object"/> to compare.</param>
-		/// <returns>
-		/// true if left is the same instance as right or if both are null references;
-		/// otherwise, false.
-		/// </returns>
-		[NonVersionable]
-		public static bool ReferenceEquals(object left, object right)
-		{
-			return (left == right);
-		}
-
-		/// <summary>
-		/// Returns a <see cref="String"/> that represents the current <see cref="Object"/>.
-		/// </summary>
-		/// <returns>
-		/// A <see cref="String"/> that represents the current <see cref="Object"/>.
-		/// </returns>
-		public virtual string ToString()
-		{
-			return GetType().ToString();
 		}
 	}
 }

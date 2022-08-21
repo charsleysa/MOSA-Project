@@ -1,131 +1,102 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace System.Reflection
 {
-	/// <summary>
-	/// Obtains information about the attributes of a member and provides access to member metadata.
-	/// </summary>
-	[SerializableAttribute]
 	public abstract class PropertyInfo : MemberInfo
 	{
-		/// <summary>
-		/// Gets the attributes for this property.
-		/// </summary>
-		public abstract PropertyAttributes Attributes { get; }
+		protected PropertyInfo()
+		{ }
 
-		/// <summary>
-		/// Gets a value indicating whether the property can be read.
-		/// </summary>
-		public abstract bool CanRead { get; }
+		public override MemberTypes MemberType => MemberTypes.Property;
 
-		/// <summary>
-		/// Gets a value indicating whether the property can be written to.
-		/// </summary>
-		public abstract bool CanWrite { get; }
-
-		/// <summary>
-		/// Gets the get accessor for this property.
-		/// </summary>
-		public virtual MethodInfo GetMethod
-		{
-			get { return null; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether the property is the special name.
-		/// </summary>
-		public bool IsSpecialName
-		{
-			get { return (Attributes & PropertyAttributes.SpecialName) == PropertyAttributes.SpecialName; }
-		}
-
-		/// <summary>
-		/// Gets the type of this property.
-		/// </summary>
 		public abstract Type PropertyType { get; }
 
-		/// <summary>
-		/// Gets the set accessor for this property.
-		/// </summary>
-		public virtual MethodInfo SetMethod
-		{
-			get { return null; }
-		}
-
-		/// <summary>
-		/// Returns a value that indicates whether this instance is equal to a specified object.
-		/// </summary>
-		/// <param name="obj">An object to compare with this instance, or null.</param>
-		/// <returns>True if obj equals the type and value of this instance; otherwise, False.</returns>
-		public override bool Equals(object obj)
-		{
-			return base.Equals(obj);
-		}
-
-		/// <summary>
-		/// Returns a literal value associated with the property by a compiler.
-		/// </summary>
-		/// <returns>An Object that contains the literal value associated with the property. If the literal value is a class type with an element value of zero, the return value is null.</returns>
-		public virtual object GetConstantValue()
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Returns the hash code for this instance.
-		/// </summary>
-		/// <returns>A 32-bit signed integer hash code.</returns>
-		public override int GetHashCode()
-		{
-			return base.GetHashCode();
-		}
-
-		/// <summary>
-		/// When overridden in a derived class, returns an array of all the index parameters for the property.
-		/// </summary>
-		/// <returns>An array of type ParameterInfo containing the parameters for the indexes. If the property is not indexed, the array has 0 (zero) elements.</returns>
 		public abstract ParameterInfo[] GetIndexParameters();
 
-		/// <summary>
-		/// Returns the property value of a specified object.
-		/// </summary>
-		/// <param name="obj">The object whose property value will be returned.</param>
-		/// <returns>The property value of the specified object.</returns>
-		public object GetValue(object obj)
+		public abstract PropertyAttributes Attributes { get; }
+		public bool IsSpecialName => (Attributes & PropertyAttributes.SpecialName) != 0;
+
+		public abstract bool CanRead { get; }
+		public abstract bool CanWrite { get; }
+
+		public MethodInfo[] GetAccessors() => GetAccessors(nonPublic: false);
+
+		public abstract MethodInfo[] GetAccessors(bool nonPublic);
+
+		public virtual MethodInfo? GetMethod => GetGetMethod(nonPublic: true);
+
+		public MethodInfo? GetGetMethod() => GetGetMethod(nonPublic: false);
+
+		public abstract MethodInfo? GetGetMethod(bool nonPublic);
+
+		public virtual MethodInfo? SetMethod => GetSetMethod(nonPublic: true);
+
+		public MethodInfo? GetSetMethod() => GetSetMethod(nonPublic: false);
+
+		public abstract MethodInfo? GetSetMethod(bool nonPublic);
+
+		public virtual Type[] GetOptionalCustomModifiers() => Type.EmptyTypes;
+
+		public virtual Type[] GetRequiredCustomModifiers() => Type.EmptyTypes;
+
+		[DebuggerHidden]
+		[DebuggerStepThrough]
+		public object? GetValue(object? obj) => GetValue(obj, index: null);
+
+		[DebuggerHidden]
+		[DebuggerStepThrough]
+		public virtual object? GetValue(object? obj, object?[]? index) => GetValue(obj, BindingFlags.Default, binder: null, index: index, culture: null);
+
+		public abstract object? GetValue(object? obj, BindingFlags invokeAttr, Binder? binder, object?[]? index, CultureInfo? culture);
+
+		public virtual object? GetConstantValue()
+		{ throw NotImplemented.ByDesign; }
+
+		public virtual object? GetRawConstantValue()
+		{ throw NotImplemented.ByDesign; }
+
+		[DebuggerHidden]
+		[DebuggerStepThrough]
+		public void SetValue(object? obj, object? value) => SetValue(obj, value, index: null);
+
+		[DebuggerHidden]
+		[DebuggerStepThrough]
+		public virtual void SetValue(object? obj, object? value, object?[]? index) => SetValue(obj, value, BindingFlags.Default, binder: null, index: index, culture: null);
+
+		public abstract void SetValue(object? obj, object? value, BindingFlags invokeAttr, Binder? binder, object?[]? index, CultureInfo? culture);
+
+		public override bool Equals(object? obj) => base.Equals(obj);
+
+		public override int GetHashCode() => base.GetHashCode();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool operator ==(PropertyInfo? left, PropertyInfo? right)
 		{
-			return GetValue(obj, null);
+			// Test "right" first to allow branch elimination when inlined for null checks (== null)
+			// so it can become a simple test
+			if (right is null)
+			{
+				// return true/false not the test result https://github.com/dotnet/runtime/issues/4207
+				return (left is null) ? true : false;
+			}
+
+			// Try fast reference equality and opposite null check prior to calling the slower virtual Equals
+			if ((object?)left == (object)right)
+			{
+				return true;
+			}
+
+			return (left is null) ? false : left.Equals(right);
 		}
 
-		/// <summary>
-		/// Returns the property value of a specified object with optional index values for indexed properties.
-		/// </summary>
-		/// <param name="obj">The object whose property value will be returned.</param>
-		/// <param name="index">Optional index values for indexed properties. This value should be null for non-indexed properties.</param>
-		/// <returns>The property value of the specified object.</returns>
-		public virtual object GetValue(object obj, object[] index)
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Sets the property value of a specified object.
-		/// </summary>
-		/// <param name="obj">The object whose property value will be set.</param>
-		/// <param name="value">The new property value.</param>
-		public void SetValue(object obj, object value)
-		{
-			SetValue(obj, value, null);
-		}
-
-		/// <summary>
-		/// Sets the property value of a specified object with optional index values for index properties.
-		/// </summary>
-		/// <param name="obj">The object whose property value will be set.</param>
-		/// <param name="value">The new property value.</param>
-		/// <param name="index">Optional index values for indexed properties. This value should be null for non-indexed properties.</param>
-		public virtual void SetValue(object obj, object value, object[] index)
-		{
-			throw new NotImplementedException();
-		}
+		public static bool operator !=(PropertyInfo? left, PropertyInfo? right) => !(left == right);
 	}
 }

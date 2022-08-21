@@ -49,11 +49,11 @@ namespace System
 
 		private void SetMessageField()
 		{
-			if (message == null)
+			if (_message == null)
 			{
 				if (_className == null && _resourceId == 0)
 				{
-					message = SR.Arg_TypeLoadException;
+					_message = SR.Arg_TypeLoadException;
 				}
 				else
 				{
@@ -61,7 +61,7 @@ namespace System
 					_assemblyName ??= SR.IO_UnknownFileName;
 					_className ??= SR.IO_UnknownFileName;
 
-					message = SR.Arg_TypeLoadException;
+					_message = SR.Arg_TypeLoadException;
 				}
 			}
 		}
@@ -71,7 +71,7 @@ namespace System
 			get
 			{
 				SetMessageField();
-				return message!;
+				return _message!;
 			}
 		}
 

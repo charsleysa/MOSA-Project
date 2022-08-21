@@ -1,137 +1,59 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 namespace System.Reflection
 {
-	/// <summary>
-	/// Method Attributes.
-	/// </summary>
-	[Serializable]
 	[Flags]
-	public enum MethodAttributes : uint
+	public enum MethodAttributes
 	{
-		/// <summary>
-		/// Member access mask - Use this mask to retrieve accessibility information.
-		/// </summary>
+		// NOTE: This Enum matchs the CorMethodAttr defined in CorHdr.h
+
+		// member access mask - Use this mask to retrieve accessibility information.
 		MemberAccessMask = 0x0007,
 
-		/// <summary>
-		/// Member not referenceable.
-		/// </summary>
-		PrivateScope = 0x0000,
+		PrivateScope = 0x0000,     // Member not referenceable.
+		Private = 0x0001,     // Accessible only by the parent type.
+		FamANDAssem = 0x0002,     // Accessible by sub-types only in this Assembly.
+		Assembly = 0x0003,     // Accessibly by anyone in the Assembly.
+		Family = 0x0004,     // Accessible only by type and sub-types.
+		FamORAssem = 0x0005,     // Accessibly by sub-types anywhere, plus anyone in assembly.
+		Public = 0x0006,     // Accessibly by anyone who has visibility to this scope.
 
-		/// <summary>
-		/// Member not referenceable.
-		/// </summary>
-		CompilerControlled = PrivateScope,
+		// end member access mask
 
-		/// <summary>
-		/// Accessible only by the parent type.
-		/// </summary>
-		Private = 0x0001,
+		// method contract attributes.
+		Static = 0x0010,     // Defined on type, else per instance.
 
-		/// <summary>
-		/// Accessible by sub-types only in this Assembly.
-		/// </summary>
-		FamANDAssem = 0x0002,
-
-		/// <summary>
-		/// Accessibly by anyone in the Assembly.
-		/// </summary>
-		Assembly = 0x0003,
-
-		/// <summary>
-		/// Accessible only by type and sub-types.
-		/// </summary>
-		Family = 0x0004,
-
-		/// <summary>
-		/// Accessibly by sub-types anywhere, plus anyone in assembly.
-		/// </summary>
-		FamORAssem = 0x0005,
-
-		/// <summary>
-		/// Accessibly by anyone who has visibility to this scope.
-		/// </summary>
-		Public = 0x0006,
-
-		/// <summary>
-		/// Defined on type, else per instance.
-		/// </summary>
-		Static = 0x0010,
-
-		/// <summary>
-		/// Method may not be overridden.
-		/// </summary>
-		Final = 0x0020,
-
-		/// <summary>
-		/// Method virtual.
-		/// </summary>
-		Virtual = 0x0040,
-
-		/// <summary>
-		/// Method hides by name+sig, else just by name.
-		/// </summary>
-		HideBySig = 0x0080,
-
-		/// <summary>
-		/// vtable layout mask - Use this mask to retrieve vtable attributes.
-		/// </summary>
-		VtableLayoutMask = 0x0100,
-
-		/// <summary>
-		/// The default.
-		/// </summary>
-		ReuseSlot = 0x0000,
-
-		/// <summary>
-		/// Method always gets a new slot in the vtable.
-		/// </summary>
-		NewSlot = 0x0100,
-
-		/// <summary>
-		/// Overridability is the same as the visibility.
-		/// </summary>
+		Final = 0x0020,     // Method may not be overridden.
+		Virtual = 0x0040,     // Method virtual.
+		HideBySig = 0x0080,     // Method hides by name+sig, else just by name.
 		CheckAccessOnOverride = 0x0200,
 
-		/// <summary>
-		/// Method does not provide an implementation.
-		/// </summary>
-		Abstract = 0x0400,
+		// vtable layout mask - Use this mask to retrieve vtable attributes.
+		VtableLayoutMask = 0x0100,
 
-		/// <summary>
-		/// Method is special.  Name describes how.
-		/// </summary>
-		SpecialName = 0x0800,
+		ReuseSlot = 0x0000,     // The default.
+		NewSlot = 0x0100,     // Method always gets a new slot in the vtable.
 
-		/// <summary>
-		/// Implementation is forwarded through pinvoke.
-		/// </summary>
-		PinvokeImpl = 0x2000,
+		// end vtable layout mask
 
-		/// <summary>
-		/// Implementation is forwarded through pinvoke.
-		/// </summary>
-		PInvokeImpl = PinvokeImpl,
+		// method implementation attributes.
+		Abstract = 0x0400,     // Method does not provide an implementation.
 
-		/// <summary>
-		/// Managed method exported via thunk to unmanaged code.
-		/// </summary>
-		UnmanagedExport = 0x0008,
+		SpecialName = 0x0800,     // Method is special.  Name describes how.
 
-		/// <summary>
-		/// Runtime should check name encoding.
-		/// </summary>
-		RTSpecialName = 0x1000,
+		// interop attributes
+		PinvokeImpl = 0x2000,     // Implementation is forwarded through pinvoke.
 
-		/// <summary>
-		/// Method has security associate with it.
-		/// </summary>
-		HasSecurity = 0x4000,
+		UnmanagedExport = 0x0008,     // Managed method exported via thunk to unmanaged code.
+		RTSpecialName = 0x1000,     // Runtime should check name encoding.
 
-		/// <summary>
-		/// Method calls another method containing security code.
-		/// </summary>
-		RequireSecObject = 0x8000,
+		HasSecurity = 0x4000,     // Method has security associate with it.
+		RequireSecObject = 0x8000,     // Method calls another method containing security code.
+
+		ReservedMask = 0xd000,
 	}
 }
