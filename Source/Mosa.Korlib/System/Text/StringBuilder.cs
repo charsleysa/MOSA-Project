@@ -590,8 +590,7 @@ namespace System.Text
 			/// Implement IEnumerable.GetEnumerator() to return  'this' as the IEnumerator
 			/// </summary>
 			[ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)] // Only here to make foreach work
-			public ChunkEnumerator GetEnumerator()
-			{ return this; }
+			public ChunkEnumerator GetEnumerator() { return this; }
 
 			/// <summary>
 			/// Implements the IEnumerator pattern.
@@ -1737,7 +1736,7 @@ namespace System.Text
 
 				ReadOnlySpan<char> itemFormatSpan = default; // used if itemFormat is null
 
-				// Is current character a colon? which indicates start of formatting parameter.
+															 // Is current character a colon? which indicates start of formatting parameter.
 				if (ch == ':')
 				{
 					pos++;

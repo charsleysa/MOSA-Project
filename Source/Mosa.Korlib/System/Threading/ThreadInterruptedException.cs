@@ -1,0 +1,45 @@
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Runtime.Serialization;
+
+namespace System.Threading
+{
+	/// <summary>
+	/// An exception class to indicate that the thread was interrupted from a waiting state.
+	/// </summary>
+	[Serializable]
+	public class ThreadInterruptedException : SystemException
+	{
+		public ThreadInterruptedException()
+			: base(
+#if CORECLR
+			GetMessageFromNativeResources(ExceptionMessageKind.ThreadInterrupted)
+#else
+            SR.Threading_ThreadInterrupted
+#endif
+			)
+		{
+			HResult = HResults.COR_E_THREADINTERRUPTED;
+		}
+
+		public ThreadInterruptedException(string? message)
+			: base(message)
+		{
+			HResult = HResults.COR_E_THREADINTERRUPTED;
+		}
+
+		public ThreadInterruptedException(string? message, Exception? innerException)
+			: base(message, innerException)
+		{
+			HResult = HResults.COR_E_THREADINTERRUPTED;
+		}
+
+		protected ThreadInterruptedException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
+		{ }
+	}
+}

@@ -21,12 +21,7 @@ namespace System.Text
 	/// assuming that the underlying <see cref="Rune"/> instance is well-formed.
 	/// </remarks>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
-	public readonly struct Rune : IComparable, IComparable<Rune>, IEquatable<Rune>
-#if SYSTEM_PRIVATE_CORELIB
-#pragma warning disable SA1001 // Commas should be spaced correctly
-		, ISpanFormattable
-#pragma warning restore SA1001
-#endif
+	public readonly struct Rune : IComparable, IComparable<Rune>, IEquatable<Rune>, ISpanFormattable
 	{
 		internal const int MaxUtf16CharsPerRune = 2; // supplementary plane code points are encoded as 2 UTF-16 code units
 		internal const int MaxUtf8BytesPerRune = 4; // supplementary plane code points are encoded as 4 UTF-8 code units
@@ -858,7 +853,6 @@ namespace System.Text
 		/// </summary>
 		public override string ToString()
 		{
-#if SYSTEM_PRIVATE_CORELIB
 			if (IsBmp)
 			{
 				return string.CreateFromChar((char)_value);
@@ -868,28 +862,12 @@ namespace System.Text
 				UnicodeUtility.GetUtf16SurrogatesFromSupplementaryPlaneScalar(_value, out char high, out char low);
 				return string.CreateFromChar(high, low);
 			}
-#else
-            if (IsBmp)
-            {
-                return ((char)_value).ToString();
-            }
-            else
-            {
-                Span<char> buffer = stackalloc char[MaxUtf16CharsPerRune];
-                UnicodeUtility.GetUtf16SurrogatesFromSupplementaryPlaneScalar(_value, out buffer[0], out buffer[1]);
-                return buffer.ToString();
-            }
-#endif
 		}
-
-#if SYSTEM_PRIVATE_CORELIB
 
 		bool ISpanFormattable.TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
 			TryEncodeToUtf16(destination, out charsWritten);
 
 		string IFormattable.ToString(string? format, IFormatProvider? formatProvider) => ToString();
-
-#endif
 
 		/// <summary>
 		/// Attempts to create a <see cref="Rune"/> from the provided input value.
@@ -1139,15 +1117,7 @@ namespace System.Text
 			else
 			{
 				// not an ASCII char; fall back to globalization table
-#if SYSTEM_PRIVATE_CORELIB
 				return CharUnicodeInfo.GetNumericValue(value.Value);
-#else
-                if (value.IsBmp)
-                {
-                    return CharUnicodeInfo.GetNumericValue((char)value._value);
-                }
-                return CharUnicodeInfo.GetNumericValue(value.ToString(), 0);
-#endif
 			}
 		}
 
@@ -1166,15 +1136,7 @@ namespace System.Text
 		private static UnicodeCategory GetUnicodeCategoryNonAscii(Rune value)
 		{
 			Debug.Assert(!value.IsAscii, "Shouldn't use this non-optimized code path for ASCII characters.");
-#if (!NETSTANDARD2_0 && !NETFRAMEWORK)
 			return CharUnicodeInfo.GetUnicodeCategory(value.Value);
-#else
-            if (value.IsBmp)
-            {
-                return CharUnicodeInfo.GetUnicodeCategory((char)value._value);
-            }
-            return CharUnicodeInfo.GetUnicodeCategory(value.ToString(), 0);
-#endif
 		}
 
 		// Returns true iff this Unicode category represents a letter
@@ -1366,7 +1328,6 @@ namespace System.Text
 			}
 
 			// Non-ASCII data requires going through the case folding tables.
-
 			return ChangeCaseCultureAware(value, TextInfo.Invariant, toUpper: false);
 		}
 
@@ -1407,7 +1368,6 @@ namespace System.Text
 			}
 
 			// Non-ASCII data requires going through the case folding tables.
-
 			return ChangeCaseCultureAware(value, TextInfo.Invariant, toUpper: true);
 		}
 

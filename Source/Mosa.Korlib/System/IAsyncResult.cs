@@ -1,30 +1,30 @@
-﻿// Copyright (c) MOSA Project. Licensed under the New BSD License.
+// Copyright (c) MOSA Project. Licensed under the New BSD License.
+#nullable enable
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+/*============================================================
+**
+** Interface: IAsyncResult
+**
+** Purpose: Interface to encapsulate the results of an async
+**          operation
+**
+===========================================================*/
+
+using System.Threading;
 
 namespace System
 {
-	/// <summary>
-	///
-	/// </summary>
 	public interface IAsyncResult
 	{
-		object AsyncState
-		{
-			get;
-		}
+		bool IsCompleted { get; }
 
-		WaitHandle AsyncWaitHandle
-		{
-			get;
-		}
+		WaitHandle AsyncWaitHandle { get; }
 
-		bool CompletedSynchronously
-		{
-			get;
-		}
+		object? AsyncState { get; }
 
-		bool IsCompleted
-		{
-			get;
-		}
+		bool CompletedSynchronously { get; }
 	}
 }
